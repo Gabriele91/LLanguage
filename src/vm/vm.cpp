@@ -277,6 +277,7 @@ namespace l_language
         #define top        thread.top
         #define pop        thread.pop
         #define global     thread.global
+        #define register3  thread.register3
         //for all commands
         for (pc = 0; pc < commands.size(); ++pc)
         {
@@ -386,12 +387,12 @@ namespace l_language
                 ////////////////////////////////////////////////////////////
                 case L_NEW_ARRAY:
                 {
-                    l_variable  l_array(l_gc::s_global_gc.new_obj< l_vector >());
+                    register3(0) = l_vector::gc_new(get_gc());
                     //init ?
                     if( cmp.m_arg > 0 )
                     {
                         //get object
-                        l_obj* this_obj = (l_obj*)l_array.m_value.m_pobj;
+                        l_obj* this_obj = (l_obj*)register3(0).m_value.m_pobj;
                         //types
                         l_vector* vector = dynamic_cast< l_vector* > ( this_obj );
                         //put stack into vector
@@ -400,7 +401,8 @@ namespace l_language
                             vector->operator[](i) = pop();
                         }
                     }
-                    push( l_array );
+                    //push array (n.b. gc run...)
+                    push( register3(0) );
                 }
                 break;
                 
@@ -473,7 +475,7 @@ namespace l_language
                 case L_IT:
                 {
                     //get index
-                    l_variable r_a = top();
+                    l_variable& r_a = top();
                     //..
                     //try
                     if ( r_a.m_type == l_variable::type::OBJECT )

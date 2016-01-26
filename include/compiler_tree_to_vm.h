@@ -359,7 +359,7 @@ namespace l_language
         {
             //name into table
             add_variable_into_table_and_id(m_main,cfun_name,-(int)(m_vm->m_globals.size()+1));
-            m_vm->m_globals.push_back(l_variable::stack(function));
+            m_vm->m_globals.push_back(l_variable(function));
             
         }
         

@@ -37,71 +37,61 @@ namespace l_language
         {
             int   	      m_i;
             float  	 	  m_f;
-            const l_obj*  m_pobj;
+            l_obj*        m_pobj;
             std::string*  m_pstr;
             l_cfunction   m_pcfun;
         };
         
         //attributes
-        l_ref  m_ref;
         type   m_type{ INT };
         value  m_value{ 0 };
         
         l_variable() : l_variable(0) {}
         
         
-        l_variable(bool is_in_stack)
-        :m_ref(*this, is_in_stack)
+        l_variable(bool value)
         {
-            m_type = INT;
-            m_value.m_i = 0;
+            m_type      = INT;
+            m_value.m_i = value != 0;
         }
         
         l_variable(int i)
-        :m_ref(*this, true)
         {
-            m_type = INT;
+            m_type      = INT;
             m_value.m_i = i;
         }
         
         l_variable(float f)
-        :m_ref(*this, true)
         {
-            m_type = FLOAT;
+            m_type      = FLOAT;
             m_value.m_f = f;
         }
         
         l_variable(const char* cstr)
-        :m_ref(*this, true)
         {
-            m_type = STRING;
+            m_type         = STRING;
             m_value.m_pstr = new std::string(cstr);
         }
         
         l_variable(const std::string& str)
-        :m_ref(*this, true)
         {
-            m_type = STRING;
+            m_type         = STRING;
             m_value.m_pstr = new std::string(str);
         }
         
-        l_variable(const l_obj* obj,bool is_in_stack=true)
-        :m_ref(*this, is_in_stack)
+        l_variable(l_obj* obj)
         {
-            m_type = OBJECT;
-            obj->inc_ref_count();
+            m_type         = OBJECT;
             m_value.m_pobj = obj;
         }
         
-        l_variable(const l_cfunction cfun,bool is_in_stack=true)
-        :m_ref(*this, is_in_stack)
+        l_variable(const l_cfunction cfun)
         {
-            m_type = CFUNCTION;
+            m_type          = CFUNCTION;
             m_value.m_pcfun = cfun;
         }
         
-        l_variable(const l_variable& value, bool is_in_stack = true)
-        :m_ref(*this, is_in_stack && m_type == OBJECT)
+        l_variable(const l_variable& value)
         {
             m_type = value.m_type;
             
@@ -112,7 +102,6 @@ namespace l_language
             else if (m_type == OBJECT)
             {
                 m_value = value.m_value;
-                m_value.m_pobj->inc_ref_count();
             }
             else
             {
@@ -120,71 +109,10 @@ namespace l_language
             }
         }
         
-        static l_variable stack(bool value)
-        {
-            return (value ? 1 : 0);
-        }
-        
-        static l_variable stack(int value)
-        {
-            return value;
-        }
-        
-        static l_variable stack(float value)
-        {
-            return value;
-        }
-        
-        static l_variable stack(const std::string& value)
-        {
-            return value;
-        }
-        
-        static l_variable stack(const l_obj* value)
-        {
-            return value;
-        }
-        
-        static l_variable stack(const l_cfunction value)
-        {
-            return value;
-        }
-        
-        static l_variable* heap(bool value)
-        {
-            return new l_variable((value ? 1 : 0),false);
-        }
-        
-        static l_variable* heap(int value)
-        {
-            return new l_variable(value,false);
-        }
-        
-        static l_variable* heap(float value)
-        {
-            return new l_variable(value,false);
-        }
-        
-        static l_variable* heap(const std::string& value)
-        {
-            return new l_variable(value,false);
-        }
-        
-        static l_variable* heap(const l_obj* value)
-        {
-            return new l_variable(value,false);
-        }
-        
-        static l_variable* heap(const l_cfunction value)
-        {
-            return new l_variable(value,false);
-        }
-        
         l_variable& operator = (const l_variable& value)
         {
             //delete event..
-                 if (m_type == STRING) delete m_value.m_pstr;
-            else if (m_type == OBJECT) m_value.m_pobj->dec_ref_count();
+            if (m_type == STRING) delete m_value.m_pstr;
             //copy type
             m_type = value.m_type;
             //copy value
@@ -195,7 +123,6 @@ namespace l_language
             else if (m_type == OBJECT)
             {
                 m_value = value.m_value;
-                m_value.m_pobj->inc_ref_count();
             }
             else
             {
@@ -206,8 +133,10 @@ namespace l_language
         
         virtual ~l_variable()
         {
-            if (m_type == STRING) delete m_value.m_pstr;
-            else if (m_type == OBJECT) m_value.m_pobj->dec_ref_count();
+            if (m_type == STRING)
+            {
+                delete m_value.m_pstr;
+            }
         }
         
         bool is_false()
@@ -373,22 +302,22 @@ namespace l_language
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return stack(m_value.m_i == var.m_value.m_i);
+                return l_variable(m_value.m_i == var.m_value.m_i);
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return stack(m_value.m_f == var.m_value.m_i);
+                return l_variable(m_value.m_f == var.m_value.m_i);
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_i == var.m_value.m_f);
+                return l_variable(m_value.m_i == var.m_value.m_f);
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_f == var.m_value.m_f);
+                return l_variable(m_value.m_f == var.m_value.m_f);
             }
             
             assert(0);
@@ -399,22 +328,22 @@ namespace l_language
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return stack(m_value.m_i != var.m_value.m_i);
+                return l_variable(m_value.m_i != var.m_value.m_i);
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return stack(m_value.m_f != var.m_value.m_i);
+                return l_variable(m_value.m_f != var.m_value.m_i);
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_i != var.m_value.m_f);
+                return l_variable(m_value.m_i != var.m_value.m_f);
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_f != var.m_value.m_f);
+                return l_variable(m_value.m_f != var.m_value.m_f);
             }
             
             assert(0);
@@ -425,156 +354,156 @@ namespace l_language
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return stack(m_value.m_i > var.m_value.m_i);
+                return l_variable(m_value.m_i > var.m_value.m_i);
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return stack(m_value.m_f > var.m_value.m_i);
+                return l_variable(m_value.m_f > var.m_value.m_i);
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_i > var.m_value.m_f);
+                return l_variable(m_value.m_i > var.m_value.m_f);
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_f > var.m_value.m_f);
+                return l_variable(m_value.m_f > var.m_value.m_f);
             }
             
             assert(0);
-            return stack(false);
+            return l_variable(false);
         }
         
         l_variable operator >= (l_variable var)
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return stack(m_value.m_i >= var.m_value.m_i);
+                return l_variable(m_value.m_i >= var.m_value.m_i);
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return stack(m_value.m_f >= var.m_value.m_i);
+                return l_variable(m_value.m_f >= var.m_value.m_i);
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_i >= var.m_value.m_f);
+                return l_variable(m_value.m_i >= var.m_value.m_f);
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_f >= var.m_value.m_f);
+                return l_variable(m_value.m_f >= var.m_value.m_f);
             }
             
             assert(0);
-            return stack(false);
+            return l_variable(false);
         }
         
         l_variable operator < (l_variable var)
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return stack(m_value.m_i < var.m_value.m_i);
+                return l_variable(m_value.m_i < var.m_value.m_i);
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return stack(m_value.m_f < var.m_value.m_i);
+                return l_variable(m_value.m_f < var.m_value.m_i);
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_i < var.m_value.m_f);
+                return l_variable(m_value.m_i < var.m_value.m_f);
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_f < var.m_value.m_f);
+                return l_variable(m_value.m_f < var.m_value.m_f);
             }
             
             assert(0);
-            return stack(false);
+            return l_variable(false);
         }
         
         l_variable operator <= (l_variable var)
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return stack(m_value.m_i <= var.m_value.m_i);
+                return l_variable(m_value.m_i <= var.m_value.m_i);
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return stack(m_value.m_f <= var.m_value.m_i);
+                return l_variable(m_value.m_f <= var.m_value.m_i);
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_i <= var.m_value.m_f);
+                return l_variable(m_value.m_i <= var.m_value.m_f);
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_f <= var.m_value.m_f);
+                return l_variable(m_value.m_f <= var.m_value.m_f);
             }
             
             assert(0);
-            return stack(false);
+            return l_variable(false);
         }
         
         l_variable operator && (l_variable var)
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return stack(m_value.m_i && var.m_value.m_i);
+                return l_variable(m_value.m_i && var.m_value.m_i);
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return stack(m_value.m_f && var.m_value.m_i);
+                return l_variable(m_value.m_f && var.m_value.m_i);
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_i && var.m_value.m_f);
+                return l_variable(m_value.m_i && var.m_value.m_f);
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_f && var.m_value.m_f);
+                return l_variable(m_value.m_f && var.m_value.m_f);
             }
             
             assert(0);
-            return stack(false);
+            return l_variable(false);
         }
         
         l_variable operator || (l_variable var)
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return stack(m_value.m_i || var.m_value.m_i);
+                return l_variable(m_value.m_i || var.m_value.m_i);
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return stack(m_value.m_f || var.m_value.m_i);
+                return l_variable(m_value.m_f || var.m_value.m_i);
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_i || var.m_value.m_f);
+                return l_variable(m_value.m_i || var.m_value.m_f);
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return stack(m_value.m_f || var.m_value.m_f);
+                return l_variable(m_value.m_f || var.m_value.m_f);
             }
             
             assert(0);
-            return stack(false);
+            return l_variable(false);
         }
         
         l_variable operator - (void)
@@ -596,45 +525,38 @@ namespace l_language
         
         l_variable operator ! (void)
         {
-            return stack(is_false());
+            return l_variable(is_false());
         }
         
         //gc methos
         
-        bool is_marked() const
+        bool is_object()
         {
-            return m_value.m_pobj && m_value.m_pobj->is_marked();
+            return m_type == OBJECT;
         }
         
-        void mark() const
+        bool is_marked() const
+        {
+            return m_value.m_pobj->is_marked();
+        }
+        
+        bool is_unmarked() const
+        {
+            return m_value.m_pobj->is_unmarked();
+        }
+        
+        void mark()
         {
             assert(m_value.m_pobj);
             m_value.m_pobj->mark(); 
         }
         
-        void unmark() const
+        void unmark()
         {
             assert(m_value.m_pobj);
             m_value.m_pobj->unmark();
         }
         
-        void mark_childs() const
-        {
-            assert(m_value.m_pobj);
-            return m_value.m_pobj->mark_childs();
-        }
-        
-        void unmark_childs() const
-        {
-            assert(m_value.m_pobj);
-            return m_value.m_pobj->unmark_childs();
-        }
-        
-        bool has_childs() const
-        {
-            assert(m_value.m_pobj);
-            return m_value.m_pobj->has_childs();
-        }
         
     };
 };

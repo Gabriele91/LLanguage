@@ -11,31 +11,17 @@
 
 namespace l_language
 {
-    class l_ref;
+    class l_vm;
+    class l_thread;
     class l_variable;
     class l_gc;
     class l_obj;
-        
-    class l_ref
-    {
-    public:
-        
-        //reference variable
-        l_ref(l_variable& variable,bool is_in_stack);
-        virtual ~l_ref();
-        
-        l_variable& variable() const
-        {
-            return m_variable;
-        }
-        
-    private:
-        
-        l_variable&  m_variable;
-        bool         m_is_in_stack{ false };
-        
-    };
     
+#ifdef DEBUG
+    #define GC_DEBUG(x) x
+#else
+    #define GC_DEBUG(x)
+#endif
     class l_gc
     {
         //type object ref
@@ -44,19 +30,25 @@ namespace l_language
             l_obj* m_obj{ nullptr };
             size_t  m_size{ 0 };
             
-            l_ref_obj(l_obj* obj, size_t  size)
+            GC_DEBUG( size_t m_id { 0 }; )
+            
+            l_ref_obj(l_obj* obj, size_t  size )
             {
                 m_obj  = obj;
                 m_size = size;
+                
+                GC_DEBUG(
+                static size_t gen_id{ 0 };
+                m_id = gen_id++;
+                )
             }
+            
         };
         //type of pool
         using l_pool = std::list< l_ref_obj >;
-        using l_refs = std::list< l_ref* >;
         
     public:
         
-        static         l_gc s_global_gc;
         static const size_t kbyte = 1024;
         static const size_t mbyte = 1024*1024;
         
@@ -64,7 +56,10 @@ namespace l_language
         l_obj* new_obj(A... args)
         {
             //update size
-            if (m_max_size >= m_size_allocs) delete_garbage();
+            if (m_max_size < m_size_allocs)
+            {
+                delete_garbage();
+            }
             //alloc
             l_obj* optr =(l_obj*)new T(args...);
             //put gc ref
@@ -75,31 +70,41 @@ namespace l_language
             return optr;
         }
         
+        //auto execute
         void set_max_alloc_size(size_t max_alloc);
         
         //execute garbage collector
         void delete_garbage();
         
+        //init gc
+        l_gc(l_vm& vm):m_vm(vm){}
+        
+        //get vm
+        l_vm& get_vm()
+        {
+            return m_vm;
+        }
+        const l_vm& get_vm() const
+        {
+            return m_vm;
+        }
+        
+        virtual ~l_gc()
+        {
+            
+        }
         
     protected:
         
+        void push(l_obj* object,size_t size);
         
-        //gc actions
-        void push(l_ref* ref);
+        void  remove(l_pool::iterator it);
         
-        void remove(l_refs::iterator it);
+        void  remove(l_obj* obj);
         
-        void remove(l_ref* ref);
+        void  free(l_obj* obj);
         
-        void push(l_obj* obj,size_t size);
-        
-        void remove(l_pool::iterator it);
-        
-        void remove(l_obj* obj);
-        
-        void free(l_obj* obj);
-        
-        void free(l_pool::iterator it);
+        void  free(l_pool::iterator it);
         
         void mark_pool();
         
@@ -107,8 +112,9 @@ namespace l_language
         
         //pool of the objects
         l_pool m_pool;
-        //list of the refs
-        l_refs m_refs;
+        
+        //vm ptr
+        l_vm& m_vm;
         
         //allocations size
         size_t m_max_size   { kbyte*16 };

@@ -10,6 +10,7 @@
 #include <vector>
 #include <stack>
 #include <variable.h>
+#include <gc.h>
 
 namespace l_language
 {
@@ -136,12 +137,7 @@ namespace l_language
     //context list
     struct l_call_context
     {
-        //call fun id
-        unsigned int m_fun_id { 0 };
-        //upvalue
-        l_list_variables m_up_values;
-        //context
-        l_list_variables m_vars;
+    
         //auto alloc
         void alloc(const l_list_function& list)
         {
@@ -164,6 +160,29 @@ namespace l_language
         {
             return m_vars[i];
         }
+        
+        unsigned int get_fun_id()
+        {
+            return m_fun_id;
+        }
+        
+        size_t get_size_up_values() const
+        {
+            return m_up_values.size();
+        }
+        
+        size_t get_size_vars() const
+        {
+            return m_vars.size();
+        }
+        
+    protected:
+        //call fun id
+        unsigned int m_fun_id { 0 };
+        //upvalue
+        l_list_variables m_up_values;
+        //context
+        l_list_variables m_vars;
     };
     
     //list contexts
@@ -178,6 +197,8 @@ namespace l_language
         unsigned int m_pc { 0 };
         //current index
         long m_top{ -1 };
+        //temp variable
+        l_variable m_register[3];
         //save vm
         l_vm* m_vm;
         //contexts
@@ -194,6 +215,11 @@ namespace l_language
         l_variable& top()
         {
             return m_stack[m_top];
+        }
+        //get a register
+        l_variable& register3(size_t i)
+        {
+            return m_register[i];
         }
         //get top
         l_variable& value(size_t x)
@@ -242,13 +268,31 @@ namespace l_language
     
     class l_vm
     {
+        //gc
+        l_gc m_gc;
+        
     public:
+        //init vm
+        l_vm()
+        :m_gc(*this)
+        {
+        
+        }
         //global modules
         l_list_variables m_globals;
         //thread list
         l_list_threads  m_threads;
         //functions
         l_list_function m_functions;
+        //get gc
+        l_gc& get_gc()
+        {
+            return m_gc;
+        }
+        const l_gc& get_gc() const
+        {
+            return m_gc;
+        }
         //execute
         void execute(unsigned int id_thread);
         void execute(l_thread* this_thread);

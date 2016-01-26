@@ -23,7 +23,7 @@ int l_print(l_language::l_thread* th,int args)
             case l_language::l_variable::CFUNCTION:
             case l_language::l_variable::FUNCTION:
             case l_language::l_variable::OBJECT:
-            default: assert(0); break;
+            default: printf("%p",(void*)var.m_value.m_pstr); break;
         }
     }
     //number of return

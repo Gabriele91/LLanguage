@@ -35,12 +35,10 @@ namespace l_language
         public:
             
             l_pool_object()
-            :m_variable(false)
             {
             }
             
             l_pool_object(const l_variable& variable)
-            :m_variable(false)
             {
                 m_variable = variable;
             }
@@ -71,27 +69,40 @@ namespace l_language
         
         l_pool_object_list m_pool;
         
-        virtual void mark_childs() const
+        //mark event
+        virtual void mark()
         {
-            for (auto& obj : m_pool)
-                if (obj.variable().m_type == l_variable::OBJECT)
+            //..
+            if(is_marked()) return;
+            //mark
+            l_obj::mark();
+            //mark childs
+            for(auto& var : m_pool)
+            {
+                if(var.variable().is_object())
+                if(var.variable().is_unmarked())
                 {
-                    obj.variable().mark();
+                    var.variable().mark();
                 }
+            }
         }
         
-        virtual void unmark_childs() const
+        //unmark event
+        virtual void unmark()
         {
-            for (auto& obj : m_pool)
-                if (obj.variable().m_type == l_variable::OBJECT)
+            //..
+            if(is_unmarked()) return;
+            //mark
+            l_obj::unmark();
+            //mark childs
+            for(auto& var : m_pool)
+            {
+                if(var.variable().is_object())
+                if(var.variable().is_marked())
                 {
-                    obj.variable().unmark();
+                    var.variable().unmark();
                 }
-        }
-        
-        virtual bool has_childs() const
-        {
-            return true;
+            }
         }
         
     public:
@@ -104,17 +115,32 @@ namespace l_language
         l_variable& operator[](size_t i)
         {
             if (size() <= i) m_pool.resize(i+1);
-            return m_pool[i];
+            return m_pool[i].variable();
         }
         
         void push(l_variable variable)
         {
-            m_pool.push_back(variable);
+            m_pool.push_back(l_pool_object(variable));
         }
         
-        static l_variable gc_new()
+        static l_variable gc_new(l_gc* gc)
         {
-            return   l_variable::stack((l_obj*)l_gc::s_global_gc.new_obj< l_vector >());
+            return  gc->new_obj< l_vector >();
+        }
+        
+        static l_variable gc_new(l_gc& gc)
+        {
+            return  gc.new_obj< l_vector >();
+        }
+        
+        static l_variable gc_new(l_vm* vm)
+        {
+            return  gc_new(vm->get_gc());
+        }
+        
+        static l_variable gc_new(l_vm& vm)
+        {
+            return  gc_new(vm.get_gc());
         }
         
         l_variable get_it();
@@ -123,38 +149,27 @@ namespace l_language
     
     class l_vector_it : public l_obj
     {
-        const l_vector*                       m_vector;
-        l_vector::l_pool_object_list_const_it m_iterator;
+        l_vector*                       m_vector;
+        l_vector::l_pool_object_list_it m_iterator;
         
-        virtual void mark_childs() const
+        //mark event
+        virtual void mark()
         {
-            if(m_vector)
-            {
-                m_vector->mark();
-                
-                if(m_vector->m_pool.end() != m_iterator)
-                {
-                    m_iterator->m_variable.mark();
-                }
-            }
+            //..
+            if(is_marked()) return;
+            //mark
+            l_obj::mark();
+            m_vector->mark();
         }
         
-        virtual void unmark_childs() const
+        //unmark event
+        virtual void unmark()
         {
-            if(m_vector)
-            {
-                m_vector->unmark();
-                
-                if(m_vector->m_pool.end() != m_iterator)
-                {
-                    m_iterator->m_variable.unmark();
-                }
-            }
-        }
-        
-        virtual bool has_childs() const
-        {
-            return valid();
+            //..
+            if(is_unmarked()) return;
+            //mark
+            l_obj::unmark();
+            m_vector->unmark();
         }
         
     public:
@@ -164,7 +179,7 @@ namespace l_language
             if( vector.m_type == l_variable::OBJECT )
             {
                 //get vector
-                m_vector = dynamic_cast< const l_vector* >(vector.m_value.m_pobj);
+                m_vector = dynamic_cast< l_vector* >(vector.m_value.m_pobj);
                 //if is a vector
                 if( m_vector )
                 {
@@ -185,17 +200,51 @@ namespace l_language
             m_iterator = m_vector->m_pool.begin();
         }
         
-        l_vector_it(l_vector::l_pool_object_list_const_it c_it)
+        l_vector_it(const l_vector::l_pool_object_list_it& c_it)
         {
             //get iterator
-            m_iterator = ++c_it;
+            m_iterator = c_it;
             assert(0);
         }
         
-        template < typename ... A >
-        static l_variable gc_new(A... args)
+        static l_variable gc_new(l_gc* gc,l_vector* vector)
         {
-            return   l_variable::stack((l_obj*)l_gc::s_global_gc.new_obj< l_vector_it >(args...));
+            return  gc->new_obj< l_vector_it >(vector);
+        }
+        
+        static l_variable gc_new(l_gc& gc,l_vector* vector)
+        {
+            return  gc.new_obj< l_vector_it >(vector);
+        }
+        
+        static l_variable gc_new(l_vm* vm,l_vector* vector)
+        {
+            return  vm->get_gc().new_obj< l_vector_it >(vector);
+        }
+        
+        static l_variable gc_new(l_vm& vm,l_vector* vector)
+        {
+            return  vm.get_gc().new_obj< l_vector_it >(vector);
+        }
+        
+        static l_variable gc_new(l_gc* gc,l_vector::l_pool_object_list_it c_it)
+        {
+            return  gc->new_obj< l_vector_it >(c_it);
+        }
+        
+        static l_variable gc_new(l_gc& gc,l_vector::l_pool_object_list_it c_it)
+        {
+            return  gc.new_obj< l_vector_it >(c_it);
+        }
+        
+        static l_variable gc_new(l_vm* vm,l_vector::l_pool_object_list_it c_it)
+        {
+            return  vm->get_gc().new_obj< l_vector_it >(c_it);
+        }
+        
+        static l_variable gc_new(l_vm& vm,l_vector::l_pool_object_list_it c_it)
+        {
+            return  vm.get_gc().new_obj< l_vector_it >(c_it);
         }
         
         l_variable get() const
@@ -203,10 +252,11 @@ namespace l_language
             return m_iterator->m_variable;
         }
         
-        l_variable get_id() const
+        l_variable get_id()
         {
-            auto difference = std::distance(m_vector->m_pool.begin(),m_iterator);
-            return l_variable::stack((int)difference);
+            l_vector::l_pool_object_list_it begin = m_vector->m_pool.begin();
+            auto difference = std::distance(begin,m_iterator);
+            return l_variable((int)difference);
         }
         
         bool valid() const
@@ -214,9 +264,10 @@ namespace l_language
             return m_vector && m_vector->m_pool.end() != m_iterator;
         }
         
-        l_variable next() const
+        l_variable next()
         {
-            return   l_variable::heap((l_obj*)l_gc::s_global_gc.new_obj< l_vector_it >(m_iterator + 1));
+            //next
+            return l_vector_it::gc_new(get_gc(),m_iterator+1);
         }
         
         void self_next()
@@ -229,6 +280,6 @@ namespace l_language
     //get iterator
     inline l_variable l_vector::get_it()
     {
-        return l_vector_it::gc_new(this);
+        return l_vector_it::gc_new(get_gc(), this);
     }
 };

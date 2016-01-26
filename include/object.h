@@ -19,33 +19,50 @@ namespace l_language
         
     public:
         
-        bool is_marked() const;
+        virtual bool is_marked() const
+        {
+            return m_mark;
+        }
         
-        size_t ref_count() const;
+        virtual bool is_unmarked() const
+        {
+            return !is_marked();
+        }
+        
+        l_gc* get_gc()
+        {
+            return m_gc;
+        }
+        
+        const l_gc* get_gc() const
+        {
+            return m_gc;
+        }
         
     protected:
         
-        virtual ~l_obj();
+        //virtual ~l_obj();
         
-        void mark() const;
+        virtual void mark()
+        {
+            m_mark = true;
+        }
         
-        void unmark() const;
+        virtual void unmark()
+        {
+            m_mark = false;
+        }
         
-        void inc_ref_count() const;
         
-        void dec_ref_count() const;
+    private:
         
-        virtual void mark_childs() const = 0;
+        //gc reference
+        l_gc* m_gc { nullptr };
         
-        virtual void unmark_childs() const = 0;
+        //mark flag
+        bool m_mark { false };
         
-        virtual bool has_childs() const = 0;
-        
-        mutable l_gc*  m_gc          { nullptr };
-        mutable bool   m_mark        { false   };
-        mutable bool   m_self_delete { true    };
-        mutable size_t m_count       { 0	   };
-        
+        //firend class
         friend class   l_gc;
         friend class   l_variable;
         

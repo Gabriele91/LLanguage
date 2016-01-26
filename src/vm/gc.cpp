@@ -8,33 +8,14 @@
 
 #include <stdio.h>
 #include <gc.h>
+#include <vm.h>
 #include <variable.h>
 #include <vector>
+#include <vector.h>
 
 
 namespace  l_language
 {
-    
-    //init ref
-    l_ref::l_ref(l_variable& variable, bool is_in_stack)
-    :m_variable(variable)
-    ,m_is_in_stack(is_in_stack)
-    {
-        if (m_is_in_stack)
-        {
-            l_gc::s_global_gc.push(this);
-        }
-    }
-    l_ref::~l_ref()
-    {
-        if (m_is_in_stack)
-        {
-            l_gc::s_global_gc.remove(this);
-        }
-    }
-    
-    //init global gc
-    l_gc l_gc::s_global_gc;
     
     //gc max heap size
     void  l_gc::set_max_alloc_size(size_t max_alloc)
@@ -58,34 +39,33 @@ namespace  l_language
         {
             if (!it->m_obj->is_marked()) to_delete.push_back(it);
         }
-        //disable ref count delete...
-        for (l_pool::iterator it : to_delete) it->m_obj->m_self_delete = false;
         //delete
-        for (l_pool::iterator it : to_delete) free(it);
-    }
-
-    //gc actions
-    void  l_gc::push(l_ref* ref)
-    {
-        m_refs.push_back(ref);
-    }
-
-    void  l_gc::remove(l_refs::iterator it)
-    {
-        m_refs.erase(it);
-    }
-
-    void  l_gc::remove(l_ref* ref)
-    {
-        l_refs::iterator it;
-        for (it  = m_refs.begin();
-             it != m_refs.end();
-             ++it)
+        for (l_pool::iterator it : to_delete)
         {
-            if ((*it) == ref) { remove(it); return; }
+            GC_DEBUG(
+             //
+             printf("dealloc: %u, id %u\n",
+                    (unsigned)it->m_size,
+                    (unsigned)it->m_id);
+                 //if is a vector?
+                 l_vector*  vector = dynamic_cast< l_vector* >(it->m_obj);
+                 //if is a vector?
+                 l_vector_it*  vector_it = dynamic_cast< l_vector_it* >(it->m_obj);
+                 //print vector
+                 if(vector)
+                 {
+                     printf("vector[%u]\n", (unsigned)vector->size());
+                 }
+                 if(vector_it)
+                 {
+                     printf("vector_it\n");
+                 }
+            )
+            free(it);
         }
     }
 
+    //gc actions
     void  l_gc::push(l_obj* obj,size_t size)
     {
         m_size_allocs += size;
@@ -126,18 +106,65 @@ namespace  l_language
 
     void  l_gc::mark_pool()
     {
-        for (l_ref* ref_obj : m_refs)
-            if (ref_obj->variable().m_type == l_variable::OBJECT)
+        //global mark
+        for(l_variable& var : m_vm.m_globals)
+        {
+            if(var.is_object())
             {
-                ref_obj->variable().m_value.m_pobj->mark();
+                var.mark();
             }
+        }
+        
+        for(l_thread& thread  : m_vm.m_threads)
+        {
+            //temporal register
+            for(l_variable& var : thread.m_register)
+            {
+                if(var.is_object() && var.is_unmarked())
+                {
+                    var.mark();
+                }
+            }
+            //call context mark
+            for(l_call_context& call : thread.m_contexts)
+            {
+                for(int i=0;i != call.get_size_up_values();++i)
+                {
+                    l_variable& var = call.up_value(i);
+                    
+                    if(var.is_object() && var.is_unmarked())
+                    {
+                        var.mark();
+                    }
+                }
+                for(int i=0;i != call.get_size_vars();++i)
+                {
+                    l_variable& var = call.variable(i);
+                    
+                    if(var.is_object() && var.is_unmarked())
+                    {
+                        var.mark();
+                    }
+                }
+            }
+            //stack mark
+            for(long i=0;i <= thread.m_top /* n.b. top can get -1 */;++i)
+            {
+                l_variable& var  = thread.value(i);
+                
+                if(var.is_object() && var.is_unmarked())
+                {
+                    var.mark();
+                }
+            }
+        }
     }
 
     inline void l_gc::unmark_pool()
     {
         for (auto& ref_obj : m_pool)
         {
-            ref_obj.m_obj->m_mark = false;
+            ref_obj.m_obj->unmark();
         }
     }
     
