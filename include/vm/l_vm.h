@@ -1,5 +1,5 @@
 //
-//  vm.h
+//  l_vm.h
 //  LLanguage
 //
 //  Created by Gabriele on 09/01/16.
@@ -9,8 +9,8 @@
 
 #include <vector>
 #include <stack>
-#include <variable.h>
-#include <gc.h>
+#include <l_variable.h>
+#include <l_gc.h>
 
 namespace l_language
 {
@@ -220,6 +220,12 @@ namespace l_language
         l_variable& register3(size_t i)
         {
             return m_register[i];
+        }
+        //push return
+        void push_return(const l_variable& var,size_t nargs)
+        {
+            if(nargs == 0) push(var);
+            else value(nargs-1) = var;
         }
         //get top
         l_variable& value(size_t x)

@@ -7,11 +7,11 @@
 //
 
 #include <stdio.h>
-#include <gc.h>
-#include <vm.h>
-#include <variable.h>
 #include <vector>
-#include <vector.h>
+#include <l_gc.h>
+#include <l_vm.h>
+#include <l_variable.h>
+#include <l_vector.h>
 
 
 namespace  l_language

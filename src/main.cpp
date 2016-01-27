@@ -3,43 +3,19 @@
 #include <fstream>
 #include <sstream>
 #include <program_language.h>
+#include <l_lib_base.h>
 #define STR_VERSION_MAJOR "0"
 #define STR_VERSION_MINOR "1"
 #define STR_VERSION_MAINTENANCE "2"
 
 
-int l_print(l_language::l_thread* th,int args)
-{
-    for(size_t i=0; i!=args; ++i)
-    {
-        //
-        const l_language::l_variable& var = th->value(args-i-1);
-        //
-        switch (var.m_type)
-        {
-            case l_language::l_variable::INT: printf("%d",var.m_value.m_i); break;
-            case l_language::l_variable::FLOAT: printf("%g",var.m_value.m_f); break;
-            case l_language::l_variable::STRING: printf("%s",var.m_value.m_pstr->c_str()); break;
-            case l_language::l_variable::CFUNCTION:
-            case l_language::l_variable::FUNCTION:
-            case l_language::l_variable::OBJECT:
-            default: printf("%p",(void*)var.m_value.m_pstr); break;
-        }
-    }
-    //number of return
-    return 0;
-}
 
-l_language::program_language::extern_libary base_lib=
-{
-    { "print", l_print }
-};
 
 
 int main(int argc,const char* args[])
 {
     //fast access
-    using program_language = l_language::program_language;
+    using program_language = l_language::l_program_language;
     using compiler_flags   = program_language::compiler_flags;
     using compiler_ouput   = program_language::compiler_ouput;
     //name app
@@ -126,7 +102,7 @@ int main(int argc,const char* args[])
         //compiler object
         program_language it_compiler;
         //add libs
-        it_compiler.add_lib(base_lib);
+        it_compiler.add_lib(l_language::l_base_lib);
         //read code // "source.it"
         std::ifstream source_file(i_source);
         std::string source((std::istreambuf_iterator<char>(source_file)),

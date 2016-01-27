@@ -10,8 +10,8 @@
 #include <string>
 #include <array>
 #include <map>
-#include <vm.h>
-#include <variable.h>
+#include <l_vm.h>
+#include <l_variable.h>
 #include <syntactic_tree.h>
 
 namespace l_language
@@ -25,6 +25,8 @@ namespace l_language
         
         //main context function
         l_function* m_main {  nullptr  };
+        //main context function
+        l_gc*       m_gc {  nullptr  };
         //const struct
         struct const_info
         {
@@ -32,7 +34,12 @@ namespace l_language
             syntactic_tree::constant_node* m_constant_node { nullptr };
             l_variable m_variable;
             
-            const_info(unsigned int l_id = 0,
+            const_info()
+            {
+            }
+            
+            const_info(l_gc* gc,
+                       unsigned int l_id = 0,
                        syntactic_tree::constant_node* constant_node = nullptr)
             {
                 m_id = l_id;
@@ -46,10 +53,10 @@ namespace l_language
                             break;
                         case syntactic_tree::constant_node::FLOAT:
                             m_variable=l_variable(m_constant_node->m_value.m_float);
-                            break;
+                        break;
                         case syntactic_tree::constant_node::STRING:
-                            m_variable=l_variable(m_constant_node->m_value.m_string);
-                            break;
+                            m_variable=l_string::no_gc_new(gc,m_constant_node->m_value.m_string);
+                        break;
                         default: assert(0); break;
                     };
             }
@@ -255,6 +262,11 @@ namespace l_language
             m_main = main;
         }
         
+        void set_gc_from_vm(l_vm* vm)
+        {
+            m_gc = &vm->get_gc();
+        }
+        
         //push variable
         void add_variable_into_table(const std::string& var_name)
         {
@@ -298,7 +310,7 @@ namespace l_language
             //find name
             if(f_table.find(key) == f_table.end())
             {
-                f_table[key] = const_info( m_gen_const_id++, const_value );
+                f_table[key] = const_info(m_gc, m_gen_const_id++, const_value );
             }
         }
         

@@ -1,5 +1,5 @@
 //
-//  vector.h
+//  l_vector.h
 //  LLanguage
 //
 //  Created by Gabriele on 16/01/16.
@@ -7,8 +7,8 @@
 //
 #pragma once
 
-#include <gc.h>
-#include <variable.h>
+#include <l_gc.h>
+#include <l_variable.h>
 
 namespace l_language
 {

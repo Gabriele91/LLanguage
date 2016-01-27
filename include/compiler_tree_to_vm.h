@@ -8,7 +8,7 @@
 #pragma once
 #include <string>
 #include <map>
-#include <vm.h>
+#include <l_vm.h>
 #include <syntactic_tree.h>
 #include <variables_context.h>
 #if 1
@@ -155,6 +155,11 @@ namespace l_language
                 auto*  assignable_node = node->to<syntactic_tree::assignable_node>();
                 return compile_assignable_get(fun,assignable_node);
             }
+            else if(node->m_type == syntactic_tree::CALL_NODE)
+            {
+                //return true...
+                return compile_call(fun, (syntactic_tree::call_node*)node);
+            }
             else if(node->m_type == syntactic_tree::ARRAY_NODE)
             {
                 //cast to array
@@ -299,13 +304,13 @@ namespace l_language
             auto* call_name = (syntactic_tree::variable_node*)call_node->m_assignable;
             //search in vars
             int var_id = get_var_id(fun, call_name->m_name);
-            //push
-            fun->push({ L_GET_GLOBAL, var_id, call_node->m_line });
             //push args
             for(syntactic_tree::exp_node* exp_node : call_node->m_args)
             {
                 compile_exp(fun, exp_node);
             }
+            //push call
+            fun->push({ L_GET_GLOBAL, var_id, call_node->m_line });
             //push call
             fun->push({ L_CALL, n_args, call_node->m_line });
             //success
@@ -353,6 +358,8 @@ namespace l_language
             m_vm->m_functions.resize(1);
             //set main
             set_main_function(&m_vm->m_functions[0]);
+            //set gc
+            set_gc_from_vm(m_vm);
         }
         
         void add_c_function(const l_cfunction function,const std::string& cfun_name)

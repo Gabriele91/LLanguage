@@ -1,5 +1,5 @@
 //
-//  gc.h
+//  l_gc.h
 //  LLanguage
 //
 //  Created by Gabriele on 16/01/16.
@@ -7,7 +7,7 @@
 //
 #pragma once
 #include <list>
-#include <object.h>
+#include <l_object.h>
 
 namespace l_language
 {
@@ -53,7 +53,7 @@ namespace l_language
         static const size_t mbyte = 1024*1024;
         
         template < typename T, typename... A >
-        l_obj* new_obj(A... args)
+        T* new_obj(A... args)
         {
             //update size
             if (m_max_size < m_size_allocs)
@@ -67,7 +67,7 @@ namespace l_language
             //push obj to pool
             push(optr,sizeof(T));
             //return ptr
-            return optr;
+            return (T*)optr;
         }
         
         //auto execute
@@ -117,8 +117,8 @@ namespace l_language
         l_vm& m_vm;
         
         //allocations size
-        size_t m_max_size   { kbyte*16 };
-        size_t m_size_allocs{ 0        };
+        size_t m_max_size   { kbyte };
+        size_t m_size_allocs{ 0     };
         
         //Object self delete
         friend class l_obj;

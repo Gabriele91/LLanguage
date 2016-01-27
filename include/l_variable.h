@@ -1,5 +1,5 @@
 //
-//  variable.h
+//  l_variable.h
 //  LLanguage
 //
 //  Created by Gabriele on 16/01/16.
@@ -7,9 +7,9 @@
 //
 #pragma once
 
-#include <gc.h>
 #include <assert.h>
-#include <string>
+#include <l_gc.h>
+#include <l_string.h>
 
 namespace l_language
 {
@@ -27,9 +27,9 @@ namespace l_language
         {
             INT,
             FLOAT,
-            STRING,
             FUNCTION,
             CFUNCTION,
+            STRING,
             OBJECT
         };
         
@@ -38,13 +38,13 @@ namespace l_language
             int   	      m_i;
             float  	 	  m_f;
             l_obj*        m_pobj;
-            std::string*  m_pstr;
             l_cfunction   m_pcfun;
         };
         
         //attributes
         type   m_type{ INT };
         value  m_value{ 0 };
+        bool   m_auto_delete { false };
         
         l_variable() : l_variable(0) {}
         
@@ -67,22 +67,16 @@ namespace l_language
             m_value.m_f = f;
         }
         
-        l_variable(const char* cstr)
-        {
-            m_type         = STRING;
-            m_value.m_pstr = new std::string(cstr);
-        }
-        
-        l_variable(const std::string& str)
-        {
-            m_type         = STRING;
-            m_value.m_pstr = new std::string(str);
-        }
-        
         l_variable(l_obj* obj)
         {
             m_type         = OBJECT;
             m_value.m_pobj = obj;
+        }
+        
+        l_variable(l_string* obj)
+        {
+            m_type         = STRING;
+            m_value.m_pobj = (l_obj*)obj;
         }
         
         l_variable(const l_cfunction cfun)
@@ -93,49 +87,87 @@ namespace l_language
         
         l_variable(const l_variable& value)
         {
-            m_type = value.m_type;
-            
-            if (m_type == STRING)
-            {
-                m_value.m_pstr = new std::string(*value.m_value.m_pstr);
-            }
-            else if (m_type == OBJECT)
-            {
-                m_value = value.m_value;
-            }
-            else
-            {
-                m_value = value.m_value;
-            }
+            (*this) = value;
         }
         
         l_variable& operator = (const l_variable& value)
         {
-            //delete event..
-            if (m_type == STRING) delete m_value.m_pstr;
             //copy type
             m_type = value.m_type;
             //copy value
-            if (m_type == STRING)
+            m_value = value.m_value;
+            //auto delete
+            m_auto_delete = value.m_auto_delete;
+            //auto delete?
+            if(value.m_auto_delete && value.is_string())
             {
-                m_value.m_pstr = new std::string(*value.m_value.m_pstr);
+                //copy
+                m_value.m_pobj = new l_string(value.string()->str());
+                //set gc
+                m_value.m_pobj->set_gc(value.m_value.m_pobj->get_gc());
             }
-            else if (m_type == OBJECT)
-            {
-                m_value = value.m_value;
-            }
-            else
-            {
-                m_value = value.m_value;
-            }
+            //strings
             return *this;
+        }
+        
+        l_gc* get_gc()
+        {
+            return  m_value.m_pobj->get_gc();
+        }
+        
+        const l_gc* get_gc() const
+        {
+            return  m_value.m_pobj->get_gc();
+        }
+        
+        bool is_int() const
+        {
+            return m_type == INT;
+        }
+        
+        bool is_float() const
+        {
+            return m_type == FLOAT;
+        }
+        
+        bool is_string() const
+        {
+            return m_type == STRING;
+        }
+        
+        bool is_object()
+        {
+            return m_type == OBJECT || m_type == STRING;
+        }
+        
+        bool is_function() const
+        {
+            return m_type == FUNCTION;
+        }
+        
+        bool is_cfunction() const
+        {
+            return m_type == CFUNCTION;
+        }
+        
+        l_string* string()
+        {
+            return dynamic_cast< l_string* >( m_value.m_pobj );
+        }
+        
+        const l_string* string() const
+        {
+            return dynamic_cast< const l_string* >( m_value.m_pobj );
         }
         
         virtual ~l_variable()
         {
-            if (m_type == STRING)
+            if(m_auto_delete && m_type == STRING)
             {
-                delete m_value.m_pstr;
+                delete dynamic_cast< l_string* >( m_value.m_pobj );
+                //to int
+                m_type = INT;
+                m_value.m_i = 0;
             }
         }
         
@@ -153,13 +185,13 @@ namespace l_language
             {
                 return m_value.m_pcfun == nullptr;
             }
-            if(m_type == OBJECT)
+            if(m_type == STRING)
             {
                 return m_value.m_pobj == nullptr;
             }
-            if(m_type == STRING)
+            if(m_type == OBJECT)
             {
-                return m_value.m_pstr == nullptr;
+                return m_value.m_pobj == nullptr;
             }
             return false;
         }
@@ -191,29 +223,29 @@ namespace l_language
                 return m_value.m_f + var.m_value.m_f;
             }
             
-            if (m_type == STRING && var.m_type == STRING)
+            if (is_string() && var.is_string())
             {
-                return *m_value.m_pstr + *var.m_value.m_pstr;
+                return string()->gc_merge(var.string());
             }
             
-            if (m_type == STRING && var.m_type == FLOAT)
+            if (is_string()&& var.m_type == FLOAT)
             {
-                return *m_value.m_pstr + std::to_string(var.m_value.m_f);
+                return string()->gc_merge(std::to_string(var.m_value.m_f));
             }
             
-            if (m_type == STRING && var.m_type == INT)
+            if (is_string() && var.m_type == INT)
             {
-                return *m_value.m_pstr + std::to_string(var.m_value.m_i);
+                return string()->gc_merge(std::to_string(var.m_value.m_i));
             }
             
-            if (m_type == FLOAT && var.m_type == STRING)
+            if (m_type == FLOAT && var.is_string())
             {
-                return std::to_string(m_value.m_f) + *var.m_value.m_pstr;
+                return var.string()->gc_merge_left(std::to_string(var.m_value.m_f));
             }
             
-            if (m_type == INT && var.m_type == STRING)
+            if (m_type == INT && var.is_string())
             {
-                return std::to_string(m_value.m_i) + *var.m_value.m_pstr;
+                return var.string()->gc_merge_left(std::to_string(m_value.m_i));
             }
             
             assert(0);
@@ -529,11 +561,6 @@ namespace l_language
         }
         
         //gc methos
-        
-        bool is_object()
-        {
-            return m_type == OBJECT;
-        }
         
         bool is_marked() const
         {

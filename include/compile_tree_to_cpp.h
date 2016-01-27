@@ -11,14 +11,12 @@
 #include <list>
 #include <assert.h>
 #include <syntactic_tree.h>
-#include <compiler_utilities.h>
+#include <l_compiler_utilities.h>
 
 namespace l_language
 {
-	const char* code_cpp_header = 
-	#include <backend_cpp_header.h>
-	;
-
+    extern const char* code_cpp_header;
+    
 	class compile_tree_to_cpp
 	{
 	public:

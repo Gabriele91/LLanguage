@@ -1,4 +1,17 @@
+
 /*
+print( type_of("lol"),        "\n" )
+print( type_of(1),            "\n" )
+print( type_of(to_float(1)),  "\n" )
+print( type_of(type_of),      "\n" )
+print( type_of([]),           "\n" )
+*/
+
+//print( to_string( to_int( input(0) ) * to_int(10) ),"\n")
+
+/*
+l = "l"
+
 x = [
       [ 0,0 ],
       [1,2,3,4,5,6,7,8]
@@ -18,9 +31,10 @@ v = 0
 x = 1
 x = [ 1,2,3 ]
 x = [ 1,2, [1,2,3] ]
-
-
 */
+
+
+/*
 voti <-
 [
  //Voto   | CFU | Lode
@@ -65,3 +79,4 @@ print("crediti:\t",crediti, "\n")
 print("media ponderata:\t", voto, "\n")
 print("valore delle lodi:\t", lodi_valore, "\n")
 print("voto con cui ci si presenta:\t", voto_con_lodi, "\n")
+

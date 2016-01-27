@@ -1,5 +1,5 @@
 //
-//  object.h
+//  l_object.h
 //  LLanguage
 //
 //  Created by Gabriele on 16/01/16.
@@ -41,8 +41,6 @@ namespace l_language
         
     protected:
         
-        //virtual ~l_obj();
-        
         virtual void mark()
         {
             m_mark = true;
@@ -53,6 +51,14 @@ namespace l_language
             m_mark = false;
         }
         
+        virtual ~l_obj()
+        {
+        }
+        
+        void set_gc(l_gc* gc)
+        {
+            m_gc = gc;
+        }
         
     private:
         

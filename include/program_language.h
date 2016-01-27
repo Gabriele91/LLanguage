@@ -16,7 +16,7 @@
 
 namespace l_language
 {
-    class program_language
+    class l_program_language
     {
         
         using tree         = l_language::syntactic_tree;
@@ -25,7 +25,7 @@ namespace l_language
         using cpp_compiler = l_language::compile_tree_to_cpp;
         using vm_compiler  = l_language::compiler_tree_to_vm;
         //parser...
-        parser       it_parser;
+        parser       m_parser;
         //compilers
         cpp_compiler m_cpp_comp;
         js_compiler  m_js_comp;
@@ -65,7 +65,7 @@ namespace l_language
             }
         };
         //libary vector
-        using extern_libary = std::vector< lib_field >;
+        using l_extern_libary = std::vector< lib_field >;
         
         //flags
         enum compiler_flags
@@ -92,10 +92,10 @@ namespace l_language
             //output
             compiler_ouput output;
             //
-            if (!it_parser.italanguage(source_code,it_tree))
+            if (!m_parser.italanguage(source_code,it_tree))
             //ouput errors
             {
-                for (auto& error : it_parser.m_errors)
+                for (auto& error : m_parser.m_errors)
                 {
                     output.m_errors += std::to_string( error.m_line ) + ":" + error.m_error + "\n";
                 }
@@ -156,7 +156,7 @@ namespace l_language
             return output;
         }
         
-        void add_lib(const extern_libary& libs)
+        void add_lib(const l_extern_libary& libs)
         {
             for(const lib_field& field : libs)
             {
@@ -165,7 +165,7 @@ namespace l_language
         }
         
         //default
-        program_language()
+        l_program_language()
         {
             //init vm
             m_vm_comp.set_vm(&m_vm);

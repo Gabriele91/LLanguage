@@ -7,9 +7,9 @@
 //
 
 #include <stdio.h>
-#include <vm.h>
-#include <gc.h>
-#include <vector.h>
+#include <l_vm.h>
+#include <l_gc.h>
+#include <l_vector.h>
 #include <iostream>
 
 namespace l_language
@@ -130,9 +130,11 @@ namespace l_language
             {
                 case l_variable::INT: type = "int"; value = std::to_string(variable.m_value.m_i); break;
                 case l_variable::FLOAT: type = "float"; value = std::to_string(variable.m_value.m_f); break;
-                case l_variable::STRING: type = "string"; value = *variable.m_value.m_pstr; break;
+                case l_variable::STRING: type = "string"; value = variable.string()->str(); break;
                 case l_variable::FUNCTION: type = "function"; value = std::to_string(variable.m_value.m_i);  break;
-                case l_variable::OBJECT: type = "object"; value = std::to_string((unsigned long)variable.m_value.m_pobj);  break;
+                case l_variable::CFUNCTION: type = "c-function"; value = std::to_string((unsigned long)variable.m_value.m_pcfun);  break;
+                case l_variable::OBJECT: type = "object"; value = std::to_string((unsigned long)variable.m_value.m_pobj); break;
+                
                 default: break;
             }
             
@@ -166,16 +168,17 @@ namespace l_language
         std::string value("none");
         
         
-        for(const l_variable& variable : m_costants)
+        for(l_variable& variable : m_costants)
         {
             switch (variable.m_type)
             {
                 case l_variable::INT: type = "int"; value = std::to_string(variable.m_value.m_i); break;
                 case l_variable::FLOAT: type = "float"; value = std::to_string(variable.m_value.m_f); break;
-                case l_variable::STRING: type = "string"; value = *variable.m_value.m_pstr; break;
+                case l_variable::STRING: type = "string"; value = variable.string()->str(); break;
                 case l_variable::FUNCTION: type = "function"; value = std::to_string(variable.m_value.m_i);  break;
                 case l_variable::CFUNCTION: type = "c-function"; value = std::to_string((unsigned long)variable.m_value.m_pcfun);  break;
-                case l_variable::OBJECT: type = "object"; value = std::to_string((unsigned long)variable.m_value.m_pobj);  break;
+                case l_variable::OBJECT: type = "object"; value = std::to_string((unsigned long)variable.m_value.m_pobj); break;
+
                 default: break;
             }
             
@@ -275,6 +278,7 @@ namespace l_language
         #define stack      thread.value
         #define push       thread.push
         #define top        thread.top
+        #define top_size   (thread.m_top+1)
         #define pop        thread.pop
         #define global     thread.global
         #define register3  thread.register3
@@ -554,15 +558,21 @@ namespace l_language
                 case L_CALL:
                 {
                     //get index
-                    l_variable& call = stack(cmp.m_arg);
+                    register3(0) = pop();
                     //get args
-                    if(call.m_type == l_variable::CFUNCTION)
+                    if(register3(0).m_type == l_variable::CFUNCTION)
                     {
-                        assert(!call.m_value.m_pcfun(&thread,cmp.m_arg));
+                        //return size
+                        int n_return = register3(0).m_value.m_pcfun(&thread,cmp.m_arg);
+                        //assert (1 return)
+                        assert(n_return <= 1);
+                        //error
+                        assert(n_return >= 0);
                         //pop args
-                        for(int i=0; i < cmp.m_arg; ++i){ pop(); }
-                        //pop call
-                        pop();
+                        for(int i=0; i < (cmp.m_arg - n_return); ++i)
+                        {
+                            pop();
+                        }
                     }
                     else
                     {
