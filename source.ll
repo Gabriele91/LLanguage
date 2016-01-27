@@ -1,3 +1,13 @@
+/*
+if type_of( [] ) == type_of( [] )
+{
+    print("uguali","\n")
+}
+else
+{
+    print("diversi","\n")
+}
+*/
 
 /*
 print( type_of("lol"),        "\n" )

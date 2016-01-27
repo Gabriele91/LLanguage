@@ -352,6 +352,11 @@ namespace l_language
                 return l_variable(m_value.m_f == var.m_value.m_f);
             }
             
+            if (m_type == STRING && var.m_type == STRING)
+            {
+                return l_variable(string()->str() == var.string()->str());
+            }
+            
             assert(0);
             return l_variable();
         }
@@ -376,6 +381,11 @@ namespace l_language
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
                 return l_variable(m_value.m_f != var.m_value.m_f);
+            }
+            
+            if (m_type == STRING && var.m_type == STRING)
+            {
+                return l_variable(string()->str() != var.string()->str());
             }
             
             assert(0);
