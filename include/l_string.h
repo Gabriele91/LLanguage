@@ -68,13 +68,13 @@ namespace l_language
         
         static l_variable gc_new(l_vm& vm,const std::string& string);
         
-        static l_variable no_gc_new(l_gc* gc,const std::string& string);
+        static l_variable const_new(l_gc* gc,const std::string& string);
         
-        static l_variable no_gc_new(l_gc& gc,const std::string& string);
+        static l_variable const_new(l_gc& gc,const std::string& string);
         
-        static l_variable no_gc_new(l_vm* vm,const std::string& string);
+        static l_variable const_new(l_vm* vm,const std::string& string);
         
-        static l_variable no_gc_new(l_vm& vm,const std::string& string);
+        static l_variable const_new(l_vm& vm,const std::string& string);
         
         virtual ~l_string()
         {

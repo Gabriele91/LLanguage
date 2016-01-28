@@ -1147,19 +1147,26 @@ namespace l_language
             // '('
             if ( CSTRCMP_SKIP(ptr, "(") )
             {
-                do
+                
+                //skip space
+                skip_space_end_comment(ptr);
+                
+                if ( !CSTRCMP(ptr, ")") )
                 {
-                    //skip space
-                    skip_space_end_comment(ptr);
-                    //parse exp
-                    syntactic_tree::exp_node* exp;
-                    //parse exp
-                    if (!parse_exp(ptr, exp)) return false;
-                    //append exp
-                    call_node->append(exp);
-                    //skip space
-                    skip_space_end_comment(ptr);
-                } while (CSTRCMP_SKIP(ptr, ","));
+                    do
+                    {
+                        //skip space
+                        skip_space_end_comment(ptr);
+                        //parse exp
+                        syntactic_tree::exp_node* exp;
+                        //parse exp
+                        if (!parse_exp(ptr, exp)) return false;
+                        //append exp
+                        call_node->append(exp);
+                        //skip space
+                        skip_space_end_comment(ptr);
+                    } while (CSTRCMP_SKIP(ptr, ","));
+                }
             }
             //else 
             return CSTRCMP_SKIP(ptr, ")");

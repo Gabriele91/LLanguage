@@ -1,3 +1,4 @@
+print( input() )
 /*
 if type_of( [] ) == type_of( [] )
 {
@@ -6,8 +7,7 @@ if type_of( [] ) == type_of( [] )
 else
 {
     print("diversi","\n")
-}
-*/
+}*/
 
 /*
 print( type_of("lol"),        "\n" )

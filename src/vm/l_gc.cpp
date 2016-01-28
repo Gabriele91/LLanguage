@@ -64,6 +64,27 @@ namespace  l_language
             free(it);
         }
     }
+    
+    //dealloc consts
+    l_gc::~l_gc()
+    {
+        //dealloc consts
+        for(l_function&  fun : m_vm.m_functions)
+        {
+            for(l_variable&  var : fun.m_costants)
+            {
+                if(var.is_string() && var.m_const)
+                {
+                    delete var.string();
+                }
+            }
+        }
+        //dealloc all heap gc
+        for(auto& it : m_pool)
+        {
+            delete it.m_obj;
+        }
+    }
 
     //gc actions
     void  l_gc::push(l_obj* obj,size_t size)

@@ -170,5 +170,11 @@ namespace l_language
             //init vm
             m_vm_comp.set_vm(&m_vm);
         }
+        
+        //default
+        virtual ~l_program_language()
+        {
+            //dealloc
+        }
     };
 };

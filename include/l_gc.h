@@ -89,10 +89,7 @@ namespace l_language
             return m_vm;
         }
         
-        virtual ~l_gc()
-        {
-            
-        }
+        virtual ~l_gc();
         
     protected:
         

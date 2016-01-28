@@ -55,7 +55,7 @@ namespace l_language
                             m_variable=l_variable(m_constant_node->m_value.m_float);
                         break;
                         case syntactic_tree::constant_node::STRING:
-                            m_variable=l_string::no_gc_new(gc,m_constant_node->m_value.m_string);
+                            m_variable=l_string::const_new(gc,m_constant_node->m_value.m_string);
                         break;
                         default: assert(0); break;
                     };

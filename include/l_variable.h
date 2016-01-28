@@ -11,6 +11,7 @@
 #include <l_gc.h>
 #include <l_string.h>
 
+
 namespace l_language
 {
     //types
@@ -42,9 +43,9 @@ namespace l_language
         };
         
         //attributes
-        type   m_type{ INT };
-        value  m_value{ 0 };
-        bool   m_auto_delete { false };
+        type   m_type  { INT };
+        value  m_value { 0 };
+        bool   m_const { false };
         
         l_variable() : l_variable(0) {}
         
@@ -96,16 +97,8 @@ namespace l_language
             m_type = value.m_type;
             //copy value
             m_value = value.m_value;
-            //auto delete
-            m_auto_delete = value.m_auto_delete;
-            //auto delete?
-            if(value.m_auto_delete && value.is_string())
-            {
-                //copy
-                m_value.m_pobj = new l_string(value.string()->str());
-                //set gc
-                m_value.m_pobj->set_gc(value.m_value.m_pobj->get_gc());
-            }
+            //const delete
+            m_const = value.m_const;
             //strings
             return *this;
         }
@@ -158,17 +151,6 @@ namespace l_language
         const l_string* string() const
         {
             return dynamic_cast< const l_string* >( m_value.m_pobj );
-        }
-        
-        virtual ~l_variable()
-        {
-            if(m_auto_delete && m_type == STRING)
-            {
-                delete dynamic_cast< l_string* >( m_value.m_pobj );
-                //to int
-                m_type = INT;
-                m_value.m_i = 0;
-            }
         }
         
         bool is_false()

@@ -275,15 +275,12 @@ namespace l_language
     class l_vm
     {
         //gc
-        l_gc m_gc;
+        l_gc* m_gc;
         
     public:
         //init vm
-        l_vm()
-        :m_gc(*this)
-        {
-        
-        }
+        l_vm();
+        virtual ~l_vm();
         //global modules
         l_list_variables m_globals;
         //thread list
@@ -293,11 +290,11 @@ namespace l_language
         //get gc
         l_gc& get_gc()
         {
-            return m_gc;
+            return *m_gc;
         }
         const l_gc& get_gc() const
         {
-            return m_gc;
+            return *m_gc;
         }
         //execute
         void execute(unsigned int id_thread);

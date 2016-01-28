@@ -53,46 +53,46 @@ namespace l_language
         return  vm.get_gc().new_obj< l_string >(string);
     }
     
-    l_variable l_string::no_gc_new(l_gc* gc,const std::string& string)
+    l_variable l_string::const_new(l_gc* gc,const std::string& string)
     {
         l_string*  var_str  = new l_string(string);
         var_str->set_gc(gc);
         
         l_variable variable = var_str;
-        variable.m_auto_delete = true;
+        variable.m_const = true;
         
         return  variable;
     }
     
-    l_variable l_string::no_gc_new(l_gc& gc,const std::string& string)
+    l_variable l_string::const_new(l_gc& gc,const std::string& string)
     {
         l_string*  var_str  = new l_string(string);
         var_str->set_gc(&gc);
         
         l_variable variable = var_str;
-        variable.m_auto_delete = true;
+        variable.m_const = true;
         
         return  variable;
     }
     
-    l_variable l_string::no_gc_new(l_vm* vm,const std::string& string)
+    l_variable l_string::const_new(l_vm* vm,const std::string& string)
     {
         l_string*  var_str  = new l_string(string);
         var_str->set_gc(&vm->get_gc());
         
         l_variable variable = var_str;
-        variable.m_auto_delete = true;
+        variable.m_const = true;
         
         return  variable;
     }
     
-    l_variable l_string::no_gc_new(l_vm& vm,const std::string& string)
+    l_variable l_string::const_new(l_vm& vm,const std::string& string)
     {
         l_string*  var_str  = new l_string(string);
         var_str->set_gc(&vm.get_gc());
         
         l_variable variable = var_str;
-        variable.m_auto_delete = true;
+        variable.m_const = true;
         
         return  variable;
     }

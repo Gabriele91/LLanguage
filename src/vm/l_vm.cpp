@@ -248,11 +248,23 @@ namespace l_language
         }
     }
     
+    
     l_variable& l_thread::global(int i)
     {
         return i >= 0 ?
                m_contexts[0].variable(i) :
                m_vm->m_globals[-(i+1)];
+    }
+    
+    //alloc vm
+    l_vm::l_vm()
+    {
+        m_gc = new l_gc(*this);
+    }
+    //dealloc vm
+    l_vm::~l_vm()
+    {
+        delete m_gc;
     }
     
     void l_vm::execute(unsigned int id_thread)
