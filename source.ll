@@ -1,3 +1,32 @@
+
+l = {}
+l.hello = "ciao"
+l .hell = "inferno"
+l. god = "Dio"
+
+l . jpg = { }
+l . jpg
+  . some = "cosa??"
+
+for v of l
+{
+    if type_of(v) != "OBJECT"
+    {
+        print( v, "\n" )
+    }
+    else
+    {
+        for v2 of v
+        {
+            print( v2, "\n")
+        }
+    }
+}
+
+print(
+    l [ "jpg" ] . some , "\n"
+)
+
 /*
 s = []
 s[0] = 1

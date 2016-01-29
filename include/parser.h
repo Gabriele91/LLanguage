@@ -810,6 +810,10 @@ namespace l_language
             {
                 logiccomp = syntactic_tree::exp(std::string("=="), nullptr, m_line);
             }
+            else if( CSTRCMP_SKIP(ptr, "!=") )
+            {
+                logiccomp = syntactic_tree::exp(std::string("!="), nullptr, m_line);
+            }
             else
             {
                 node = left;
@@ -1000,6 +1004,8 @@ namespace l_language
                 {
                     //jmp point
                     ++ptr;
+                    //skip
+                    skip_space_end_comment(ptr);
                     //parse variable name
                     std::string field_name;
                     if (!parse_name(ptr, &ptr, field_name))
@@ -1009,6 +1015,8 @@ namespace l_language
                     }
                     //append node
                     list_values.push_back (syntactic_tree::constant(field_name, m_line));
+                    //jmp space
+                    skip_space_end_comment(ptr);
                 }
                 else if(is_start_index(*ptr))
                 {
@@ -1034,6 +1042,8 @@ namespace l_language
                     ++ptr;
                     //append
                     list_values.push_back (exp_node);
+                    //skip
+                    skip_space_end_comment(ptr);
                 }
                 else
                 {
