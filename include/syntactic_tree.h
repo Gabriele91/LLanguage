@@ -850,10 +850,18 @@ namespace l_language
             node->m_char = ichar;
             return node;
         }
-        //if stament
+        //array stament
         static array_node* array(size_t line = 0, size_t ichar = 0)
         {
             auto* node = new array_node;
+            node->m_line = line;
+            node->m_char = ichar;
+            return node;
+        }
+        //table stament
+        static table_node* table(size_t line = 0, size_t ichar = 0)
+        {
+            auto* node = new table_node;
             node->m_line = line;
             node->m_char = ichar;
             return node;

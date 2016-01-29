@@ -32,7 +32,7 @@
 
 /* Begin PBXFileReference section */
 		E024D5061C52DEC000317AF1 /* variables_context.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = variables_context.h; sourceTree = "<group>"; };
-		E05F4B4A1C57F52400F7EB6A /* l_string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = l_string.h; sourceTree = "<group>"; };
+		E05F4B4A1C57F52400F7EB6A /* l_string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_string.h; path = vm/l_string.h; sourceTree = "<group>"; };
 		E05F4B4B1C57FB8D00F7EB6A /* l_string.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_string.cpp; sourceTree = "<group>"; };
 		E05F4B4D1C58985500F7EB6A /* l_lib_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_lib_base.cpp; sourceTree = "<group>"; };
 		E05F4B4F1C58995D00F7EB6A /* l_lib_base.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = l_lib_base.h; sourceTree = "<group>"; };
@@ -51,12 +51,13 @@
 		E072DDD91C35357A00B197A1 /* syntactic_tree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = syntactic_tree.h; sourceTree = "<group>"; };
 		E072DDDB1C35357A00B197A1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		E08511D31C3D6205005AC8B2 /* source.ll */ = {isa = PBXFileReference; explicitFileType = text.json; fileEncoding = 4; path = source.ll; sourceTree = SOURCE_ROOT; };
+		E0891CC61C5A61E200FB37F6 /* l_table.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = l_table.h; sourceTree = "<group>"; };
+		E0891CC71C5A62AD00FB37F6 /* l_variable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = l_variable.h; path = vm/l_variable.h; sourceTree = "<group>"; };
 		E0950C761C4A871700845FEE /* l_vm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = l_vm.h; path = vm/l_vm.h; sourceTree = "<group>"; };
-		E0950C771C4A877800845FEE /* l_variable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = l_variable.h; sourceTree = "<group>"; };
-		E0950C781C4A87E800845FEE /* l_gc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = l_gc.h; sourceTree = "<group>"; };
-		E0950C791C4A88F500845FEE /* l_vector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = l_vector.h; sourceTree = "<group>"; };
+		E0950C771C4A877800845FEE /* l_vector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_vector.h; path = vm/l_vector.h; sourceTree = "<group>"; };
+		E0950C781C4A87E800845FEE /* l_gc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_gc.h; path = vm/l_gc.h; sourceTree = "<group>"; };
 		E0950C7D1C4AC50400845FEE /* l_gc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_gc.cpp; sourceTree = "<group>"; };
-		E0950C7F1C4AC58800845FEE /* l_object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = l_object.h; sourceTree = "<group>"; };
+		E0950C7F1C4AC58800845FEE /* l_object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_object.h; path = vm/l_object.h; sourceTree = "<group>"; };
 		E0C68B331C4E7ECE0055F4FB /* compiler_tree_to_vm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compiler_tree_to_vm.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -136,12 +137,13 @@
 		E0950C751C4A870D00845FEE /* vm */ = {
 			isa = PBXGroup;
 			children = (
+				E0891CC71C5A62AD00FB37F6 /* l_variable.h */,
 				E0950C761C4A871700845FEE /* l_vm.h */,
-				E0950C771C4A877800845FEE /* l_variable.h */,
+				E0950C771C4A877800845FEE /* l_vector.h */,
 				E0950C781C4A87E800845FEE /* l_gc.h */,
-				E0950C791C4A88F500845FEE /* l_vector.h */,
 				E0950C7F1C4AC58800845FEE /* l_object.h */,
 				E05F4B4A1C57F52400F7EB6A /* l_string.h */,
+				E0891CC61C5A61E200FB37F6 /* l_table.h */,
 			);
 			name = vm;
 			sourceTree = "<group>";

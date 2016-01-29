@@ -179,6 +179,16 @@ namespace l_language
                 //create array declaretion
                 for(auto& arr_node_exp:array_node->m_exps) visit(fun,arr_node_exp);
             }
+            else if(exp_node->m_type == syntactic_tree::TABLE_NODE)
+            {
+                auto* table_node = exp_node->to<syntactic_tree::table_node>();
+                //table array declaretion
+                for(auto& table_node_exp:table_node->m_exps)
+                {
+                    visit(fun,table_node_exp[0]);
+                    visit(fun,table_node_exp[1]);
+                }
+            }
             else if (exp_node->is_link())
             {
                 if(exp_node->m_left) visit(fun,exp_node->m_left);

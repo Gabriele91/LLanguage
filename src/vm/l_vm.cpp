@@ -10,6 +10,7 @@
 #include <l_vm.h>
 #include <l_gc.h>
 #include <l_vector.h>
+#include <l_table.h>
 #include <iostream>
 
 namespace l_language
@@ -276,8 +277,6 @@ namespace l_language
     {
         //get thread
         l_thread& thread = *ptr_thread;
-        //main function context
-        auto&  stack = thread.m_stack;
         //current function
         unsigned int function_id = thread.m_main_fun_id;
         //main function
@@ -421,17 +420,37 @@ namespace l_language
                     push( register3(0) );
                 }
                 break;
+                //alloc tablet
+                case L_NEW_TABLE:
+                {
+                    register3(0) = l_table::gc_new(get_gc());
+                    //init ?
+                    if( cmp.m_arg > 0 )
+                    {
+                        //get object
+                        l_obj* this_obj = (l_obj*)register3(0).m_value.m_pobj;
+                        //types
+                        l_table* table = dynamic_cast< l_table* > ( this_obj );
+                        //assert
+                        assert(!(cmp.m_arg % 2));
+                        //put stack into vector
+                        for(int i = (cmp.m_arg)-1; i >= 0; i-=2)
+                        {
+                            //push key and value
+                            table->operator[](stack(1)) = pop();
+                            //pop key
+                            pop();
+                        }
+                    }
+                    //push table (n.b. gc run...)
+                    push( register3(0) );
+                }
+                break;
                 
                 case L_GET_AT_VAL:
                 {
                     const l_variable& r_b = stack(1);
                     const l_variable& r_c = stack(0);
-                    //to size int
-                    size_t index = 0;
-                    //cast
-                         if( r_c.m_type == l_variable::INT )  index= (size_t)r_c.m_value.m_i;
-                    else if( r_c.m_type == l_variable::FLOAT )index= (size_t)r_c.m_value.m_f;
-                    else assert(0);
                     //try
                     if ( r_b.m_type == l_variable::type::OBJECT )
                     {
@@ -439,10 +458,29 @@ namespace l_language
                         l_obj* this_obj = (l_obj*)r_b.m_value.m_pobj;
                         //types
                         l_vector* vector = dynamic_cast< l_vector* > ( this_obj );
-                        //else assert
-                        assert(vector);
-                        //get
-                        stack(1) = vector->operator[](index) ;
+                        //types
+                        l_table* table = dynamic_cast< l_table* > ( this_obj );
+                        //is a vector
+                        if(vector)
+                        {
+                            //to size int
+                            size_t index = 0;
+                            //cast
+                                 if( r_c.m_type == l_variable::INT )  index= (size_t)r_c.m_value.m_i;
+                            else if( r_c.m_type == l_variable::FLOAT )index= (size_t)r_c.m_value.m_f;
+                            else assert(0);
+                            //get
+                            stack(1) = vector->operator[](index) ;
+                        }
+                        else if(table)
+                        {
+                            //get and pop value
+                            stack(1) = table->operator[](r_c);
+                        }
+                        else
+                        {
+                            assert(0);
+                        }
                     }
                     else
                     {
@@ -458,12 +496,6 @@ namespace l_language
                     const l_variable& r_a = stack(2);
                     //get index
                     const l_variable& r_b = stack(1);
-                    //to size int
-                    size_t index = 0;
-                    //cast
-                         if( r_b.m_type == l_variable::INT )  index= (size_t)r_b.m_value.m_i;
-                    else if( r_b.m_type == l_variable::FLOAT )index= (size_t)r_b.m_value.m_f;
-                    else assert(0);
                     //try
                     if ( r_a.m_type == l_variable::type::OBJECT )
                     {
@@ -471,10 +503,29 @@ namespace l_language
                         l_obj* this_obj = (l_obj*)r_a.m_value.m_pobj;
                         //types
                         l_vector* vector = dynamic_cast< l_vector* > ( this_obj );
-                        //else assert
-                        assert(vector);
-                        //get and pop value
-                        vector->operator[](index) = pop();
+                        //types
+                        l_table* table = dynamic_cast< l_table* > ( this_obj );
+                        //is a vector
+                        if(vector)
+                        {
+                            //to size int
+                            size_t index = 0;
+                            //cast
+                                 if( r_b.m_type == l_variable::INT )  index= (size_t)r_b.m_value.m_i;
+                            else if( r_b.m_type == l_variable::FLOAT )index= (size_t)r_b.m_value.m_f;
+                            else assert(0);
+                            //get and pop value
+                            vector->operator[](index) = pop();
+                        }
+                        else if(table)
+                        {
+                            //get and pop value
+                            table->operator[](r_b) = pop();
+                        }
+                        else
+                        {
+                            assert(0);
+                        }
                     }
                     else
                     {
@@ -500,12 +551,27 @@ namespace l_language
                         l_obj* this_obj = (l_obj*)r_a.m_value.m_pobj;
                         //types
                         l_vector* vector = dynamic_cast< l_vector* > ( this_obj );
-                        //else assert
-                        assert(vector);
-                        //pop value
-                        pop();
-                        //push it
-                        push( vector->get_it() );
+                        //types
+                        l_table* table = dynamic_cast< l_table* > ( this_obj );
+                        //is a vector
+                        if(vector)
+                        {
+                            //pop value
+                            pop();
+                            //push it
+                            push( vector->get_it() );
+                        }
+                        else if (table)
+                        {
+                            //pop value
+                            pop();
+                            //push it
+                            push( table->get_it() );
+                        }
+                        else
+                        {
+                            assert(0);
+                        }
                     }
                     else
                     {
@@ -528,31 +594,70 @@ namespace l_language
                         //get object
                         l_obj* this_obj = (l_obj*)r_it.m_value.m_pobj;
                         //types
-                        l_vector_it* it = dynamic_cast< l_vector_it* > ( this_obj );
-                        //else assert
-                        assert(it);
-                        //push it
-                        if(it->valid())
+                        l_vector_it* a_it = dynamic_cast< l_vector_it* > ( this_obj );
+                        //types
+                        l_table_it* t_it = dynamic_cast< l_table_it* > ( this_obj );
+                        //is array it
+                        if(a_it)
                         {
-                            if(cmp.m_op_code == L_FOR_OF)
+                            //else assert
+                            assert(a_it);
+                            //push it
+                            if(a_it->valid())
                             {
-                                //get next
-                                push( it->get() );
+                                if(cmp.m_op_code == L_FOR_OF)
+                                {
+                                    //get next
+                                    push( a_it->get() );
+                                }
+                                else //L_FOR_IN
+                                {
+                                    //get next
+                                    push( a_it->get_id() );
+                                }
+                                //next
+                                a_it->self_next();
                             }
-                            else //L_FOR_IN
+                            else
                             {
-                                //get next
-                                push( it->get_id() );
+                                //pop iterator
+                                pop();
+                                //and jump
+                                pc = cmp.m_arg - 1;
                             }
-                            //next
-                            it->self_next();
+                        }
+                        //is a table it
+                        else if(t_it)
+                        {
+                            //else assert
+                            assert(t_it);
+                            //push it
+                            if(t_it->valid())
+                            {
+                                if(cmp.m_op_code == L_FOR_OF)
+                                {
+                                    //get next
+                                    push( t_it->get() );
+                                }
+                                else //L_FOR_IN
+                                {
+                                    //get next
+                                    push( t_it->get_id() );
+                                }
+                                //next
+                                t_it->self_next();
+                            }
+                            else
+                            {
+                                //pop iterator
+                                pop();
+                                //and jump
+                                pc = cmp.m_arg - 1;
+                            }
                         }
                         else
                         {
-                            //pop iterator
-                            pop();
-                            //and jump
-                            pc = cmp.m_arg - 1;
+                            assert(0);
                         }
                     }
                     else

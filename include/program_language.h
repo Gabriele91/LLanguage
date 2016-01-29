@@ -148,7 +148,7 @@ namespace l_language
             {
                 m_thread= m_vm_comp.compile(&it_tree);
                 //main bytecode
-                m_vm.m_functions[0].dump_all_function();
+                //m_vm.m_functions[0].dump_all_function();
                 //start
                 m_vm.execute(m_thread);
             }

@@ -42,7 +42,7 @@ int l_print(l_language::l_thread* th,int args)
         }
     }
     //number of return
-    return 1;
+    return 0;
 }
 
 int l_input(l_language::l_thread* th,int args)

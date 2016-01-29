@@ -566,25 +566,30 @@ namespace l_language
 			else if(is_start_index(*ptr))
 			{
 				//skip [
-				++ptr;
+                ++ptr;
+                //skip space
+                skip_space_end_comment(ptr);
 				//alloc node
 				syntactic_tree::array_node* array_node = syntactic_tree::array(m_line);
 				syntactic_tree::exp_node* exp_node = nullptr;
 				//parsing all values
-				do
-				{
-					//parsing..
-					if (!parse_exp(ptr, exp_node))
-					{
-						push_error("not valid expression (value)");
-						return false;
-					}
-					//parse list exp
-					if(exp_node) array_node->append(exp_node);
-					//skip
-					skip_space_end_comment(ptr);
-				}
-				while(CSTRCMP_SKIP(ptr,","));
+                if(!is_end_index(*ptr))
+                {
+                    do
+                    {
+                        //parsing..
+                        if (!parse_exp(ptr, exp_node))
+                        {
+                            push_error("not valid expression (value)");
+                            return false;
+                        }
+                        //parse list exp
+                        if(exp_node) array_node->append(exp_node);
+                        //skip
+                        skip_space_end_comment(ptr);
+                    }
+                    while(CSTRCMP_SKIP(ptr,","));
+                }
 				//end ]
 				if (!is_end_index(*ptr))
 				{
@@ -595,7 +600,69 @@ namespace l_language
 				++ptr;
                 //field node is a exp node
                 node = (syntactic_tree::exp_node*)array_node;
-			}
+            }
+            //is table dec
+            else if(CSTRCMP_SKIP(ptr,"{"))
+            {
+                //skip space
+                skip_space_end_comment(ptr);
+                //alloc node
+                syntactic_tree::table_node* table_node = syntactic_tree::table(m_line);
+                syntactic_tree::exp_node* exp_left = nullptr;
+                syntactic_tree::exp_node* exp_right = nullptr;
+                //parsing }
+                if(!CSTRCMP(ptr,"}"))
+                {
+                    //parsing all values
+                    do
+                    {
+                        //skip space
+                        skip_space_end_comment(ptr);
+                        //parsing..
+                        if (!parse_exp(ptr, exp_left))
+                        {
+                            push_error("not valid expression (value)");
+                            return false;
+                        }
+                        //skip space
+                        skip_space_end_comment(ptr);
+                        //jump assignament
+                        if(is_assignment(ptr))
+                        {
+                            parse_assignment(ptr);
+                        }
+                        else if(!CSTRCMP_SKIP(ptr,":"))
+                        {
+                            push_error("not found assignment statement");
+                            return false;
+                        }
+                        //skip space
+                        skip_space_end_comment(ptr);
+                        //parsing..
+                        if (!parse_exp(ptr, exp_right))
+                        {
+                            push_error("not valid expression (value)");
+                            return false;
+                        }
+                        //parse list exp
+                        if(exp_left && exp_right)
+                        {
+                            table_node->append(exp_left,exp_right);
+                        }
+                        //skip
+                        skip_space_end_comment(ptr);
+                    }
+                    while(CSTRCMP_SKIP(ptr,","));
+                }
+                //end }
+                if (!CSTRCMP_SKIP(ptr,"}"))
+                {
+                    push_error("not valid table declaretion (value)");
+                    return false;
+                }
+                //field node is a exp node
+                node = (syntactic_tree::exp_node*)table_node;
+            }
 			//return true...
 			return true;
 		}
@@ -941,7 +1008,7 @@ namespace l_language
                         return false;
                     }
                     //append node
-                    list_values.push_back (syntactic_tree::variable(field_name, m_line));
+                    list_values.push_back (syntactic_tree::constant(field_name, m_line));
                 }
                 else if(is_start_index(*ptr))
                 {

@@ -1,4 +1,42 @@
-print( input() )
+/*
+s = []
+s[0] = 1
+print(s[0])
+
+l = { }
+l.hello = "ciao"
+
+print( l["hello"] )
+
+/*
+c =
+{
+    "hello" : 0 ,
+    "hei" : 50 ,
+    "love" = [ "r","s" ]
+}
+
+for v in c
+{
+    if( type_of( c[v] ) == "OBJECT"  )
+    {
+        for s in c[v]
+        {
+            print( v, "[", s, "] -> " , c[v][s], "\n")
+        }
+    }
+    else
+    {
+        print( v, " -> " , c[v], "\n")
+    }
+}
+
+/*
+a = [ 1,2,3 ]
+a[0] = [1]
+print(a[0][0],"\n")
+
+//print( input() )
 /*
 if type_of( [] ) == type_of( [] )
 {

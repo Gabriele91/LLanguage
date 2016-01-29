@@ -128,7 +128,7 @@ namespace l_language
             return m_type == STRING;
         }
         
-        bool is_object()
+        bool is_object() const
         {
             return m_type == OBJECT || m_type == STRING;
         }

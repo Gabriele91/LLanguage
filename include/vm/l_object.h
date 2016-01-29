@@ -24,6 +24,16 @@ namespace l_language
             return m_mark;
         }
         
+        virtual void mark()
+        {
+            m_mark = true;
+        }
+        
+        virtual void unmark()
+        {
+            m_mark = false;
+        }
+        
         virtual bool is_unmarked() const
         {
             return !is_marked();
@@ -40,16 +50,6 @@ namespace l_language
         }
         
     protected:
-        
-        virtual void mark()
-        {
-            m_mark = true;
-        }
-        
-        virtual void unmark()
-        {
-            m_mark = false;
-        }
         
         virtual ~l_obj()
         {

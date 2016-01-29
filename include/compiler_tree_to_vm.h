@@ -174,6 +174,21 @@ namespace l_language
                 //return true...
                 return true;
             }
+            else if(node->m_type == syntactic_tree::TABLE_NODE)
+            {
+                //cast to array
+                auto* table_node = node->to<syntactic_tree::table_node>();
+                //push all
+                for(auto& node_exp:table_node->m_exps)
+                {
+                    if(!compile_exp(fun,node_exp[0])) return false;
+                    if(!compile_exp(fun,node_exp[1])) return false;
+                }
+                //init table
+                fun->push({ L_NEW_TABLE, (int)table_node->m_exps.size()*2, node->m_line });
+                //return true...
+                return true;
+            }
             return false;
         }
         
