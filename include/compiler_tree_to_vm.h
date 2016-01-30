@@ -316,17 +316,13 @@ namespace l_language
         bool compile_call(l_function* fun,syntactic_tree::call_node* call_node)
         {
             int n_args = (int)call_node->m_args.size();
-            //push call
-            auto* call_name = (syntactic_tree::variable_node*)call_node->m_assignable;
-            //search in vars
-            int var_id = get_var_id(fun, call_name->m_name);
             //push args
             for(syntactic_tree::exp_node* exp_node : call_node->m_args)
             {
                 compile_exp(fun, exp_node);
             }
             //push call
-            fun->push({ L_GET_GLOBAL, var_id, call_node->m_line });
+            compile_assignable_get(fun,call_node->m_assignable);
             //push call
             fun->push({ L_CALL, n_args, call_node->m_line });
             //success

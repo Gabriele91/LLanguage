@@ -1,4 +1,13 @@
+c =
+{
+    "print" : print,
+    "input" : input,
+    "type" : type_of
+}
 
+c.print(c.type([]),"\n")
+
+/*
 l = {}
 l.hello = "ciao"
 l .hell = "inferno"
@@ -26,7 +35,16 @@ for v of l
 print(
     l [ "jpg" ] . some , "\n"
 )
-
+*/
+/*
+std = {}
+std.print = print
+std.to_int = to_int
+std.to_float = to_float
+std.to_string = to_string
+std.input = input
+std.print ( "this is a std function\n", std.input (), "\n" )
+ */
 /*
 s = []
 s[0] = 1
@@ -36,6 +54,7 @@ l = { }
 l.hello = "ciao"
 
 print( l["hello"] )
+*/
 
 /*
 c =
