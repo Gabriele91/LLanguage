@@ -6,7 +6,7 @@
 //  Copyright © 2016 Gabriele Di Bari. All rights reserved.
 //
 #include <l_lib_base.h>
-
+#include <cmath>
 int l_print(l_language::l_thread* th,int args)
 {
     for(size_t i=0; i!=args; ++i)
@@ -95,6 +95,38 @@ int l_to_float(l_language::l_thread* th,int args)
     //return
     return 1;
 }
+
+int l_mod(l_language::l_thread* th,int args)
+{
+    //get arg
+    l_language::l_variable& var       = th->value(args-1);
+    l_language::l_variable& var_right = th->value(args-2);
+    //cast
+    float f = 0;
+    //cast
+    switch (var.m_type)
+    {
+        case l_language::l_variable::INT: f = (float)var.m_value.m_i; break;
+        case l_language::l_variable::FLOAT: f = var.m_value.m_f; break;
+        case l_language::l_variable::STRING: f = std::atof(var.string()->c_str()); break;
+        default: assert(0); break;
+    }
+    //cast
+    float f_right = 0;
+    //cast
+    switch (var.m_type)
+    {
+        case l_language::l_variable::INT: f_right = (float)var_right.m_value.m_i; break;
+        case l_language::l_variable::FLOAT: f_right = var_right.m_value.m_f; break;
+        case l_language::l_variable::STRING: f_right = std::atof(var_right.string()->c_str()); break;
+        default: assert(0); break;
+    }
+    //push string
+    th->push_return(l_language::l_variable(std::fmod(f,f_right)),args);
+    //return
+    return 1;
+}
+
 int l_to_string(l_language::l_thread* th,int args)
 {
     //get arg
@@ -146,6 +178,7 @@ namespace l_language
         { "to_int",    l_to_int    },
         { "to_float",  l_to_float  },
         { "to_string", l_to_string },
-        { "type_of",   l_type_of   }
+        { "type_of",   l_type_of   },
+        { "mod",     l_mod       }
     };
 }

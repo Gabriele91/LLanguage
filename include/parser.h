@@ -64,7 +64,7 @@ namespace l_language
 	italanguage := staments
 	staments    := { stament }
     stament		:=  if | call | cicle | operation
-    assignment  := '=' | '<-'
+    assignment  := '=' | '<-' | "+=" | "-=" | "*=" | "/="
     operation   := assignable assignament exp | call
     if			:= 'if' exp '{' staments '}' {[ else_if ]} [ else ]
     else_if     :=  else if exp '{' staments '}'
@@ -629,7 +629,13 @@ namespace l_language
                         //jump assignament
                         if(is_assignment(ptr))
                         {
-                            parse_assignment(ptr);
+                            std::string op_name;
+                            parse_assignment(ptr,op_name);
+                            if(op_name!="=")
+                            {
+                                push_error("not found valid assignment statement");
+                                return false;
+                            }
                         }
                         else if(!CSTRCMP_SKIP(ptr,":"))
                         {
@@ -1127,20 +1133,36 @@ namespace l_language
             if (CSTRCMP_SKIP(ptr, "=")) return true;
             // <- ?
             if (CSTRCMP_SKIP(ptr, "<-")) return true;
+            // += ?
+            if (CSTRCMP_SKIP(ptr, "+=")) return true;
+            // -= ?
+            if (CSTRCMP_SKIP(ptr, "-=")) return true;
+            // *= ?
+            if (CSTRCMP_SKIP(ptr, "*=")) return true;
+            // /= ?
+            if (CSTRCMP_SKIP(ptr, "/=")) return true;
             // it isn't an assignment
             return false;
         }
         //parse assignment
-        bool parse_assignment(const char*& ptr)
+        bool parse_assignment(const char*& ptr,std::string& name)
         {
             //skip
             skip_space_end_comment(ptr);
             // = ?
-            if (CSTRCMP_SKIP(ptr, "=")) return true;
+            if (CSTRCMP_SKIP(ptr, "=")){ name="="; return true; }
             // 'come' ?
-            if (CSTRCMP_SKIP(ptr, "<-")) return true;
+            if (CSTRCMP_SKIP(ptr, "<-")){ name="="; return true; }
+            // += ?
+            if (CSTRCMP_SKIP(ptr, "+=")){ name="+="; return true; }
+            // -= ?
+            if (CSTRCMP_SKIP(ptr, "-=")){ name="-="; return true; }
+            // *= ?
+            if (CSTRCMP_SKIP(ptr, "*=")){ name="*="; return true; }
+            // /= ?
+            if (CSTRCMP_SKIP(ptr, "/=")){ name="/="; return true; }
             //error
-            push_error("not find = or <-");
+            push_error("not find (+|-|*|/)?= or <-");
             return false;
         }
         //is operation?
@@ -1171,14 +1193,16 @@ namespace l_language
                 //find assignment ?
 				if (is_assignment(ptr))
                 {
+                    //op name
+                    std::string op_name;
                     //parse exp
-                    if (!parse_assignment(ptr) || !parse_exp(ptr, exp))
+                    if (!parse_assignment(ptr,op_name) || !parse_exp(ptr, exp))
                     {
                         if (assignable_node) delete assignable_node;
                         return false;
                     }
                     //build node
-                    node = syntactic_tree::operation((syntactic_tree::assignable_node*)assignable_node, exp, m_line);
+                    node = syntactic_tree::assignment((syntactic_tree::assignable_node*)assignable_node, op_name, exp, m_line);
                 }
                 //is call args?
                 else if(is_call_args(ptr))

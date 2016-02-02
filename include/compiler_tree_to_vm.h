@@ -196,15 +196,52 @@ namespace l_language
         //compile op
         bool compile_op(l_function* fun,syntactic_tree::op_node* node)
         {
+            
+            //no op
+            l_op_code opcode = L_NO_OP;
+            //cases
+            if(node->m_name == "+=") opcode = L_ADD;
+            else if(node->m_name == "-=") opcode = L_SUB;
+            else if(node->m_name == "*=") opcode = L_MUL;
+            else if(node->m_name == "/=") opcode = L_DIV;
+            //
             if(node->m_assignable->is_variable())
             {
+                //is (+|-|*|/)=
+                if(opcode != L_NO_OP)
+                {
+                    //get <var>
+                    compile_variable_get(fun,node->m_assignable->to<syntactic_tree::variable_node>());
+                }
+                //<exp>
                 if(!compile_exp(fun,node->m_exp)) return false;
+                //op
+                //+|-|*|/
+                if(opcode != L_NO_OP)
+                {
+                    fun->push({ opcode, 0, node->m_line });
+                }
+                //set var
                 compile_variable_set(fun,node->m_assignable->to<syntactic_tree::variable_node>());
             }
             else
             {
                 if(!compile_assignable_set(fun,node->m_assignable)) return false;
+                //is (+|-|*|/)=
+                if(opcode != L_NO_OP)
+                {
+                    //get <var>
+                    if(!compile_assignable_get(fun,node->m_assignable)) return false;
+                }
+                //exp
                 if(!compile_exp(fun,node->m_exp)) return false;
+                //op
+                //+|-|*|/
+                if(opcode != L_NO_OP)
+                {
+                    fun->push({ opcode, 0, node->m_line });
+                }
+                //pusn into array
                 fun->push({ L_SET_AT_VAL, 0, node->m_line });
             }
             

@@ -110,8 +110,17 @@ namespace l_language
 		class op_node : public node
 		{
 		public:
-
-			//variable and exp
+            
+            enum type_op
+            {
+                OP_ASSIGNMENT,
+                OP_INC,
+                OP_DEC
+            };
+            
+            //variable and exp
+            type_op          m_type_op { OP_ASSIGNMENT };
+            std::string      m_name;
 			assignable_node* m_assignable{ nullptr };
 			exp_node*        m_exp{ nullptr };
 
@@ -790,23 +799,27 @@ namespace l_language
 		}
 
 		//operation
-		static op_node* operation(assignable_node* assignable, exp_node* exp, size_t line = 0, size_t ichar = 0)
+		static op_node* operation(assignable_node* assignable, op_node::type_op type,const std::string& name, exp_node* exp, size_t line = 0, size_t ichar = 0)
 		{
-			auto* node = new op_node;
-			node->m_assignable = assignable;
+            auto* node = new op_node;
+            node->m_assignable = assignable;
+            node->m_type_op = type;
+            node->m_name = name;
 			node->m_exp = exp;
 			node->m_line = line;
 			node->m_char = ichar;
 			return node;
 		}
 
-		static op_node* assignment(assignable_node* assignable, exp_node* exp, size_t line = 0, size_t ichar = 0)
+		static op_node* assignment(assignable_node* assignable, const std::string& name,exp_node* exp, size_t line = 0, size_t ichar = 0)
 		{
 			auto* node = new op_node;
 			node->m_assignable = assignable;
-			node->m_exp = exp;
-			node->m_line = line;
-			node->m_char = ichar;
+            node->m_name       = name;
+            node->m_type_op    = op_node::OP_ASSIGNMENT;
+			node->m_exp        = exp;
+			node->m_line       = line;
+			node->m_char       = ichar;
 			return node;
         }
         //while stament
