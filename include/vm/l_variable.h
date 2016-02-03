@@ -143,6 +143,28 @@ namespace l_language
             return m_type == CFUNCTION;
         }
         
+        int to_int()
+        {
+                 if(is_int())   return m_value.m_i;
+            else if(is_float()) return m_value.m_f;
+            assert(0);
+        }
+        
+        float to_float()
+        {
+                 if(is_float()) return m_value.m_f;
+            else if(is_int())   return m_value.m_i;
+            assert(0);
+        }
+        
+        std::string to_string()
+        {
+                 if(is_float()) return std::to_string(m_value.m_f);
+            else if(is_int())   return std::to_string(m_value.m_i);
+            else if(is_string())return string()->str();
+            assert(0);
+        }
+
         l_string* string()
         {
             return dynamic_cast< l_string* >( m_value.m_pobj );

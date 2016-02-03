@@ -101,28 +101,19 @@ int l_mod(l_language::l_thread* th,int args)
     //get arg
     l_language::l_variable& var       = th->value(args-1);
     l_language::l_variable& var_right = th->value(args-2);
-    //cast
-    float f = 0;
-    //cast
-    switch (var.m_type)
+    //cases
+    if(var.is_float() || var.is_float())
     {
-        case l_language::l_variable::INT: f = (float)var.m_value.m_i; break;
-        case l_language::l_variable::FLOAT: f = var.m_value.m_f; break;
-        case l_language::l_variable::STRING: f = std::atof(var.string()->c_str()); break;
-        default: assert(0); break;
+        th->push_return(l_language::l_variable(std::fmod(var.to_float(),var_right.to_float())),args);
     }
-    //cast
-    float f_right = 0;
-    //cast
-    switch (var.m_type)
+    else if(var.is_int() && var.is_int())
     {
-        case l_language::l_variable::INT: f_right = (float)var_right.m_value.m_i; break;
-        case l_language::l_variable::FLOAT: f_right = var_right.m_value.m_f; break;
-        case l_language::l_variable::STRING: f_right = std::atof(var_right.string()->c_str()); break;
-        default: assert(0); break;
+        th->push_return(l_language::l_variable(var.to_int() % var_right.to_int()),args);
     }
-    //push string
-    th->push_return(l_language::l_variable(std::fmod(f,f_right)),args);
+    else
+    {
+        th->push_return(l_language::l_variable(0),args);
+    }
     //return
     return 1;
 }

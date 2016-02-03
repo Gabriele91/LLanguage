@@ -284,9 +284,9 @@ namespace l_language
         //global modules
         l_list_variables m_globals;
         //thread list
-        l_list_threads  m_threads;
+        l_list_threads   m_threads;
         //functions
-        l_list_function m_functions;
+        l_list_function  m_functions;
         //get gc
         l_gc& get_gc()
         {
