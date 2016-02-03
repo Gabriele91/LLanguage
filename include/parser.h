@@ -195,11 +195,11 @@ namespace l_language
 		{
 			return c == '\"';
 		}
-		static bool is_uint_number(char c)
+		static bool is_start_uint_number(char c)
 		{
 			return 	 (c >= '0' && c <= '9');
 		}
-		static bool is_float_number(char c)
+		static bool is_start_ufloat_number(char c)
 		{
 			return 	 (c >= '0' && c <= '9') || c == '.';
 		}
@@ -242,6 +242,26 @@ namespace l_language
         static bool is_point(char c)
         {
             return (c == '.');
+        }
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        bool is_int_number(const char* c)
+        {
+            //minus
+            if (!is_start_int_number(*c)) return false;
+            //this part is equals of uint
+            while (is_start_uint_number(*c)) ++c;
+            //isn't a point
+            return (*c)!='.';
+        }
+        bool is_float_number(const char* c)
+        {
+            if(is_int_number(c)) return false;
+            //minus
+            if (!is_start_float_number(*c)) return false;
+            //this part is equals of uint
+            while (is_start_ufloat_number(*c)) ++c;
+            //isn't a point
+            return true;
         }
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		void skip_line_space(const char*& inout)
@@ -291,11 +311,11 @@ namespace l_language
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		//parser
 		//parser of a unsigned int number
-		static bool parse_uint_number(const char*& c, size_t& i)
+		static bool parse_uint_number(const char*& c, unsigned int& i)
 		{
 			std::string number;
 
-			while (is_uint_number(*c)) { number += (*c); ++c; }
+			while (is_start_uint_number(*c)) { number += (*c); ++c; }
 
 			if (number.size())
 			{
@@ -314,10 +334,10 @@ namespace l_language
 			{
 				number += (*c);
 				++c;
-				if (!is_uint_number(*c)) return false;
+				if (!is_start_uint_number(*c)) return false;
 			}
 			//this part is equals of uint
-			while (is_uint_number(*c)) { number += (*c); ++c; }
+			while (is_start_uint_number(*c)) { number += (*c); ++c; }
 
 			if (number.size())
 			{
@@ -332,14 +352,14 @@ namespace l_language
 		{
 			std::string number;
 			//before point
-			while (is_uint_number(*c)) { number += (*c); ++c; }
+			while (is_start_uint_number(*c)) { number += (*c); ++c; }
 			//find point?
-			if ((*c) == '.' && is_uint_number(*(c + 1)))
+			if ((*c) == '.' && is_start_uint_number(*(c + 1)))
 			{
 				number += (*c); ++c;
 			}
 			//next point
-			while (is_uint_number(*c)) { number += (*c); ++c; }
+			while (is_start_uint_number(*c)) { number += (*c); ++c; }
 			//return float
 			if (number.size())
 			{
@@ -357,14 +377,14 @@ namespace l_language
 			{
 				number += (*c);
 				++c;
-				if (!is_float_number(*c)) return false;
+				if (!is_start_ufloat_number(*c)) return false;
 			}
 			//before point
-			while (is_uint_number(*c)) { number += (*c); ++c; }
+			while (is_start_uint_number(*c)) { number += (*c); ++c; }
 			//find point?
 			if ((*c) == '.') { number += (*c); ++c; }
 			//next point
-			while (is_uint_number(*c)) { number += (*c); ++c; }
+			while (is_start_uint_number(*c)) { number += (*c); ++c; }
 			//return float
 			if (number.size())
 			{
@@ -490,18 +510,29 @@ namespace l_language
 		//parse value
 		bool parse_value(const char*& ptr, syntactic_tree::exp_node*& node)
 		{
-			skip_space_end_comment(ptr);
-			//costant number
-			if (is_float_number(*ptr))
-			{
-				float value = 0;
-				if (!parse_ufloat_number(ptr, value))
-				{
-					push_error("not valid float costant");
-					return false;
-				}
-				node = syntactic_tree::constant(value, m_line);
-			}
+            skip_space_end_comment(ptr);
+            //costant int
+            if (is_int_number(ptr))
+            {
+                int value = 0;
+                if (!parse_int_number(ptr, value))
+                {
+                    push_error("not valid float costant");
+                    return false;
+                }
+                node = syntactic_tree::constant((int)value, m_line);
+            }
+            //costant float
+            else if (is_float_number(ptr))
+            {
+                float value = 0;
+                if (!parse_float_number(ptr, value))
+                {
+                    push_error("not valid float costant");
+                    return false;
+                }
+                node = syntactic_tree::constant(value, m_line);
+            }
 			//costant string
 			else if (is_start_string(*ptr))
 			{
