@@ -437,7 +437,9 @@ namespace l_language
                         for(int i = (cmp.m_arg)-1; i >= 0; i-=2)
                         {
                             //push key and value
-                            table->operator[](stack(1)) = pop();
+                            table->operator[](stack(1)) = stack(0);
+							//pop value
+							pop();
                             //pop key
                             pop();
                         }

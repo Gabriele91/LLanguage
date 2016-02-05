@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="File di origine">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="File di intestazione">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="File di risorse">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="File di origine\vm">
+      <UniqueIdentifier>{42680c75-073c-4f81-8a83-683077153365}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di intestazione\vm">
+      <UniqueIdentifier>{defaede5-34e0-48b8-817f-70bee97c4abe}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\main.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_compile_tree_to_cpp.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_compile_tree_to_js.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_compiler_utilities.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_gc.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_lib_base.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_string.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_vm.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\backend_cpp_header.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\compile_tree_to_cpp.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\compile_tree_to_js.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\compiler_tree_to_vm.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\config.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\l_compiler_utilities.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\l_lib_base.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\l_table.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\parser.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\program_language.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\syntactic_tree.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\variables_context.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vm\l_gc.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vm\l_object.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vm\l_string.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vm\l_variable.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vm\l_vector.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vm\l_vm.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
