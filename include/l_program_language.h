@@ -7,7 +7,7 @@
 //
 #pragma once
 
-#include <config.h>
+#include <l_config.h>
 #include <l_compiler_tree_to_vm.h>
 #include <l_syntactic_tree.h>
 #include <l_parser.h>
@@ -52,10 +52,9 @@ namespace l_language
         enum compiler_flags
         {
             NONE    = 0x0000,
-            TO_JS   = 0x0001,
-            TO_CPP  = 0b0010,
-            TO_VM   = 0b0100,
-            ERRORS  = 0b1000
+            ERRORS  = 0b0001,
+            EXECUTE = 0b0010,
+            DUMP    = 0b0100,
         };
         
         struct compiler_ouput
@@ -66,7 +65,7 @@ namespace l_language
             std::string m_errors;
         };
         
-        compiler_ouput compile(const std::string& source_code,int flags = NONE)
+        compiler_ouput compile(const std::string& source_code,int flags = EXECUTE)
         {
             //targets
             tree         it_tree;
@@ -87,13 +86,13 @@ namespace l_language
             }
             //else compile to...
             //VM COMPILER
-            if(flags & TO_VM)
+            if(flags & (EXECUTE|DUMP))
             {
                 m_thread= m_vm_comp.compile(&it_tree);
                 //main bytecode
-                m_vm.m_functions[0].dump_all_function();
+                if(flags & DUMP)    m_vm.m_functions[0].dump_all_function();
                 //start
-                m_vm.execute(m_thread);
+                if(flags & EXECUTE) m_vm.execute(m_thread);
             }
             //return...
             return output;

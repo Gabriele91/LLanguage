@@ -2,11 +2,11 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <program_language.h>
+#include <l_program_language.h>
 #include <l_lib_base.h>
 #define STR_VERSION_MAJOR "0"
-#define STR_VERSION_MINOR "1"
-#define STR_VERSION_MAINTENANCE "2"
+#define STR_VERSION_MINOR "2"
+#define STR_VERSION_MAINTENANCE "0"
 
 
 
@@ -16,8 +16,8 @@ int main(int argc,const char* args[])
 {
     //fast access
     using program_language = l_language::l_program_language;
-    using compiler_flags   = program_language::compiler_flags;
-    using compiler_ouput   = program_language::compiler_ouput;
+    using compiler_flags   = l_language::l_program_language::compiler_flags;
+    using compiler_ouput   = l_language::l_program_language::compiler_ouput;
     //name app
     std::string name(args[0]);
     //C++ args
@@ -28,10 +28,8 @@ int main(int argc,const char* args[])
     for(size_t i=1;i!=argc;++i) v_args[i-1]=args[i];
     //options
     bool         b_show_version  = false;
-    int          f_compier_flags = compiler_flags::TO_VM;
+    int          f_compier_flags = compiler_flags::NONE;
     std::string  i_source;
-    std::string  o_source_cpp;
-    std::string  o_source_js;
     {
         if(v_args.size()==1 && ( v_args[0]=="-h" || v_args[0]=="--help" ))
         {
@@ -40,8 +38,7 @@ int main(int argc,const char* args[])
             MESSAGE( "\t--help/-h help" );
             MESSAGE( "\t--version/-v compiler version" );
             MESSAGE( "\t--source/-s <path> source code" );
-            MESSAGE( "\t--output-cpp/-o <path>  output C++ code" );
-            MESSAGE( "\t--output-js/-j <path> output javascript code" );
+            MESSAGE( "\t--dump/-d dump bytecode" );
             return 0;
         }
         else if(v_args.size()==1)
@@ -58,23 +55,18 @@ int main(int argc,const char* args[])
                 {
                     b_show_version = true;
                 }
+                if (v_args[arg] == "-d" || v_args[arg] == "--dump")
+                {
+                    f_compier_flags |= compiler_flags::DUMP;
+                }
                 else if( (arg+1)!= v_args.size() )
                 {
                     if (v_args[arg] == "-s" || v_args[arg] == "--source")
                     {
+                        //save path
                         i_source = v_args[arg + 1]; ++arg;
-                    }
-                    else if (v_args[arg] == "-o" || v_args[arg] == "--output-cpp")
-                    {
-                        f_compier_flags ^= compiler_flags::TO_VM;
-                        f_compier_flags |= compiler_flags::TO_CPP;
-                        o_source_cpp     = v_args[arg + 1]; ++arg;
-                    }
-                    else if (v_args[arg] == "-j" || v_args[arg] == "--output-js")
-                    {
-                        f_compier_flags ^= compiler_flags::TO_VM;
-                        f_compier_flags |= compiler_flags::TO_JS;
-                        o_source_js      = v_args[arg + 1]; ++arg;
+                        //execute
+                        f_compier_flags |= compiler_flags::EXECUTE;
                     }
                     else
                     {
@@ -114,22 +106,6 @@ int main(int argc,const char* args[])
         if(compiler_ouput.m_type & program_language::ERRORS)
         {
             std::cout << compiler_ouput.m_errors;
-        }
-        //output code cpp
-        if( f_compier_flags & compiler_flags::TO_CPP )
-        {
-            //"TestOputCode/_ouput_.cpp"
-            std::ofstream outfile(o_source_cpp);
-            outfile << compiler_ouput.m_out_cpp;
-            outfile.close();
-        }
-        //output code js
-        if( f_compier_flags & compiler_flags::TO_JS )
-        {
-            //"TestOputCodeJS/index.html"
-            std::ofstream outfile(o_source_js);
-            outfile << compiler_ouput.m_out_js;
-            outfile.close();
         }
     }
     

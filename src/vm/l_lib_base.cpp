@@ -45,6 +45,13 @@ int l_print(l_language::l_thread* th,int args)
     return 0;
 }
 
+int l_println(l_language::l_thread* th,int args)
+{
+    int output = l_print(th, args);
+    printf("\n");
+    return output;
+}
+
 int l_input(l_language::l_thread* th,int args)
 {
     //str
@@ -165,6 +172,7 @@ namespace l_language
     l_language::l_program_language::l_extern_libary l_base_lib=
     {
         { "print",     l_print     },
+        { "println",   l_println   },
         { "input",     l_input     },
         { "to_int",    l_to_int    },
         { "to_float",  l_to_float  },

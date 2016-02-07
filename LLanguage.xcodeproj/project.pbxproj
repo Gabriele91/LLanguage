@@ -35,8 +35,8 @@
 		E05F4B501C589BB600F7EB6A /* l_compiler_utilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_compiler_utilities.cpp; sourceTree = "<group>"; };
 		E071D70B1C4AC9D1008840D3 /* l_vm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_vm.cpp; sourceTree = "<group>"; };
 		E072DDC71C35353200B197A1 /* LLanguage */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LLanguage; sourceTree = BUILT_PRODUCTS_DIR; };
-		E072DDD61C35357A00B197A1 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
-		E072DDD81C35357A00B197A1 /* program_language.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = program_language.h; sourceTree = "<group>"; };
+		E072DDD61C35357A00B197A1 /* l_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = l_config.h; sourceTree = "<group>"; };
+		E072DDD81C35357A00B197A1 /* l_program_language.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = l_program_language.h; sourceTree = "<group>"; };
 		E072DDDB1C35357A00B197A1 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		E08511D31C3D6205005AC8B2 /* source.ll */ = {isa = PBXFileReference; explicitFileType = text.json; fileEncoding = 4; path = source.ll; sourceTree = SOURCE_ROOT; };
 		E0891CC71C5A62AD00FB37F6 /* l_variable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = l_variable.h; path = vm/l_variable.h; sourceTree = "<group>"; };
@@ -95,8 +95,8 @@
 			isa = PBXGroup;
 			children = (
 				E0950C751C4A870D00845FEE /* vm */,
-				E072DDD61C35357A00B197A1 /* config.h */,
-				E072DDD81C35357A00B197A1 /* program_language.h */,
+				E072DDD61C35357A00B197A1 /* l_config.h */,
+				E072DDD81C35357A00B197A1 /* l_program_language.h */,
 			);
 			path = include;
 			sourceTree = SOURCE_ROOT;
