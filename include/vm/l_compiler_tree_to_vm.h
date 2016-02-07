@@ -1,5 +1,5 @@
 //
-//  compiler_tree_to_vm.h
+//  l_compiler_tree_to_vm.h
 //  LLanguage
 //
 //  Created by Gabriele on 19/01/16.
@@ -9,12 +9,12 @@
 #include <string>
 #include <map>
 #include <l_vm.h>
-#include <syntactic_tree.h>
-#include <variables_context.h>
+#include <l_syntactic_tree.h>
+#include <l_variables_context.h>
 #if 1
 namespace l_language
 {
-    class compiler_tree_to_vm : public variables_context
+    class l_compiler_tree_to_vm : public l_variables_context
     {
         /*
         //fun
@@ -37,7 +37,7 @@ namespace l_language
         
         
         
-        bool compile_variable_set(l_function* fun,syntactic_tree::variable_node* node)
+        bool compile_variable_set(l_function* fun,l_syntactic_tree::variable_node* node)
         {
             if(fun == m_main)
             {
@@ -50,7 +50,7 @@ namespace l_language
             return true;
         }
         
-        bool compile_variable_get(l_function* fun,syntactic_tree::variable_node* node)
+        bool compile_variable_get(l_function* fun,l_syntactic_tree::variable_node* node)
         {
             if(fun == m_main)
             {
@@ -63,10 +63,10 @@ namespace l_language
             return true;
         }
         
-        bool compile_assignable(l_function* fun,syntactic_tree::assignable_node* node,int is_not_first = true)
+        bool compile_assignable(l_function* fun,l_syntactic_tree::assignable_node* node,int is_not_first = true)
         {
             //return variable
-            if (node->m_type == syntactic_tree::VARIABLE_NODE)
+            if (node->m_type == l_syntactic_tree::VARIABLE_NODE)
             {
                 return compile_variable_get(fun,node->to_variable_node());
             }
@@ -80,22 +80,22 @@ namespace l_language
             return true;
         }
         
-        bool compile_assignable_get(l_function* fun,syntactic_tree::assignable_node* node)
+        bool compile_assignable_get(l_function* fun,l_syntactic_tree::assignable_node* node)
         {
             //return
             return compile_assignable(fun,node,true);
         }
         
-        bool compile_assignable_set(l_function* fun,syntactic_tree::assignable_node* node)
+        bool compile_assignable_set(l_function* fun,l_syntactic_tree::assignable_node* node)
         {
             //return
             return compile_assignable(fun,node,false);
         }
         
         //exp
-        bool compile_exp(l_function* fun,syntactic_tree::exp_node* node)
+        bool compile_exp(l_function* fun,l_syntactic_tree::exp_node* node)
         {
-            if (node->m_type == syntactic_tree::EXP_NODE)
+            if (node->m_type == l_syntactic_tree::EXP_NODE)
             {
                 if (node->is_link())
                 {
@@ -141,30 +141,30 @@ namespace l_language
                 return true;
                 
             }
-            else if (node->m_type == syntactic_tree::CONSTANT_NODE)
+            else if (node->m_type == l_syntactic_tree::CONSTANT_NODE)
             {
                 //cast
-                syntactic_tree::constant_node* c_node = node->to<syntactic_tree::constant_node>();
+                l_syntactic_tree::constant_node* c_node = node->to<l_syntactic_tree::constant_node>();
                 //push command
                 fun->push({ L_PUSHK,  get_const_id(fun, c_node), node->m_line });
                 //success
                 return true;
             }
-            else if (node->m_type == syntactic_tree::FIELD_NODE ||
-                     node->m_type == syntactic_tree::VARIABLE_NODE)
+            else if (node->m_type == l_syntactic_tree::FIELD_NODE ||
+                     node->m_type == l_syntactic_tree::VARIABLE_NODE)
             {
-                auto*  assignable_node = node->to<syntactic_tree::assignable_node>();
+                auto*  assignable_node = node->to<l_syntactic_tree::assignable_node>();
                 return compile_assignable_get(fun,assignable_node);
             }
-            else if(node->m_type == syntactic_tree::CALL_NODE)
+            else if(node->m_type == l_syntactic_tree::CALL_NODE)
             {
                 //return true...
-                return compile_call(fun, (syntactic_tree::call_node*)node);
+                return compile_call(fun, (l_syntactic_tree::call_node*)node);
             }
-            else if(node->m_type == syntactic_tree::ARRAY_NODE)
+            else if(node->m_type == l_syntactic_tree::ARRAY_NODE)
             {
                 //cast to array
-                auto* array_node = node->to<syntactic_tree::array_node>();
+                auto* array_node = node->to<l_syntactic_tree::array_node>();
                 //push all
                 for(auto& node_exp:array_node->m_exps)
                 {
@@ -175,10 +175,10 @@ namespace l_language
                 //return true...
                 return true;
             }
-            else if(node->m_type == syntactic_tree::TABLE_NODE)
+            else if(node->m_type == l_syntactic_tree::TABLE_NODE)
             {
                 //cast to array
-                auto* table_node = node->to<syntactic_tree::table_node>();
+                auto* table_node = node->to<l_syntactic_tree::table_node>();
                 //push all
                 for(auto& node_exp:table_node->m_exps)
                 {
@@ -194,7 +194,7 @@ namespace l_language
         }
         
         //compile op
-        bool compile_op(l_function* fun,syntactic_tree::op_node* node)
+        bool compile_op(l_function* fun,l_syntactic_tree::op_node* node)
         {
             
             //no op
@@ -211,7 +211,7 @@ namespace l_language
                 if(opcode != L_NO_OP)
                 {
                     //get <var>
-                    compile_variable_get(fun,node->m_assignable->to<syntactic_tree::variable_node>());
+                    compile_variable_get(fun,node->m_assignable->to<l_syntactic_tree::variable_node>());
                 }
                 //<exp>
                 if(!compile_exp(fun,node->m_exp)) return false;
@@ -222,7 +222,7 @@ namespace l_language
                     fun->push({ opcode, 0, node->m_line });
                 }
                 //set var
-                compile_variable_set(fun,node->m_assignable->to<syntactic_tree::variable_node>());
+                compile_variable_set(fun,node->m_assignable->to<l_syntactic_tree::variable_node>());
             }
             else
             {
@@ -248,7 +248,7 @@ namespace l_language
             return true;
         }
         
-        bool compile_while(l_function* fun,syntactic_tree::while_node* node)
+        bool compile_while(l_function* fun,l_syntactic_tree::while_node* node)
         {
             //get current line
             int op_line = (int)fun->m_commands.size();
@@ -266,7 +266,7 @@ namespace l_language
             return true;
         }
         
-        bool compile_if_else(l_function* fun,syntactic_tree::if_node* ifs_node)
+        bool compile_if_else(l_function* fun,l_syntactic_tree::if_node* ifs_node)
         {
             //if lines
             std::vector< size_t > exp_labels;
@@ -314,17 +314,17 @@ namespace l_language
             return true;
         }
         
-        bool compile_for(l_function* fun,syntactic_tree::for_node* for_node)
+        bool compile_for(l_function* fun,l_syntactic_tree::for_node* for_node)
         {
             
-            l_op_code  for_type = for_node->m_type_for == syntactic_tree::for_node::FOR_OF ?
+            l_op_code  for_type = for_node->m_type_for == l_syntactic_tree::for_node::FOR_OF ?
                                   L_FOR_OF :
                                   L_FOR_IN;
             
             switch (for_node->m_type_for)
             {
-                case syntactic_tree::for_node::FOR_OF:
-                case syntactic_tree::for_node::FOR_IN:
+                case l_syntactic_tree::for_node::FOR_OF:
+                case l_syntactic_tree::for_node::FOR_IN:
                 {
                     compile_assignable_get(fun,for_node->m_variable_right);
                     //get it
@@ -335,7 +335,7 @@ namespace l_language
                     size_t for_it = fun->push({ for_type, 0, for_node->m_line });
                     //put
                     //compile_assignable_set(fun,for_node->m_variable_left);
-                    compile_variable_set(fun,for_node->m_variable_left->to<syntactic_tree::variable_node>());
+                    compile_variable_set(fun,for_node->m_variable_left->to<l_syntactic_tree::variable_node>());
                     //statement
                     compile_statements(fun, for_node->m_staments);
                     //.. jmp
@@ -350,11 +350,11 @@ namespace l_language
             return true;
         }
         //compile call
-        bool compile_call(l_function* fun,syntactic_tree::call_node* call_node)
+        bool compile_call(l_function* fun,l_syntactic_tree::call_node* call_node)
         {
             int n_args = (int)call_node->m_args.size();
             //push args
-            for(syntactic_tree::exp_node* exp_node : call_node->m_args)
+            for(l_syntactic_tree::exp_node* exp_node : call_node->m_args)
             {
                 compile_exp(fun, exp_node);
             }
@@ -366,26 +366,26 @@ namespace l_language
             return true;
         }
         //compile a statements
-        bool compile_statements(l_function* fun,syntactic_tree::list_nodes& nodes)
+        bool compile_statements(l_function* fun,l_syntactic_tree::list_nodes& nodes)
         {
-            for (syntactic_tree::node* node : nodes)
+            for (l_syntactic_tree::node* node : nodes)
             {
                 switch (node->m_type)
                 {
-                    case syntactic_tree::OP_NODE:
-                        if(! compile_op(fun,node->to<syntactic_tree::op_node>()) ) return false;
+                    case l_syntactic_tree::OP_NODE:
+                        if(! compile_op(fun,node->to<l_syntactic_tree::op_node>()) ) return false;
                     break;
-                    case syntactic_tree::WHILE_NODE: 
-                        if(! compile_while(fun,node->to<syntactic_tree::while_node>()) ) return false;
+                    case l_syntactic_tree::WHILE_NODE: 
+                        if(! compile_while(fun,node->to<l_syntactic_tree::while_node>()) ) return false;
                     break;
-                    case syntactic_tree::IF_NODE:
-                        if(! compile_if_else(fun,node->to<syntactic_tree::if_node>()) ) return false;
+                    case l_syntactic_tree::IF_NODE:
+                        if(! compile_if_else(fun,node->to<l_syntactic_tree::if_node>()) ) return false;
                     break;
-                    case syntactic_tree::FOR_NODE:
-                        if(! compile_for(fun, node->to<syntactic_tree::for_node>()) ) return false;
+                    case l_syntactic_tree::FOR_NODE:
+                        if(! compile_for(fun, node->to<l_syntactic_tree::for_node>()) ) return false;
                     break;
-                    case syntactic_tree::CALL_NODE:
-                        if(! compile_call(fun,node->to<syntactic_tree::call_node>()) ) return false;
+                    case l_syntactic_tree::CALL_NODE:
+                        if(! compile_call(fun,node->to<l_syntactic_tree::call_node>()) ) return false;
                     break;
                     default:  break;
                 }
@@ -419,7 +419,7 @@ namespace l_language
             
         }
         
-        l_thread* compile(const syntactic_tree* tree)
+        l_thread* compile(const l_syntactic_tree* tree)
         {
             //build tablet
             build_variable_context_from_tree(m_vm, tree);

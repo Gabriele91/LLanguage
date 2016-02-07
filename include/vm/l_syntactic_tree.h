@@ -13,7 +13,7 @@
 namespace l_language
 {
 	//tree
-	class syntactic_tree
+	class l_syntactic_tree
 	{
 	public:
 
@@ -889,7 +889,7 @@ namespace l_language
 			return m_root;
 		}
         //delete root
-        virtual ~syntactic_tree()
+        virtual ~l_syntactic_tree()
         {
             delete m_root;
         }

@@ -8,27 +8,21 @@
 #pragma once
 
 #include <config.h>
-#include <compile_tree_to_cpp.h>
-#include <compile_tree_to_js.h>
-#include <compiler_tree_to_vm.h>
-#include <syntactic_tree.h>
-#include <parser.h>
+#include <l_compiler_tree_to_vm.h>
+#include <l_syntactic_tree.h>
+#include <l_parser.h>
 
 namespace l_language
 {
     class l_program_language
     {
         
-        using tree         = l_language::syntactic_tree;
-        using parser       = l_language::parser;
-        using js_compiler  = l_language::compile_tree_to_js;
-        using cpp_compiler = l_language::compile_tree_to_cpp;
-        using vm_compiler  = l_language::compiler_tree_to_vm;
+        using tree         = l_language::l_syntactic_tree;
+        using parser       = l_language::l_parser;
+        using vm_compiler  = l_language::l_compiler_tree_to_vm;
         //parser...
         parser       m_parser;
         //compilers
-        cpp_compiler m_cpp_comp;
-        js_compiler  m_js_comp;
         vm_compiler  m_vm_comp;
         //virtual machine
         l_vm         m_vm;
@@ -43,22 +37,9 @@ namespace l_language
             
             std::string m_name;
             l_cfunction m_cfunction;
-            std::string m_cpp_function;
-            std::string m_js_function;
             
-            lib_field(std::string name,
-                      l_cfunction  cfunction,
-                      std::string cpp_function,
-                      std::string js_function)
-            {
-                m_name = name;
-                m_cfunction = cfunction;
-                m_cpp_function = cpp_function;
-                m_js_function = js_function;
-            }
-            
-            lib_field(std::string name,
-                      l_cfunction cfunction)
+            lib_field(const std::string& name,
+                      l_cfunction  cfunction)
             {
                 m_name = name;
                 m_cfunction = cfunction;
@@ -105,44 +86,6 @@ namespace l_language
                 return output;
             }
             //else compile to...
-            //CPP COMPILER
-            if(flags & TO_CPP)
-            {
-                m_cpp_comp.compile(&it_tree);
-                //errors?
-                if(m_cpp_comp.m_errors.size())
-                {
-                    //ouput errors
-                    for (auto& error : m_cpp_comp.m_errors)
-                    {
-                        output.m_errors += error + "\n";
-                    }
-                    //output errors
-                    output.m_type |= ERRORS;
-                }
-                //output code
-                output.m_type |= TO_CPP;
-                output.m_out_cpp = m_cpp_comp.m_cpp_code;
-            }
-            //JS COMPILER
-            if(flags & TO_JS)
-            {
-                m_js_comp.compile(&it_tree);
-                //errors?
-                if(m_js_comp.m_errors.size())
-                {
-                    //ouput errors
-                    for (auto& error : m_js_comp.m_errors)
-                    {
-                        output.m_errors += error + "\n";
-                    }
-                    //output errors
-                    output.m_type |= ERRORS;
-                }
-                //output code
-                output.m_type |= TO_JS;
-                output.m_out_js = m_js_comp.m_js_code;
-            }
             //VM COMPILER
             if(flags & TO_VM)
             {

@@ -12,13 +12,13 @@
 #include <map>
 #include <l_vm.h>
 #include <l_variable.h>
-#include <syntactic_tree.h>
+#include <l_syntactic_tree.h>
 
 namespace l_language
 {
     #define TABLE_GET_ERROR 0xFFFFF
     
-    class variables_context
+    class l_variables_context
     {
         
     protected:
@@ -31,7 +31,7 @@ namespace l_language
         struct const_info
         {
             unsigned int m_id { 0 };
-            syntactic_tree::constant_node* m_constant_node { nullptr };
+            l_syntactic_tree::constant_node* m_constant_node { nullptr };
             l_variable m_variable;
             
             const_info()
@@ -40,7 +40,7 @@ namespace l_language
             
             const_info(l_gc* gc,
                        unsigned int l_id = 0,
-                       syntactic_tree::constant_node* constant_node = nullptr)
+                       l_syntactic_tree::constant_node* constant_node = nullptr)
             {
                 m_id = l_id;
                 m_constant_node = constant_node;
@@ -48,13 +48,13 @@ namespace l_language
                 if(m_constant_node)
                     switch (m_constant_node->m_const_type)
                     {
-                        case syntactic_tree::constant_node::INT:
+                        case l_syntactic_tree::constant_node::INT:
                             m_variable=l_variable(m_constant_node->m_value.m_int);
                             break;
-                        case syntactic_tree::constant_node::FLOAT:
+                        case l_syntactic_tree::constant_node::FLOAT:
                             m_variable=l_variable(m_constant_node->m_value.m_float);
                         break;
-                        case syntactic_tree::constant_node::STRING:
+                        case l_syntactic_tree::constant_node::STRING:
                             m_variable=l_string::const_new(gc,m_constant_node->m_value.m_string);
                         break;
                         default: assert(0); break;
@@ -87,46 +87,46 @@ namespace l_language
         unsigned int m_gen_const_id { 0 };
         
         //const to index
-        std::string const_index(syntactic_tree::constant_node* const_value)
+        std::string const_index(l_syntactic_tree::constant_node* const_value)
         {
             //name node
             std::string c_name;
             //name
             switch (const_value->m_const_type)
             {
-                case syntactic_tree::constant_node::FLOAT:  c_name = "float:"+std::to_string(const_value->m_value.m_float); break;
-                case syntactic_tree::constant_node::INT:    c_name = "int:"+std::to_string(const_value->m_value.m_int); break;
-                case syntactic_tree::constant_node::STRING: c_name = "string:"+const_value->m_value.m_string; break;
+                case l_syntactic_tree::constant_node::FLOAT:  c_name = "float:"+std::to_string(const_value->m_value.m_float); break;
+                case l_syntactic_tree::constant_node::INT:    c_name = "int:"+std::to_string(const_value->m_value.m_int); break;
+                case l_syntactic_tree::constant_node::STRING: c_name = "string:"+const_value->m_value.m_string; break;
                 default: assert(0); break;
             }
             
             return c_name;
         }
         
-        void visit(l_function* fun, syntactic_tree::node* node)
+        void visit(l_function* fun, l_syntactic_tree::node* node)
         {
                 
             switch (node->m_type)
             {
-                case syntactic_tree::OP_NODE:     visit(fun,node->to<syntactic_tree::op_node>());    break;
-                case syntactic_tree::CALL_NODE:   visit(fun,node->to<syntactic_tree::call_node>());  break;
-                case syntactic_tree::IF_NODE:     visit(fun,node->to<syntactic_tree::if_node>());    break;
-                case syntactic_tree::WHILE_NODE:  visit(fun,node->to<syntactic_tree::while_node>()); break;
-                case syntactic_tree::FOR_NODE:    visit(fun,node->to<syntactic_tree::for_node>());   break;
+                case l_syntactic_tree::OP_NODE:     visit(fun,node->to<l_syntactic_tree::op_node>());    break;
+                case l_syntactic_tree::CALL_NODE:   visit(fun,node->to<l_syntactic_tree::call_node>());  break;
+                case l_syntactic_tree::IF_NODE:     visit(fun,node->to<l_syntactic_tree::if_node>());    break;
+                case l_syntactic_tree::WHILE_NODE:  visit(fun,node->to<l_syntactic_tree::while_node>()); break;
+                case l_syntactic_tree::FOR_NODE:    visit(fun,node->to<l_syntactic_tree::for_node>());   break;
                 default: assert(0); break;
             }
         }
         
         //assignable
-        void visit(l_function* fun,syntactic_tree::variable_node* node)
+        void visit(l_function* fun,l_syntactic_tree::variable_node* node)
         {
             add_variable_into_table(fun, node->m_name);
         }
         
-        void visit(l_function* fun,syntactic_tree::assignable_node* node)
+        void visit(l_function* fun,l_syntactic_tree::assignable_node* node)
         {
             //return variable
-            if (node->m_type == syntactic_tree::VARIABLE_NODE)
+            if (node->m_type == l_syntactic_tree::VARIABLE_NODE)
             {
                 visit(fun,node->to_variable_node());
                 return;
@@ -138,7 +138,7 @@ namespace l_language
         }
         
         //call
-        void visit(l_function*  fun, syntactic_tree::call_node* call_node)
+        void visit(l_function*  fun, l_syntactic_tree::call_node* call_node)
         {
             //args
             for (size_t i = 0; i != call_node->m_args.size(); ++i)
@@ -150,38 +150,38 @@ namespace l_language
         }
         
         //exp
-        void visit(l_function* fun, syntactic_tree::exp_node* exp_node)
+        void visit(l_function* fun, l_syntactic_tree::exp_node* exp_node)
         {
-            if (exp_node->m_type == syntactic_tree::EXP_NODE)
+            if (exp_node->m_type == l_syntactic_tree::EXP_NODE)
             {
                 if(exp_node->m_left) visit(fun,exp_node->m_left);
                 if(exp_node->m_right) visit(fun,exp_node->m_right);
             }
-            else if (exp_node->m_type == syntactic_tree::CONSTANT_NODE)
+            else if (exp_node->m_type == l_syntactic_tree::CONSTANT_NODE)
             {
-                syntactic_tree::constant_node* c_node = exp_node->to<syntactic_tree::constant_node>();
+                l_syntactic_tree::constant_node* c_node = exp_node->to<l_syntactic_tree::constant_node>();
                 add_const_into_table(fun,c_node);
             }
-            else if (exp_node->m_type == syntactic_tree::CALL_NODE)
+            else if (exp_node->m_type == l_syntactic_tree::CALL_NODE)
             {
-                auto*  call_node = exp_node->to<syntactic_tree::call_node>();
+                auto*  call_node = exp_node->to<l_syntactic_tree::call_node>();
                 visit(fun,call_node);
             }
-            else if (exp_node->m_type == syntactic_tree::FIELD_NODE ||
-                     exp_node->m_type == syntactic_tree::VARIABLE_NODE)
+            else if (exp_node->m_type == l_syntactic_tree::FIELD_NODE ||
+                     exp_node->m_type == l_syntactic_tree::VARIABLE_NODE)
             {
-                auto*  assignable_node = exp_node->to<syntactic_tree::assignable_node>();
+                auto*  assignable_node = exp_node->to<l_syntactic_tree::assignable_node>();
                 visit(fun,assignable_node);
             }
-            else if(exp_node->m_type == syntactic_tree::ARRAY_NODE)
+            else if(exp_node->m_type == l_syntactic_tree::ARRAY_NODE)
             {
-                auto* array_node = exp_node->to<syntactic_tree::array_node>();
+                auto* array_node = exp_node->to<l_syntactic_tree::array_node>();
                 //create array declaretion
                 for(auto& arr_node_exp:array_node->m_exps) visit(fun,arr_node_exp);
             }
-            else if(exp_node->m_type == syntactic_tree::TABLE_NODE)
+            else if(exp_node->m_type == l_syntactic_tree::TABLE_NODE)
             {
-                auto* table_node = exp_node->to<syntactic_tree::table_node>();
+                auto* table_node = exp_node->to<l_syntactic_tree::table_node>();
                 //table array declaretion
                 for(auto& table_node_exp:table_node->m_exps)
                 {
@@ -204,20 +204,20 @@ namespace l_language
         }
         
         //op
-        void visit(l_function* fun, syntactic_tree::op_node* op_node)
+        void visit(l_function* fun, l_syntactic_tree::op_node* op_node)
         {
             visit(fun,op_node->m_assignable);
             visit(fun,op_node->m_exp);
         }
         
         //for
-        void visit(l_function* fun, syntactic_tree::for_node* for_node)
+        void visit(l_function* fun, l_syntactic_tree::for_node* for_node)
         {
             switch (for_node->m_type_for)
             {
                     
-                case syntactic_tree::for_node::FOR_OF:
-                case syntactic_tree::for_node::FOR_IN:
+                case l_syntactic_tree::for_node::FOR_OF:
+                case l_syntactic_tree::for_node::FOR_IN:
                     
                     visit(fun, for_node->m_variable_left);
                     visit(fun, for_node->m_variable_right);
@@ -231,14 +231,14 @@ namespace l_language
         }
         
         //while
-        void visit(l_function* fun, syntactic_tree::while_node* while_node)
+        void visit(l_function* fun, l_syntactic_tree::while_node* while_node)
         {
             visit(fun,while_node->m_exp);
             for(auto& st_node : while_node->m_staments) visit(fun,st_node);
         }
         
         //if
-        void visit(l_function* fun, syntactic_tree::if_node* if_node)
+        void visit(l_function* fun, l_syntactic_tree::if_node* if_node)
         {
             for(auto& node : if_node->m_ifs)
             {
@@ -252,7 +252,7 @@ namespace l_language
         }
         
         //root
-        void visit(l_function* fun, syntactic_tree::root_node* root)
+        void visit(l_function* fun, l_syntactic_tree::root_node* root)
         {
             for(auto* node : root->m_staments) visit(fun,node);
         }
@@ -261,7 +261,7 @@ namespace l_language
     public:
         
         void build_variable_context_from_tree(l_vm* vm,
-                                              const syntactic_tree* tree)
+                                              const l_syntactic_tree* tree)
         {
             //visit
             visit(m_main,tree->m_root);
@@ -307,11 +307,11 @@ namespace l_language
         }
         
         //push constant
-        void add_const_into_table(syntactic_tree::constant_node* const_value)
+        void add_const_into_table(l_syntactic_tree::constant_node* const_value)
         {
             add_const_into_table(m_main,const_value);
         }
-        void add_const_into_table(l_function* f_context, syntactic_tree::constant_node* const_value)
+        void add_const_into_table(l_function* f_context, l_syntactic_tree::constant_node* const_value)
         {
             //function map context
             auto& f_table = m_funs_table[f_context].m_consts;
@@ -343,7 +343,7 @@ namespace l_language
         
         
         //get
-        int get_var_id(l_function* f_context,syntactic_tree::variable_node* node)
+        int get_var_id(l_function* f_context,l_syntactic_tree::variable_node* node)
         {
             return get_var_id(f_context,node->m_name);
         }
@@ -362,7 +362,7 @@ namespace l_language
             return TABLE_GET_ERROR;
         }
         
-        int get_const_id(l_function* f_context,syntactic_tree::constant_node* c_node)
+        int get_const_id(l_function* f_context,l_syntactic_tree::constant_node* c_node)
         {
             return get_const_id(f_context,const_index(c_node));
         }

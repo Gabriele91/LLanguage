@@ -1,5 +1,5 @@
 //
-//  parser.h
+//  l_parser.h
 //  LLanguage
 //
 //  Created by Gabriele Di Bari on 12/12/15.
@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <string>
 #include <sstream>
-#include <syntactic_tree.h>
+#include <l_syntactic_tree.h>
 //utf 8
 #define UTF_8_CODE
 
@@ -74,7 +74,7 @@ namespace l_language
 	while       := 'while' <exp> '{' staments '}'
 	for_each    := 'for' variable 'in' variable '{' staments '}'
 	*/
-	class parser
+	class l_parser
 	{
 	public:
 		//context
@@ -171,8 +171,8 @@ namespace l_language
 		}
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		//defines
-        #define CSTRCMP(x,y) l_language::parser::strcmp(x,y,sizeof(y)-1)
-        #define CSTRCMP_SKIP(x,y) l_language::parser::strcmp_skip(x,y,sizeof(y)-1)
+        #define CSTRCMP(x,y) l_language::l_parser::strcmp(x,y,sizeof(y)-1)
+        #define CSTRCMP_SKIP(x,y) l_language::l_parser::strcmp_skip(x,y,sizeof(y)-1)
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		//static types
 		static bool is_line_space(char c)
@@ -508,7 +508,7 @@ namespace l_language
          table_field:= (constant | variable) ':' exp
 		*/
 		//parse value
-		bool parse_value(const char*& ptr, syntactic_tree::exp_node*& node)
+		bool parse_value(const char*& ptr, l_syntactic_tree::exp_node*& node)
 		{
             skip_space_end_comment(ptr);
             //costant int
@@ -520,7 +520,7 @@ namespace l_language
                     push_error("not valid float costant");
                     return false;
                 }
-                node = syntactic_tree::constant((int)value, m_line);
+                node = l_syntactic_tree::constant((int)value, m_line);
             }
             //costant float
             else if (is_float_number(ptr))
@@ -531,7 +531,7 @@ namespace l_language
                     push_error("not valid float costant");
                     return false;
                 }
-                node = syntactic_tree::constant(value, m_line);
+                node = l_syntactic_tree::constant(value, m_line);
             }
 			//costant string
 			else if (is_start_string(*ptr))
@@ -542,33 +542,33 @@ namespace l_language
 					push_error("not valid string costant");
 					return false;
 				}
-				node = syntactic_tree::constant(value, m_line);
+				node = l_syntactic_tree::constant(value, m_line);
 			}
 			//is variable/field request
 			else if (is_an_assignable_attribute(ptr))
 			{
 				//get assignable attribute
-				syntactic_tree::node* var_field_node;
+				l_syntactic_tree::node* var_field_node;
 				if (!parse_assignable(ptr, var_field_node)) return false;
                 //is call ?
                 if (is_call_args(ptr))
                 {
                     //cast var field
-                    auto* assignable_node = (syntactic_tree::assignable_node*)var_field_node;
+                    auto* assignable_node = (l_syntactic_tree::assignable_node*)var_field_node;
                     //get call node
-                    syntactic_tree::node* call_node = syntactic_tree::call(assignable_node,m_line);
+                    l_syntactic_tree::node* call_node = l_syntactic_tree::call(assignable_node,m_line);
                     if (!parse_call_arguments(ptr, call_node))
                     {
                         if(call_node) delete call_node;
                         return false;
                     }
                     //call node is a exp node
-                    node = (syntactic_tree::exp_node*)call_node;
+                    node = (l_syntactic_tree::exp_node*)call_node;
                 }
                 else
                 {
                     //field node is a exp node
-                    node = (syntactic_tree::exp_node*)var_field_node;
+                    node = (l_syntactic_tree::exp_node*)var_field_node;
                 }
 			}
 			//is exp
@@ -601,8 +601,8 @@ namespace l_language
                 //skip space
                 skip_space_end_comment(ptr);
 				//alloc node
-				syntactic_tree::array_node* array_node = syntactic_tree::array(m_line);
-				syntactic_tree::exp_node* exp_node = nullptr;
+				l_syntactic_tree::array_node* array_node = l_syntactic_tree::array(m_line);
+				l_syntactic_tree::exp_node* exp_node = nullptr;
 				//parsing all values
                 if(!is_end_index(*ptr))
                 {
@@ -630,7 +630,7 @@ namespace l_language
 				//skip ]
 				++ptr;
                 //field node is a exp node
-                node = (syntactic_tree::exp_node*)array_node;
+                node = (l_syntactic_tree::exp_node*)array_node;
             }
             //is table dec
             else if(CSTRCMP_SKIP(ptr,"{"))
@@ -638,9 +638,9 @@ namespace l_language
                 //skip space
                 skip_space_end_comment(ptr);
                 //alloc node
-                syntactic_tree::table_node* table_node = syntactic_tree::table(m_line);
-                syntactic_tree::exp_node* exp_left = nullptr;
-                syntactic_tree::exp_node* exp_right = nullptr;
+                l_syntactic_tree::table_node* table_node = l_syntactic_tree::table(m_line);
+                l_syntactic_tree::exp_node* exp_left = nullptr;
+                l_syntactic_tree::exp_node* exp_right = nullptr;
                 //parsing }
                 if(!CSTRCMP(ptr,"}"))
                 {
@@ -698,27 +698,27 @@ namespace l_language
                     return false;
                 }
                 //field node is a exp node
-                node = (syntactic_tree::exp_node*)table_node;
+                node = (l_syntactic_tree::exp_node*)table_node;
             }
 			//return true...
 			return true;
 		}
 		//one op
-		bool parse_oneop(const char*& ptr, syntactic_tree::exp_node*& node)
+		bool parse_oneop(const char*& ptr, l_syntactic_tree::exp_node*& node)
 		{
 			//value node
-			syntactic_tree::exp_node *oneop = nullptr;
-			syntactic_tree::exp_node *value = nullptr;
+			l_syntactic_tree::exp_node *oneop = nullptr;
+			l_syntactic_tree::exp_node *value = nullptr;
 			//skip
 			skip_space_end_comment(ptr);
 			//parse op
 			if (CSTRCMP_SKIP(ptr, "-"))
 			{
-				oneop = syntactic_tree::exp("-", nullptr, m_line);
+				oneop = l_syntactic_tree::exp("-", nullptr, m_line);
 			}
 			else if (CSTRCMP_SKIP(ptr, "!"))
 			{
-				oneop = syntactic_tree::exp("!", nullptr, m_line);
+				oneop = l_syntactic_tree::exp("!", nullptr, m_line);
 			}
 			//skip
 			skip_space_end_comment(ptr);
@@ -742,11 +742,11 @@ namespace l_language
 			return true;
 		}
 		//parser timediv
-		bool parse_timediv(const char*& ptr, syntactic_tree::exp_node*& node)
+		bool parse_timediv(const char*& ptr, l_syntactic_tree::exp_node*& node)
 		{
 			//value node
-			syntactic_tree::exp_node *left   = nullptr;
-			syntactic_tree::exp_node *opnode = nullptr;
+			l_syntactic_tree::exp_node *left   = nullptr;
+			l_syntactic_tree::exp_node *opnode = nullptr;
 			//skip
 			skip_space_end_comment(ptr);
 			//parse value
@@ -759,7 +759,7 @@ namespace l_language
 				//left node
 				left   = opnode;
 				//node
-				opnode = syntactic_tree::exp(std::string() + *ptr, nullptr, m_line);
+				opnode = l_syntactic_tree::exp(std::string() + *ptr, nullptr, m_line);
 				//jmp op (*|/)
 				++ptr;
 				//compone node
@@ -777,11 +777,11 @@ namespace l_language
 			return true;
 		}
 		//parser timediv
-		bool parse_summinus(const char*& ptr, syntactic_tree::exp_node*& node)
+		bool parse_summinus(const char*& ptr, l_syntactic_tree::exp_node*& node)
 		{
 			//value node
-			syntactic_tree::exp_node *left = nullptr;
-			syntactic_tree::exp_node *opnode = nullptr;
+			l_syntactic_tree::exp_node *left = nullptr;
+			l_syntactic_tree::exp_node *opnode = nullptr;
 			//skip
 			skip_space_end_comment(ptr);
 			//parse value
@@ -794,7 +794,7 @@ namespace l_language
 				//left node
 				left = opnode;
 				//node
-				opnode = syntactic_tree::exp(std::string() + *ptr, nullptr, m_line);
+				opnode = l_syntactic_tree::exp(std::string() + *ptr, nullptr, m_line);
 				//jmp op (+|-)
 				++ptr;
 				//compone node
@@ -812,14 +812,14 @@ namespace l_language
 			return true;
 		}
 		//parser compare
-		bool parse_compare(const char*& ptr, syntactic_tree::exp_node*& node)
+		bool parse_compare(const char*& ptr, l_syntactic_tree::exp_node*& node)
 		{
 			//skip
 			skip_space_end_comment(ptr);
 			//value node
-			syntactic_tree::exp_node *left = nullptr;
-			syntactic_tree::exp_node *logiccomp = nullptr;
-			syntactic_tree::exp_node *right = nullptr;
+			l_syntactic_tree::exp_node *left = nullptr;
+			l_syntactic_tree::exp_node *logiccomp = nullptr;
+			l_syntactic_tree::exp_node *right = nullptr;
 			//skip
 			skip_space_end_comment(ptr);
 			//parse value
@@ -829,27 +829,27 @@ namespace l_language
             // logicComp := (str oprations|'<='|'>=''<'|'>'|'==')
             if ( CSTRCMP_SKIP(ptr, "<=") )
 			{
-				logiccomp = syntactic_tree::exp(std::string("<="), nullptr, m_line);
+				logiccomp = l_syntactic_tree::exp(std::string("<="), nullptr, m_line);
             }
             else if( CSTRCMP_SKIP(ptr, ">=") )
             {
-                logiccomp = syntactic_tree::exp(std::string(">="), nullptr, m_line);
+                logiccomp = l_syntactic_tree::exp(std::string(">="), nullptr, m_line);
             }
             else if( CSTRCMP_SKIP(ptr, "<") )
             {
-                logiccomp = syntactic_tree::exp(std::string("<"), nullptr, m_line);
+                logiccomp = l_syntactic_tree::exp(std::string("<"), nullptr, m_line);
             }
             else if( CSTRCMP_SKIP(ptr, ">") )
             {
-                logiccomp = syntactic_tree::exp(std::string(">"), nullptr, m_line);
+                logiccomp = l_syntactic_tree::exp(std::string(">"), nullptr, m_line);
             }
             else if( CSTRCMP_SKIP(ptr, "==") )
             {
-                logiccomp = syntactic_tree::exp(std::string("=="), nullptr, m_line);
+                logiccomp = l_syntactic_tree::exp(std::string("=="), nullptr, m_line);
             }
             else if( CSTRCMP_SKIP(ptr, "!=") )
             {
-                logiccomp = syntactic_tree::exp(std::string("!="), nullptr, m_line);
+                logiccomp = l_syntactic_tree::exp(std::string("!="), nullptr, m_line);
             }
             else
             {
@@ -869,11 +869,11 @@ namespace l_language
 			return true;
 		}
 		//parser logic
-		bool parse_logic(const char*& ptr, syntactic_tree::exp_node*& node)
+		bool parse_logic(const char*& ptr, l_syntactic_tree::exp_node*& node)
 		{
 			//value node
-			syntactic_tree::exp_node *left = nullptr;
-			syntactic_tree::exp_node *opnode = nullptr;
+			l_syntactic_tree::exp_node *left = nullptr;
+			l_syntactic_tree::exp_node *opnode = nullptr;
 			//skip
 			skip_space_end_comment(ptr);
 			//parse value
@@ -891,11 +891,11 @@ namespace l_language
 				//op
 				if ( CSTRCMP_SKIP(ptr, "and") || CSTRCMP_SKIP(ptr, "&&") )
 				{
-					opnode = syntactic_tree::exp(std::string("&&"), nullptr, m_line);
+					opnode = l_syntactic_tree::exp(std::string("&&"), nullptr, m_line);
 				}
 				else if( CSTRCMP_SKIP(ptr, "or") || CSTRCMP_SKIP(ptr, "||") )
 				{
-					opnode = syntactic_tree::exp(std::string("||"), nullptr, m_line);
+					opnode = l_syntactic_tree::exp(std::string("||"), nullptr, m_line);
 				}
 				//compone node
 				opnode->m_left = left;
@@ -912,7 +912,7 @@ namespace l_language
 			return true;
 		}
 		//parser exp
-		bool parse_exp(const char*& ptr, syntactic_tree::exp_node*& node)
+		bool parse_exp(const char*& ptr, l_syntactic_tree::exp_node*& node)
 		{
 			/* none */
 			return parse_logic(ptr, node);
@@ -933,7 +933,7 @@ namespace l_language
          for_each    := 'for' variable 'in' variable '{' staments '}'
 		*/
 		//parse staments
-		bool parse_staments(const char*& ptr, syntactic_tree::list_nodes& nodes)
+		bool parse_staments(const char*& ptr, l_syntactic_tree::list_nodes& nodes)
 		{
 			//skip
 			skip_space_end_comment(ptr);
@@ -941,7 +941,7 @@ namespace l_language
 			while (*ptr && *ptr != EOF && !CSTRCMP(ptr,"}"))
 			{
 				//parse
-				syntactic_tree::node* stament;
+				l_syntactic_tree::node* stament;
 				if (!parse_stament(ptr, stament)) return false;
 				//push stament
 				nodes.push_back(stament);
@@ -953,7 +953,7 @@ namespace l_language
 			return true;
 		}
 		//parse stament
-		bool parse_stament(const char*& ptr, syntactic_tree::node*& node)
+		bool parse_stament(const char*& ptr, l_syntactic_tree::node*& node)
 		{
 			//skip
 			skip_space_end_comment(ptr);
@@ -1011,10 +1011,10 @@ namespace l_language
             return is_start_index(*ptr) || is_point(*ptr);
         }
 		//parse field
-		bool parse_field(const char*& ptr, syntactic_tree::node*& node)
+		bool parse_field(const char*& ptr, l_syntactic_tree::node*& node)
 		{
-			syntactic_tree::exp_node*        exp_node = nullptr;
-			syntactic_tree::assignable_node* variable_node = nullptr;
+			l_syntactic_tree::exp_node*        exp_node = nullptr;
+			l_syntactic_tree::assignable_node* variable_node = nullptr;
 			//parse variable string
 			std::string variable_name;
 			if (!parse_name(ptr, &ptr, variable_name))
@@ -1028,11 +1028,11 @@ namespace l_language
                 push_variable(variable_name);
             }
             //alloc variable node
-            variable_node = syntactic_tree::variable(variable_name, m_line);
+            variable_node = l_syntactic_tree::variable(variable_name, m_line);
             //skip
             skip_space_end_comment(ptr);
             //list values
-            std::vector< syntactic_tree::exp_node* > list_values;
+            std::vector< l_syntactic_tree::exp_node* > list_values;
             //parser
             while (true)
             {
@@ -1051,7 +1051,7 @@ namespace l_language
                         return false;
                     }
                     //append node
-                    list_values.push_back (syntactic_tree::constant(field_name, m_line));
+                    list_values.push_back (l_syntactic_tree::constant(field_name, m_line));
                     //jmp space
                     skip_space_end_comment(ptr);
                 }
@@ -1088,12 +1088,12 @@ namespace l_language
                 }
             }
             //first
-            syntactic_tree::assignable_node* left = syntactic_tree::field(variable_node, &(*list_values.front()));
+            l_syntactic_tree::assignable_node* left = l_syntactic_tree::field(variable_node, &(*list_values.front()));
             //build tree
             if(list_values.size()>=2)
             for(long i=1;  i != list_values.size(); ++i)
             {
-                left = syntactic_tree::field(left,list_values[i]);
+                left = l_syntactic_tree::field(left,list_values[i]);
             }
 			//save last field node
             node = left;
@@ -1111,7 +1111,7 @@ namespace l_language
 			return true;
 		}
 		//parse variable
-		bool parse_variable(const char*& ptr, syntactic_tree::node*& node)
+		bool parse_variable(const char*& ptr, l_syntactic_tree::node*& node)
 		{
 			//skip
 			skip_space_end_comment(ptr);
@@ -1128,7 +1128,7 @@ namespace l_language
                 push_variable(variable_name);
 			}
             //return node
-            node = syntactic_tree::variable(variable_name, m_line);
+            node = l_syntactic_tree::variable(variable_name, m_line);
 			//return true...
 			return true;
 		}
@@ -1141,7 +1141,7 @@ namespace l_language
 			return is_variable(ptr);
 		}
 		//parse assignable
-		bool parse_assignable(const char*& ptr, syntactic_tree::node*& node)
+		bool parse_assignable(const char*& ptr, l_syntactic_tree::node*& node)
 		{
 			if (is_a_field(ptr))
 			{
@@ -1207,16 +1207,16 @@ namespace l_language
             return false;
         }
 		//parse operation
-		bool parse_operation(const char*& ptr, syntactic_tree::node*& node)
+		bool parse_operation(const char*& ptr, l_syntactic_tree::node*& node)
 		{
 			//exp
-			syntactic_tree::exp_node *exp = nullptr;
+			l_syntactic_tree::exp_node *exp = nullptr;
 			//skip
 			skip_space_end_comment(ptr);
             // <assignable> <assignment> <exp> | <assignable> '(' args ')'
             {
                 // parse variable or field
-                syntactic_tree::node *assignable_node = nullptr;
+                l_syntactic_tree::node *assignable_node = nullptr;
 				// is a variable o field?
                 if (!parse_assignable(ptr, assignable_node)) return false;
                 //skip space
@@ -1233,15 +1233,15 @@ namespace l_language
                         return false;
                     }
                     //build node
-                    node = syntactic_tree::assignment((syntactic_tree::assignable_node*)assignable_node, op_name, exp, m_line);
+                    node = l_syntactic_tree::assignment((l_syntactic_tree::assignable_node*)assignable_node, op_name, exp, m_line);
                 }
                 //is call args?
                 else if(is_call_args(ptr))
                 {
                     //cast..
-                    auto *call_var_node = (syntactic_tree::assignable_node*)assignable_node;
+                    auto *call_var_node = (l_syntactic_tree::assignable_node*)assignable_node;
                     //build call
-                    node = syntactic_tree::call(call_var_node, m_line);
+                    node = l_syntactic_tree::call(call_var_node, m_line);
                     //parse args
                     if(!parse_call_arguments(ptr,node))
                     {
@@ -1270,10 +1270,10 @@ namespace l_language
             return is_start_arg(*ptr);
         }
         //parse call
-        bool parse_call_arguments(const char*& ptr, syntactic_tree::node*& node)
+        bool parse_call_arguments(const char*& ptr, l_syntactic_tree::node*& node)
         {
             //cast to call node
-            auto* call_node = (syntactic_tree::call_node*)node;
+            auto* call_node = (l_syntactic_tree::call_node*)node;
             //skip space
             skip_space_end_comment(ptr);
             // '('
@@ -1290,7 +1290,7 @@ namespace l_language
                         //skip space
                         skip_space_end_comment(ptr);
                         //parse exp
-                        syntactic_tree::exp_node* exp;
+                        l_syntactic_tree::exp_node* exp;
                         //parse exp
                         if (!parse_exp(ptr, exp)) return false;
                         //append exp
@@ -1304,7 +1304,7 @@ namespace l_language
             return CSTRCMP_SKIP(ptr, ")");
         }
 		//parse if
-		bool parse_if(const char*& ptr, syntactic_tree::node*& node)
+		bool parse_if(const char*& ptr, l_syntactic_tree::node*& node)
 		{
 			//skip
 			skip_space_end_comment(ptr);
@@ -1322,12 +1322,12 @@ namespace l_language
             //else if id
             int else_if_id = 0;
             // exp
-            syntactic_tree::exp_node *exp = nullptr;
+            l_syntactic_tree::exp_node *exp = nullptr;
             // build node
-                     node = syntactic_tree::if_else(exp, m_line);
-            auto* if_node = (syntactic_tree::if_node*) (node);
+                     node = l_syntactic_tree::if_else(exp, m_line);
+            auto* if_node = (l_syntactic_tree::if_node*) (node);
             //staments pointer
-            syntactic_tree::list_nodes* staments = nullptr;
+            l_syntactic_tree::list_nodes* staments = nullptr;
 			//add sub nodes
             while(loop)
             {
@@ -1439,14 +1439,14 @@ namespace l_language
 			return true;
 		}
         //parse while
-        bool parse_while(const char*& ptr, syntactic_tree::node*& node)
+        bool parse_while(const char*& ptr, l_syntactic_tree::node*& node)
         {
             //skip
             skip_space_end_comment(ptr);
             // 'mentre'
             if (!CSTRCMP_SKIP(ptr, "while")) return false;
             // exp
-            syntactic_tree::exp_node *exp = nullptr;
+            l_syntactic_tree::exp_node *exp = nullptr;
             if (!parse_exp(ptr, exp)) return false;
             //skip
             skip_space_end_comment(ptr);
@@ -1459,8 +1459,8 @@ namespace l_language
             //skip
             skip_space_end_comment(ptr);
             //build node
-			            node = syntactic_tree::while_do(exp, m_line);
-            auto* while_node = (syntactic_tree::while_node*) (node);
+			            node = l_syntactic_tree::while_do(exp, m_line);
+            auto* while_node = (l_syntactic_tree::while_node*) (node);
             //add sub nodes
             if (!parse_staments(ptr, while_node->m_staments)) return false;
             //skip
@@ -1474,12 +1474,12 @@ namespace l_language
             return true;
         }
         //parse for
-        bool parse_for(const char*& ptr, syntactic_tree::node*& node)
+        bool parse_for(const char*& ptr, l_syntactic_tree::node*& node)
         {
             //parse for each
-            syntactic_tree::for_node::type_for type_for = syntactic_tree::for_node::FOR_IN;
-            syntactic_tree::node* node_left = nullptr;
-            syntactic_tree::node* node_right = nullptr;
+            l_syntactic_tree::for_node::type_for type_for = l_syntactic_tree::for_node::FOR_IN;
+            l_syntactic_tree::node* node_left = nullptr;
+            l_syntactic_tree::node* node_right = nullptr;
             //parse for
             if (!CSTRCMP_SKIP(ptr, "for"))
             {
@@ -1493,7 +1493,7 @@ namespace l_language
             if (!CSTRCMP_SKIP(ptr, "in"))
             {
                 //change type
-                type_for = syntactic_tree::for_node::FOR_OF;
+                type_for = l_syntactic_tree::for_node::FOR_OF;
                 //try
                 if (!CSTRCMP_SKIP(ptr, "of"))
                 {
@@ -1521,18 +1521,18 @@ namespace l_language
             //skip
             skip_space_end_comment(ptr);
             //static ptrs
-            auto* assignable_node_left = (syntactic_tree::assignable_node*)node_left;
-            auto* assignable_node_right = (syntactic_tree::assignable_node*)node_right;
+            auto* assignable_node_left = (l_syntactic_tree::assignable_node*)node_left;
+            auto* assignable_node_right = (l_syntactic_tree::assignable_node*)node_right;
             //build node
-            if(type_for == syntactic_tree::for_node::FOR_IN)
+            if(type_for == l_syntactic_tree::for_node::FOR_IN)
             {
-                node = syntactic_tree::for_in(assignable_node_left,assignable_node_right, m_line);
+                node = l_syntactic_tree::for_in(assignable_node_left,assignable_node_right, m_line);
             }
             else
             {
-                node = syntactic_tree::for_of(assignable_node_left,assignable_node_right, m_line);
+                node = l_syntactic_tree::for_of(assignable_node_left,assignable_node_right, m_line);
             }
-            auto* for_node = (syntactic_tree::for_node*) (node);
+            auto* for_node = (l_syntactic_tree::for_node*) (node);
             //add sub nodes
             if (!parse_staments(ptr, for_node->m_staments))
             {
@@ -1550,14 +1550,14 @@ namespace l_language
 			return true;
         }
 		//parse cicle
-		bool parse_cicle(const char*& ptr, syntactic_tree::node*& node)
+		bool parse_cicle(const char*& ptr, l_syntactic_tree::node*& node)
         {
             if (CSTRCMP(ptr, "while"))		return parse_while(ptr, node);
             if (CSTRCMP(ptr, "for"))		return parse_for(ptr, node);
 			return false;
 		}
 		//parse itlanguage
-		bool parse_italanguage(const char*& ptr, syntactic_tree::root_node*& node)
+		bool parse_italanguage(const char*& ptr, l_syntactic_tree::root_node*& node)
 		{
 			//skip
 			skip_space_end_comment(ptr);
@@ -1565,7 +1565,7 @@ namespace l_language
 			while (*ptr != EOF && *ptr!='\0')
 			{
 				//parse
-				syntactic_tree::node* stament;
+				l_syntactic_tree::node* stament;
 				if (!parse_stament(ptr, stament)) return false;
 				//push stament
 				node->append(stament);
@@ -1587,7 +1587,7 @@ namespace l_language
         }
         //parse language
         bool italanguage(const std::string& source,
-                         syntactic_tree& tree)
+                         l_syntactic_tree& tree)
         {
             //start parsing
             return italanguage(source,
@@ -1596,7 +1596,7 @@ namespace l_language
         }
 		//parse language
 		bool italanguage(const std::string& source,
-                         syntactic_tree& tree,
+                         l_syntactic_tree& tree,
                          const list_variables& pre_builds_variables)
 		{
             //stat at line 1
