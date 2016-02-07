@@ -600,4 +600,8 @@ namespace l_language
         
         
     };
+    
+    //list variables
+    using l_list_variables = std::vector < l_variable >;
+
 };
