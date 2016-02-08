@@ -94,7 +94,7 @@ int l_to_float(l_language::l_thread* th,int args)
     {
         case l_language::l_variable::INT: f = (float)var.m_value.m_i; break;
         case l_language::l_variable::FLOAT: f = var.m_value.m_f; break;
-        case l_language::l_variable::STRING: f = std::atof(var.string()->c_str()); break;
+        case l_language::l_variable::STRING: f = (float)std::atof(var.string()->c_str()); break;
         default: assert(0); break;
     }
     //push string

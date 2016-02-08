@@ -148,16 +148,18 @@ namespace l_language
         
         int to_int()
         {
-                 if(is_int())   return m_value.m_i;
-            else if(is_float()) return m_value.m_f;
+                 if(is_int())   return      m_value.m_i;
+            else if(is_float()) return (int)m_value.m_f;
             assert(0);
+			return 0;
         }
         
         float to_float()
         {
-                 if(is_float()) return m_value.m_f;
-            else if(is_int())   return m_value.m_i;
+                 if(is_float()) return        m_value.m_f;
+            else if(is_int())   return (float)m_value.m_i;
             assert(0);
+			return 0;
         }
         
         std::string to_string()

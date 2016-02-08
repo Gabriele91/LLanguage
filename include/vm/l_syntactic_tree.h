@@ -345,7 +345,7 @@ namespace l_language
             //have else
             bool have_else() const
             {
-                return m_else_staments.size();
+                return m_else_staments.size() ? true : false;
             }
             
             //getters

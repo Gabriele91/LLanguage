@@ -21,8 +21,9 @@ namespace l_language
 {
     
     //thread
-    struct l_thread
+    class l_thread
     {
+	public:
         //main function id
         unsigned int m_main_fun_id { 0 };
         //program counter

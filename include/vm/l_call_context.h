@@ -15,8 +15,9 @@ namespace l_language
     class l_call_context;
     class l_vm;
     //context list
-    struct l_call_context
+	class l_call_context
     {
+	public:
         //init context
         void init(unsigned int fun_id,l_thread* thread);
         //get/set
