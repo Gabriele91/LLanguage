@@ -506,10 +506,12 @@ namespace l_language
                         //error
                         assert(n_return >= 0);
                         //pop args
-                        for(int i=0; i < (cmp.m_arg - n_return); ++i)
+                        for(int i=0; i < cmp.m_arg; ++i)
                         {
                             pop();
                         }
+                        //if return
+                        if(n_return) push(register3(2));
                     }
                     else
                     {

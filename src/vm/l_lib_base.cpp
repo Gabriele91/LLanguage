@@ -58,7 +58,7 @@ int l_input(l_language::l_thread* th,int args)
     std::string str;
     std::cin >> str;
     //push string
-    th->push_return(l_language::l_string::gc_new(th->m_vm->get_gc(), str),args);
+    th->push_return(l_language::l_string::gc_new(th->m_vm->get_gc(), str));
     //return
     return 1;
 }
@@ -78,7 +78,7 @@ int l_to_int(l_language::l_thread* th,int args)
         default: assert(0); break;
     }
     //push string
-    th->push_return(l_language::l_variable(i),args);
+    th->push_return(l_language::l_variable(i));
     //return
     return 1;
 }
@@ -98,7 +98,7 @@ int l_to_float(l_language::l_thread* th,int args)
         default: assert(0); break;
     }
     //push string
-    th->push_return(l_language::l_variable(f),args);
+    th->push_return(l_language::l_variable(f));
     //return
     return 1;
 }
@@ -111,15 +111,15 @@ int l_mod(l_language::l_thread* th,int args)
     //cases
     if(var.is_float() || var.is_float())
     {
-        th->push_return(l_language::l_variable(std::fmod(var.to_float(),var_right.to_float())),args);
+        th->push_return(l_language::l_variable(std::fmod(var.to_float(),var_right.to_float())));
     }
     else if(var.is_int() && var.is_int())
     {
-        th->push_return(l_language::l_variable(var.to_int() % var_right.to_int()),args);
+        th->push_return(l_language::l_variable(var.to_int() % var_right.to_int()));
     }
     else
     {
-        th->push_return(l_language::l_variable(0),args);
+        th->push_return(l_language::l_variable(0));
     }
     //return
     return 1;
@@ -140,7 +140,7 @@ int l_to_string(l_language::l_thread* th,int args)
         default: assert(0); break;
     }
     //push string
-    th->push_return(l_language::l_string::gc_new(th->m_vm->get_gc(), str),args);
+    th->push_return(l_language::l_string::gc_new(th->m_vm->get_gc(), str));
     //return
     return 1;
 }
@@ -162,7 +162,7 @@ int l_type_of(l_language::l_thread* th,int args)
         default: assert(0); break;
     }
     //push type
-    th->push_return(l_language::l_string::gc_new(th->m_vm->get_gc(), str),args);
+    th->push_return(l_language::l_string::gc_new(th->m_vm->get_gc(), str));
     //number of return
     return 1;
 }
@@ -170,7 +170,7 @@ int l_type_of(l_language::l_thread* th,int args)
 int l_global(l_language::l_thread* th,int args)
 {
     //push type
-    th->push_return(th->main_context().get_local_variables(),args);
+    th->push_return(th->main_context().get_local_variables());
     //number of return
     return 1;
 }

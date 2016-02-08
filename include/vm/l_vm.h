@@ -15,81 +15,10 @@
 #include <l_commands.h>
 #include <l_function.h>
 #include <l_table.h>
+#include <l_call_context.h>
 
 namespace l_language
 {
-    
-    class l_thread;
-    class l_call_context;
-    class l_vm;
-    //context list
-    struct l_call_context
-    {
-        //init context
-        void init(unsigned int fun_id,l_thread* thread);
-        //get/set
-        l_variable& up_value(const l_variable& key)
-        {
-            return m_up_values[key];
-        }
-        
-        l_variable& up_value(const l_variable& key,const l_variable& value)
-        {
-            return (m_up_values[key] = value);
-        }
-        
-        l_variable& variable(const l_variable& key)
-        {
-            return m_local_variables[key];
-        }
-        
-        l_variable& variable(const l_variable& key,const l_variable& value)
-        {
-            return (m_local_variables[key] = value);
-        }
-        
-        unsigned int get_fun_id()
-        {
-            return m_fun_id;
-        }
-        
-        size_t get_size_up_values() const
-        {
-            return m_up_values.size();
-        }
-        
-        size_t get_size_vars() const
-        {
-            return m_up_values.size();
-        }
-        
-        l_variable get_up_values() const
-        {
-            return l_variable((l_obj*)&m_up_values);;
-        }
-        
-        l_variable get_local_variables() const
-        {
-            return l_variable((l_obj*)&m_local_variables);
-        }
-        
-    protected:
-        //ptr to thread
-        l_thread*   m_thread { nullptr };
-        //call fun id
-        unsigned int m_fun_id { 0 };
-        //context
-        l_table m_local_variables;
-        //upvalue
-        l_table m_up_values;
-        //firends
-        friend class l_thread;
-        friend class l_vm;
-        friend class l_gc;
-    };
-    
-    //list contexts
-    using l_list_call_function = std::vector < l_call_context >;
     
     //thread
     struct l_thread
@@ -134,10 +63,9 @@ namespace l_language
             return m_register[i];
         }
         //push return
-        void push_return(const l_variable& var,size_t nargs)
+        void push_return(const l_variable& var)
         {
-            if(nargs == 0) push(var);
-            else value(nargs-1) = var;
+            m_register[2] = var;
         }
         //get top
         l_variable& value(size_t x)
