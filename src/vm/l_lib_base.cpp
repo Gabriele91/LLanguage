@@ -167,10 +167,19 @@ int l_type_of(l_language::l_thread* th,int args)
     return 1;
 }
 
+int l_global(l_language::l_thread* th,int args)
+{
+    //push type
+    th->push_return(th->main_context().get_local_variables(),args);
+    //number of return
+    return 1;
+}
+
 namespace l_language
 {
     l_language::l_program_language::l_extern_libary l_base_lib=
     {
+        { "global",    l_global    },
         { "print",     l_print     },
         { "println",   l_println   },
         { "input",     l_input     },

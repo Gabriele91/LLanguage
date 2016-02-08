@@ -41,10 +41,11 @@ namespace l_language
         {
             if(fun == m_main)
             {
-                fun->push({ L_SET_GLOBAL, get_var_id(fun, node) });
+                fun->push({ L_SET_GLOBAL, get_var_id(fun, node), node->m_line });
             }
             else
             {
+                //fun->push({ L_SET_LOCAL, get_table_id(fun, node) });
                 assert(0);
             }
             return true;
@@ -69,6 +70,10 @@ namespace l_language
             if (node->m_type == l_syntactic_tree::VARIABLE_NODE)
             {
                 return compile_variable_get(fun,node->to_variable_node());
+            }
+            else if (node->m_type == l_syntactic_tree::CALL_NODE)
+            {
+                return compile_call(fun,(l_syntactic_tree::call_node*)node);
             }
             //rec call
             compile_assignable(fun,node->to_field_node()->m_assignable);
@@ -399,24 +404,25 @@ namespace l_language
         
     public:
         
-        void set_vm(l_vm* this_vm)
+        void set_thread(l_thread* thread)
         {
             //ptr to vm
-            m_vm = this_vm;
+            m_vm = thread->get_vm();
             //main function
             m_vm->m_functions.resize(1);
             //set main
             set_main_function(&m_vm->m_functions[0]);
             //set gc
-            set_gc_from_vm(m_vm);
+            set_gc_from_vm(thread->get_vm());
         }
         
-        void add_c_function(const l_cfunction function,const std::string& cfun_name)
+        void add_c_function(l_thread& thread,const l_cfunction function,const std::string& cfun_name)
         {
+            l_variable variable = l_string::const_new(thread.get_gc(),cfun_name);
+            //add variable
+            thread.main_context().variable(variable,function);
             //name into table
-            add_variable_into_table_and_id(m_main,cfun_name,-(int)(m_vm->m_globals.size()+1));
-            m_vm->m_globals.push_back(l_variable(function));
-            
+            add_into_table(&m_vm->m_functions[thread.main_context().get_fun_id()], variable, variable_index(cfun_name));
         }
         
         l_thread* compile(const l_syntactic_tree* tree)
@@ -428,22 +434,16 @@ namespace l_language
             //add info
             m_main->m_args_size = 0;
             m_main->m_up_val_size = 0;
-            m_main->m_values_size = (unsigned int)fun_table.m_vars.size();
             //alloc values
-            m_main->m_costants.resize(fun_table.m_consts.size());
+            m_main->m_costants.resize(fun_table.size());
             //puth const
-            for(auto it : fun_table.m_consts)
+            for(auto it : fun_table)
             {
                 //save const
                 m_main->m_costants[it.second.m_id] = it.second.m_variable;
             }
             //
             if(!compile_statements(m_main,tree->m_root->m_staments)) return nullptr;
-            //alloc thread
-            m_vm->m_threads.push_back(std::move(l_thread(m_vm, // VM
-                                                         0,    // MAIN
-                                                         32    // STACK
-                                                         )));
             //compile statemens
             return &(m_vm->m_threads.back());
         }

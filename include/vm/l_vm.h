@@ -14,34 +14,38 @@
 #include <l_opcode.h>
 #include <l_commands.h>
 #include <l_function.h>
+#include <l_table.h>
 
 namespace l_language
 {
+    
+    class l_thread;
+    class l_call_context;
+    class l_vm;
     //context list
     struct l_call_context
     {
-    
-        //auto alloc
-        void alloc(const l_list_function& list)
-        {
-            m_vars.resize(list[m_fun_id].m_values_size);
-            m_up_values.resize(list[m_fun_id].m_up_val_size);
-        }
-        void alloc(unsigned int fun_id,const l_list_function& list)
-        {
-            m_fun_id = fun_id;
-            m_vars.resize(list[m_fun_id].m_values_size);
-            m_up_values.resize(list[m_fun_id].m_up_val_size);
-        }
+        //init context
+        void init(unsigned int fun_id,l_thread* thread);
         //get/set
-        l_variable& up_value(int i)
+        l_variable& up_value(const l_variable& key)
         {
-            return m_up_values[i];
+            return m_up_values[key];
         }
         
-        l_variable& variable(int i)
+        l_variable& up_value(const l_variable& key,const l_variable& value)
         {
-            return m_vars[i];
+            return (m_up_values[key] = value);
+        }
+        
+        l_variable& variable(const l_variable& key)
+        {
+            return m_local_variables[key];
+        }
+        
+        l_variable& variable(const l_variable& key,const l_variable& value)
+        {
+            return (m_local_variables[key] = value);
         }
         
         unsigned int get_fun_id()
@@ -56,16 +60,32 @@ namespace l_language
         
         size_t get_size_vars() const
         {
-            return m_vars.size();
+            return m_up_values.size();
+        }
+        
+        l_variable get_up_values() const
+        {
+            return l_variable((l_obj*)&m_up_values);;
+        }
+        
+        l_variable get_local_variables() const
+        {
+            return l_variable((l_obj*)&m_local_variables);
         }
         
     protected:
+        //ptr to thread
+        l_thread*   m_thread { nullptr };
         //call fun id
         unsigned int m_fun_id { 0 };
-        //upvalue
-        l_list_variables m_up_values;
         //context
-        l_list_variables m_vars;
+        l_table m_local_variables;
+        //upvalue
+        l_table m_up_values;
+        //firends
+        friend class l_thread;
+        friend class l_vm;
+        friend class l_gc;
     };
     
     //list contexts
@@ -91,7 +111,16 @@ namespace l_language
                  unsigned int main_id = 0,
                  size_t stack = 512);
         //access
-        l_variable& global(int i);
+        l_variable& global(int value_id);
+        //access
+        l_call_context& main_context()
+        {
+            return m_contexts[0];
+        }
+        //get vm
+        l_vm* get_vm();
+        //get gc
+        l_gc* get_gc();
         //stack
         l_list_variables m_stack;
         //get top
@@ -164,21 +193,21 @@ namespace l_language
         //init vm
         l_vm();
         virtual ~l_vm();
-        //global modules
-        l_list_variables m_globals;
         //thread list
         l_list_threads   m_threads;
         //functions
         l_list_function  m_functions;
+        //get thread
+        l_thread& get_new_thread()
+        {
+            m_threads.push_back(std::move(l_thread(this,
+                                                   0,
+                                                   64)));
+            return m_threads[m_threads.size()-1];
+        }
         //get gc
-        l_gc& get_gc()
-        {
-            return *m_gc;
-        }
-        const l_gc& get_gc() const
-        {
-            return *m_gc;
-        }
+        l_gc& get_gc();
+        const l_gc& get_gc() const;
         //execute
         void execute(unsigned int id_thread);
         void execute(l_thread* this_thread);

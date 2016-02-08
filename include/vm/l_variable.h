@@ -7,6 +7,7 @@
 //
 #pragma once
 
+#include <vector>
 #include <assert.h>
 #include <l_gc.h>
 #include <l_string.h>
@@ -17,6 +18,8 @@ namespace l_language
     //types
     class l_vm;
     class l_thread;
+    class l_vector;
+    class l_table;
     typedef int (*l_cfunction) (l_thread*,int args);
     //variable
     class l_variable
@@ -164,7 +167,19 @@ namespace l_language
             else if(is_string())return string()->str();
             assert(0);
         }
-
+        
+        template< class T >
+        T* to()
+        {
+            return dynamic_cast< T* >( m_value.m_pobj );
+        }
+        
+        template< class T >
+        const T* to() const
+        {
+            return dynamic_cast< const T* >( m_value.m_pobj );
+        }
+        
         l_string* string()
         {
             return dynamic_cast< l_string* >( m_value.m_pobj );

@@ -15,7 +15,16 @@
 
 namespace l_language
 {
-        
+    
+    
+    void l_call_context::init(unsigned int fun_id,l_thread *thread)
+    {
+        //save pointer
+        m_fun_id = fun_id;
+        //save thread
+        m_thread = thread;
+    }
+    
     l_thread::l_thread(l_vm* vm ,
                        unsigned int main_id,
                        size_t stack)
@@ -31,19 +40,27 @@ namespace l_language
         //...
         if(m_vm)
         {
-            //get function
-            vm->m_functions[m_main_fun_id];
             //main alloc
-            m_contexts[0].alloc(m_main_fun_id,vm->m_functions);
+            m_contexts[0].init(m_main_fun_id,this);
         }
     }
     
+    //get vm
+    l_vm* l_thread::get_vm()
+    {
+        return m_vm;
+    }
+    //get gc
+    l_gc* l_thread::get_gc()
+    {
+        return m_vm ? &(m_vm->get_gc()) : nullptr;
+    }
     
     l_variable& l_thread::global(int i)
     {
-        return i >= 0 ?
-               m_contexts[0].variable(i) :
-               m_vm->m_globals[-(i+1)];
+        l_call_context& main = m_contexts[0];
+        l_variable& id = m_vm->m_functions[main.m_fun_id].m_costants[i];
+        return main.variable(id);
     }
     
     //alloc vm
@@ -56,6 +73,18 @@ namespace l_language
     {
         delete m_gc;
     }
+    
+    
+    //get gc
+    l_gc& l_vm::get_gc()
+    {
+        return *m_gc;
+    }
+    const l_gc& l_vm::get_gc() const
+    {
+        return *m_gc;
+    }
+    //
     
     void l_vm::execute(unsigned int id_thread)
     {

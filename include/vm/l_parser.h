@@ -550,26 +550,8 @@ namespace l_language
 				//get assignable attribute
 				l_syntactic_tree::node* var_field_node;
 				if (!parse_assignable(ptr, var_field_node)) return false;
-                //is call ?
-                if (is_call_args(ptr))
-                {
-                    //cast var field
-                    auto* assignable_node = (l_syntactic_tree::assignable_node*)var_field_node;
-                    //get call node
-                    l_syntactic_tree::node* call_node = l_syntactic_tree::call(assignable_node,m_line);
-                    if (!parse_call_arguments(ptr, call_node))
-                    {
-                        if(call_node) delete call_node;
-                        return false;
-                    }
-                    //call node is a exp node
-                    node = (l_syntactic_tree::exp_node*)call_node;
-                }
-                else
-                {
-                    //field node is a exp node
-                    node = (l_syntactic_tree::exp_node*)var_field_node;
-                }
+                //field node is a exp node
+                node = (l_syntactic_tree::exp_node*)var_field_node;
 			}
 			//is exp
 			else if (is_start_arg(*ptr))
@@ -1011,24 +993,78 @@ namespace l_language
             return is_start_index(*ptr) || is_point(*ptr);
         }
 		//parse field
-		bool parse_field(const char*& ptr, l_syntactic_tree::node*& node)
-		{
-			l_syntactic_tree::exp_node*        exp_node = nullptr;
-			l_syntactic_tree::assignable_node* variable_node = nullptr;
-			//parse variable string
-			std::string variable_name;
-			if (!parse_name(ptr, &ptr, variable_name))
-			{
-				push_error("not valid variable name");
-				return false;
-			}
-			if (!exists_variable(variable_name))
-			{
-                //add variable
-                push_variable(variable_name);
+        bool parse_field(const char*& ptr, l_syntactic_tree::node*& node)
+        {
+            //flag
+            bool m_do_loop = true;
+            //pase
+            l_syntactic_tree::node* variable_node = nullptr;
+            //loop
+            while (m_do_loop)
+            {
+                //disable loop
+                m_do_loop = false;
+                //skip
+                skip_space_end_comment(ptr);
+                //get field
+                l_syntactic_tree::node* assignable_node = nullptr;
+                //is variable?
+                if(!variable_node)
+                {
+                    if(!parse_variable(ptr, variable_node)) return false;
+                    //skip
+                    skip_space_end_comment(ptr);
+                }
+                //parse field
+                if(is_point(*ptr) || is_start_index(*ptr))
+                {
+                    if(!parse_field_values(ptr,
+                                           (l_syntactic_tree::assignable_node*)variable_node,
+                                           assignable_node)) return false;
+                }
+                //is only variable
+                else
+                {
+                    assignable_node = variable_node;
+                }
+                //call?
+                if(is_call_args(ptr))
+                {
+                    //cast..
+                    auto *call_var_node = (l_syntactic_tree::assignable_node*)assignable_node;
+                    //build call
+                    node = l_syntactic_tree::call(call_var_node, m_line);
+                    //parse args
+                    if(!parse_call_arguments(ptr,node))
+                    {
+                        //delete call node
+                        if (node) delete node;
+                        //return false
+                        return false;
+                    }
+                    //do loop?
+                    if(is_point(*ptr) || is_start_index(*ptr))
+                    {
+                        variable_node = node;
+                        node      = nullptr;
+                        m_do_loop = true;
+                    }
+                }
+                //this fild return
+                else
+                {
+                    node = assignable_node;
+                }
+                //skip
+                skip_space_end_comment(ptr);
             }
-            //alloc variable node
-            variable_node = l_syntactic_tree::variable(variable_name, m_line);
+            return true;
+        }
+		bool parse_field_values(const char*& ptr,
+                                l_syntactic_tree::assignable_node* variable_node,
+                                l_syntactic_tree::node*& node)
+		{
+			l_syntactic_tree::exp_node* exp_node = nullptr;
             //skip
             skip_space_end_comment(ptr);
             //list values
@@ -1143,13 +1179,9 @@ namespace l_language
 		//parse assignable
 		bool parse_assignable(const char*& ptr, l_syntactic_tree::node*& node)
 		{
-			if (is_a_field(ptr))
+			if (is_a_field(ptr) || is_variable(ptr))
 			{
 				if (parse_field(ptr, node)) return true;
-			}
-			else if (is_variable(ptr))
-			{
-				if (parse_variable(ptr, node)) return true;
 			}
 			//error
 			push_error("the assignable attribute isn't valid");
@@ -1235,27 +1267,9 @@ namespace l_language
                     //build node
                     node = l_syntactic_tree::assignment((l_syntactic_tree::assignable_node*)assignable_node, op_name, exp, m_line);
                 }
-                //is call args?
-                else if(is_call_args(ptr))
-                {
-                    //cast..
-                    auto *call_var_node = (l_syntactic_tree::assignable_node*)assignable_node;
-                    //build call
-                    node = l_syntactic_tree::call(call_var_node, m_line);
-                    //parse args
-                    if(!parse_call_arguments(ptr,node))
-                    {
-                        //delete call node
-                        if (node) delete node;
-                        //return false
-                        return false;
-                    }
-                }
                 else
                 {
-                    //delete assignable_node
-                    if (assignable_node) delete assignable_node;
-                    return false;
+                    node = assignable_node;
                 }
             }
 			//is parsed

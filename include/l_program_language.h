@@ -88,11 +88,12 @@ namespace l_language
             //VM COMPILER
             if(flags & (EXECUTE|DUMP))
             {
-                m_thread= m_vm_comp.compile(&it_tree);
+                
+                m_vm_comp.compile(&it_tree);
                 //main bytecode
                 if(flags & DUMP)    m_vm.m_functions[0].dump_all_function();
                 //start
-                if(flags & EXECUTE) m_vm.execute(m_thread);
+                if(flags & EXECUTE) m_vm.execute(&m_vm.m_threads[0]);
             }
             //return...
             return output;
@@ -102,7 +103,7 @@ namespace l_language
         {
             for(const lib_field& field : libs)
             {
-                m_vm_comp.add_c_function( field.m_cfunction, field.m_name );
+                m_vm_comp.add_c_function( m_vm.m_threads[0], field.m_cfunction, field.m_name );
             }
         }
         
@@ -110,7 +111,7 @@ namespace l_language
         l_program_language()
         {
             //init vm
-            m_vm_comp.set_vm(&m_vm);
+            m_vm_comp.set_thread(&m_vm.get_new_thread());
         }
         
         //default

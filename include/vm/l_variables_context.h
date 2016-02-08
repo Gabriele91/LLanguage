@@ -31,7 +31,8 @@ namespace l_language
         struct const_info
         {
             unsigned int m_id { 0 };
-            l_syntactic_tree::constant_node* m_constant_node { nullptr };
+            l_syntactic_tree::variable_node*   m_variable_node  { nullptr };
+            l_syntactic_tree::constant_node*   m_constant_node  { nullptr };
             l_variable m_variable;
             
             const_info()
@@ -39,8 +40,8 @@ namespace l_language
             }
             
             const_info(l_gc* gc,
-                       unsigned int l_id = 0,
-                       l_syntactic_tree::constant_node* constant_node = nullptr)
+                       unsigned int l_id,
+                       l_syntactic_tree::constant_node* constant_node)
             {
                 m_id = l_id;
                 m_constant_node = constant_node;
@@ -61,6 +62,15 @@ namespace l_language
                     };
             }
             
+            const_info(l_gc* gc,
+                       unsigned int l_id,
+                       l_syntactic_tree::variable_node* variable_node)
+            {
+                m_id = l_id;
+                m_variable_node = variable_node;
+                m_variable=l_string::const_new(gc,m_variable_node->m_name);
+            }
+            
             const_info(unsigned int l_id,
                        const l_variable& variable)
             {
@@ -70,21 +80,18 @@ namespace l_language
             }
         };
         //function context, value map
-        using variable_table      = std::map< std::string, int > ;
-        using const_table         = std::map< std::string, const_info > ;
-        //table
-        struct function_table
-        {
-            variable_table m_vars;
-            const_table    m_consts;
-        };
+        using function_table = std::map< std::string, const_info > ;
         //variable map
         using functions_var_table = std::map< l_function*, function_table >;
         //map
         functions_var_table m_funs_table;
         //id generators
-        unsigned int m_gen_var_id   { 0 };
-        unsigned int m_gen_const_id { 0 };
+        unsigned int m_gen_id { 0 };
+        //utility methos
+        unsigned int get_new_id()
+        {
+            return m_gen_id++;
+        }
         
         //const to index
         std::string const_index(l_syntactic_tree::constant_node* const_value)
@@ -101,6 +108,16 @@ namespace l_language
             }
             
             return c_name;
+        }
+        
+        std::string variable_index(const std::string& name)
+        {
+            return "string:"+name;
+        }
+        
+        std::string variable_index(l_syntactic_tree::variable_node* var_node)
+        {
+            return "string:"+var_node->m_name;
         }
         
         void visit(l_function* fun, l_syntactic_tree::node* node)
@@ -120,7 +137,7 @@ namespace l_language
         //assignable
         void visit(l_function* fun,l_syntactic_tree::variable_node* node)
         {
-            add_variable_into_table(fun, node->m_name);
+            add_variable_into_table(fun, node);
         }
         
         void visit(l_function* fun,l_syntactic_tree::assignable_node* node)
@@ -129,12 +146,21 @@ namespace l_language
             if (node->m_type == l_syntactic_tree::VARIABLE_NODE)
             {
                 visit(fun,node->to_variable_node());
-                return;
             }
-            //exp field
-            visit(fun,node->to_field_node()->m_exp);
-            //rec call
-            visit(fun,node->to_field_node()->m_assignable);
+            //is a call
+            else if(node->m_type == l_syntactic_tree::CALL_NODE )
+            {
+                auto* call_node = (l_syntactic_tree::call_node*)node;
+                //visit call
+                visit(fun,call_node);
+            }
+            else
+            {
+                //else is a field
+                visit(fun,node->to_field_node()->m_exp);
+                //rec call
+                visit(fun,node->to_field_node()->m_assignable);
+            }
         }
         
         //call
@@ -276,101 +302,60 @@ namespace l_language
         {
             m_gc = &vm->get_gc();
         }
-        
         //push variable
-        void add_variable_into_table(const std::string& var_name)
-        {
-            add_variable_into_table(m_main,var_name);
-        }
-        
-        void add_variable_into_table(l_function* f_context,const std::string& var_name)
+        void add_variable_into_table(l_function* f_context, l_syntactic_tree::variable_node* var_value)
         {
             //function map context
-            auto& f_table = m_funs_table[f_context].m_vars;
+            auto& f_table = m_funs_table[f_context];
+            //index
+            std::string key = variable_index(var_value);
             //find name
-            if(f_table.find(var_name) == f_table.end())
+            if(f_table.find(key) == f_table.end())
             {
-                f_table[var_name] = m_gen_var_id++;
-            }
-        }
-        
-        //push value whit id
-        void add_variable_into_table_and_id(l_function* f_context,const std::string& var_name, int this_id)
-        {
-            //function map context
-            auto& f_table = m_funs_table[f_context].m_vars;
-            //find name
-            if(f_table.find(var_name) == f_table.end())
-            {
-                f_table[var_name] = this_id;
+                f_table[key] = const_info(m_gc, get_new_id(), var_value );
             }
         }
         
         //push constant
-        void add_const_into_table(l_syntactic_tree::constant_node* const_value)
-        {
-            add_const_into_table(m_main,const_value);
-        }
         void add_const_into_table(l_function* f_context, l_syntactic_tree::constant_node* const_value)
         {
             //function map context
-            auto& f_table = m_funs_table[f_context].m_consts;
+            auto& f_table = m_funs_table[f_context];
             //index
             std::string key = const_index(const_value);
             //find name
             if(f_table.find(key) == f_table.end())
             {
-                f_table[key] = const_info(m_gc, m_gen_const_id++, const_value );
+                f_table[key] = const_info(m_gc, get_new_id(), const_value );
             }
         }
         
         //push constant
-        void add_const_into_table(const l_variable& variable,const std::string& const_name)
-        {
-            add_const_into_table(m_main, variable, const_name);
-        }
-        
-        void add_const_into_table(l_function* f_context, const l_variable& variable, const std::string& const_name)
+        void add_into_table(l_function* f_context, const l_variable& variable, const std::string& const_name)
         {
             //function map context
-            auto& f_table = m_funs_table[f_context].m_consts;
+            auto& f_table = m_funs_table[f_context];
             //find name
             if(f_table.find(const_name) == f_table.end())
             {
-                f_table[const_name] = const_info( m_gen_const_id++, variable );
+                f_table[const_name] = const_info( get_new_id(), variable );
             }
-        }
-        
-        
+        } 
         //get
         int get_var_id(l_function* f_context,l_syntactic_tree::variable_node* node)
         {
-            return get_var_id(f_context,node->m_name);
-        }
-        
-        int get_var_id(l_function* f_context,const std::string& name)
-        {
-            //function map context
-            auto& f_table = m_funs_table[f_context].m_vars;
-            //find name
-            auto  id_var  = f_table.find(name);
-            //find name
-            if( id_var != f_table.end() )
-            {
-                return id_var->second;
-            }
-            return TABLE_GET_ERROR;
+            return get_table_id(f_context,variable_index(node));
         }
         
         int get_const_id(l_function* f_context,l_syntactic_tree::constant_node* c_node)
         {
-            return get_const_id(f_context,const_index(c_node));
+            return get_table_id(f_context,const_index(c_node));
         }
         
-        int get_const_id(l_function* f_context,const std::string& name)
+        int get_table_id(l_function* f_context,const std::string& name)
         {
             //function map context
-            auto& f_table  = m_funs_table[f_context].m_consts;;
+            auto& f_table  = m_funs_table[f_context];
             //find name
             auto  id_const = f_table.find(name);
             //find name

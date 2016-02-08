@@ -16,6 +16,7 @@
 		E0950C7E1C4AC50400845FEE /* l_gc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0950C7D1C4AC50400845FEE /* l_gc.cpp */; };
 		E09599381C676A8900BF39F8 /* l_opcode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E09599371C676A8900BF39F8 /* l_opcode.cpp */; };
 		E0DBF2E41C678A4E00F9DA98 /* l_function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0DBF2E31C678A4E00F9DA98 /* l_function.cpp */; };
+		E0DBF2E61C679C0F00F9DA98 /* l_table.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0DBF2E51C679C0F00F9DA98 /* l_table.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -59,6 +60,7 @@
 		E0DBF2E11C67893700F9DA98 /* l_commands.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_commands.h; path = vm/l_commands.h; sourceTree = "<group>"; };
 		E0DBF2E21C6789BB00F9DA98 /* l_function.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_function.h; path = vm/l_function.h; sourceTree = "<group>"; };
 		E0DBF2E31C678A4E00F9DA98 /* l_function.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_function.cpp; sourceTree = "<group>"; };
+		E0DBF2E51C679C0F00F9DA98 /* l_table.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_table.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,10 +131,10 @@
 			isa = PBXGroup;
 			children = (
 				E095992F1C67508A00BF39F8 /* l_parser.h */,
-				E09599301C67508A00BF39F8 /* l_compiler_tree_to_vm.h */,
 				E09599311C67508A00BF39F8 /* l_syntactic_tree.h */,
 				E09599321C67508A00BF39F8 /* l_table.h */,
 				E09599331C67508A00BF39F8 /* l_variables_context.h */,
+				E09599301C67508A00BF39F8 /* l_compiler_tree_to_vm.h */,
 				E09599341C67508A00BF39F8 /* l_compiler_utilities.h */,
 				E09599351C67508A00BF39F8 /* l_lib_base.h */,
 				E0891CC71C5A62AD00FB37F6 /* l_variable.h */,
@@ -158,6 +160,7 @@
 				E05F4B501C589BB600F7EB6A /* l_compiler_utilities.cpp */,
 				E09599371C676A8900BF39F8 /* l_opcode.cpp */,
 				E0DBF2E31C678A4E00F9DA98 /* l_function.cpp */,
+				E0DBF2E51C679C0F00F9DA98 /* l_table.cpp */,
 			);
 			path = vm;
 			sourceTree = "<group>";
@@ -223,6 +226,7 @@
 				E09599381C676A8900BF39F8 /* l_opcode.cpp in Sources */,
 				E05F4B4C1C57FB8D00F7EB6A /* l_string.cpp in Sources */,
 				E05F4B4E1C58985500F7EB6A /* l_lib_base.cpp in Sources */,
+				E0DBF2E61C679C0F00F9DA98 /* l_table.cpp in Sources */,
 				E0DBF2E41C678A4E00F9DA98 /* l_function.cpp in Sources */,
 				E05F4B511C589BB600F7EB6A /* l_compiler_utilities.cpp in Sources */,
 				E08511D41C3D6205005AC8B2 /* source.ll in Sources */,

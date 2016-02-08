@@ -127,14 +127,6 @@ namespace  l_language
 
     void  l_gc::mark_pool()
     {
-        //global mark
-        for(l_variable& var : m_vm.m_globals)
-        {
-            if(var.is_object())
-            {
-                var.mark();
-            }
-        }
         
         for(l_thread& thread  : m_vm.m_threads)
         {
