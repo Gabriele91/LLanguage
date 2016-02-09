@@ -108,7 +108,7 @@ namespace l_language
 
 		void add_lib(const std::string& name,const l_extern_libary& libs)
 		{
-			l_variable table = l_table::const_new(m_vm.get_gc());
+			l_variable table = l_table::gc_new(m_vm.get_gc());
 			for (const lib_field& field : libs)
 			{
 				table.to<l_table>()->push(l_string::gc_new(m_vm.get_gc(), field.m_name), field.m_cfunction);

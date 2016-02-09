@@ -141,24 +141,10 @@ namespace  l_language
             //call context mark
             for(l_call_context& call : thread.m_contexts)
             {
-                for(int i=0;i != call.get_size_up_values();++i)
-                {
-                    l_variable& var = call.up_value(i);
-                    
-                    if(var.is_object() && var.is_unmarked())
-                    {
-                        var.mark();
-                    }
-                }
-                for(int i=0;i != call.get_size_vars();++i)
-                {
-                    l_variable& var = call.variable(i);
-                    
-                    if(var.is_object() && var.is_unmarked())
-                    {
-                        var.mark();
-                    }
-                }
+				l_obj* up_values       = &call.m_up_values;
+				l_obj* local_variables = &call.m_local_variables;
+				up_values->mark();
+				local_variables->mark();
             }
             //stack mark
             for(long i=0;i <= thread.m_top /* n.b. top can get -1 */;++i)

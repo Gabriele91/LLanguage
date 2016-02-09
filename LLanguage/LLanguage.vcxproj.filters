@@ -108,4 +108,15 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\tests\fields.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\tests\for.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\tests\while.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+  </ItemGroup>
 </Project>

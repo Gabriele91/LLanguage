@@ -153,6 +153,11 @@
     <ClInclude Include="..\include\vm\l_vector.h" />
     <ClInclude Include="..\include\vm\l_vm.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\tests\fields.ll" />
+    <None Include="..\tests\for.ll" />
+    <None Include="..\tests\while.ll" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

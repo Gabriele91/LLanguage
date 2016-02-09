@@ -17,7 +17,7 @@ namespace l_language
     class l_gc;
     class l_obj;
     
-#ifdef DEBUG
+#if defined( DEBUG ) || defined( _DEBUG )
     #define GC_DEBUG(x) x
 #else
     #define GC_DEBUG(x)

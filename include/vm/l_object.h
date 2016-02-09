@@ -61,12 +61,11 @@ namespace l_language
         }
         
     private:
-        
         //gc reference
         l_gc* m_gc { nullptr };
         
         //mark flag
-        bool m_mark { false };
+        mutable bool m_mark { false };
         
         //firend class
         friend class   l_gc;
