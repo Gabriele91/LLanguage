@@ -359,9 +359,12 @@ namespace l_language
         {
             int n_args = (int)call_node->m_args.size();
             //push args
-            for(l_syntactic_tree::exp_node* exp_node : call_node->m_args)
+            for(auto
+                it  = call_node->m_args.rbegin();
+                it != call_node->m_args.rend();
+              ++it)
             {
-                compile_exp(fun, exp_node);
+                compile_exp(fun, *it);
             }
             //push call
             compile_assignable_get(fun,call_node->m_assignable);
@@ -403,6 +406,11 @@ namespace l_language
         l_vm* m_vm { nullptr };
         
     public:
+        
+        l_compiler_tree_to_vm(l_thread* thread)
+        {
+            set_thread(thread);
+        }
         
         void set_thread(l_thread* thread)
         {

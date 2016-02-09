@@ -22,11 +22,11 @@ namespace l_language
         using vm_compiler  = l_language::l_compiler_tree_to_vm;
         //parser...
         parser       m_parser;
-        //compilers
-        vm_compiler  m_vm_comp;
         //virtual machine
         l_vm         m_vm;
-        l_thread*    m_thread;
+        l_thread&    m_thread;
+        //compilers
+        vm_compiler  m_vm_comp;
         
     public:
         
@@ -88,12 +88,11 @@ namespace l_language
             //VM COMPILER
             if(flags & (EXECUTE|DUMP))
             {
-                
                 m_vm_comp.compile(&it_tree);
                 //main bytecode
                 if(flags & DUMP)    m_vm.m_functions[0].dump_all_function();
                 //start
-                if(flags & EXECUTE) m_vm.execute(&m_vm.m_threads[0]);
+                if(flags & EXECUTE) m_vm.execute(&m_thread);
             }
             //return...
             return output;
@@ -103,7 +102,7 @@ namespace l_language
         {
             for(const lib_field& field : libs)
             {
-                m_vm_comp.add_c_function( m_vm.m_threads[0], field.m_cfunction, field.m_name );
+                m_vm_comp.add_c_function( m_thread, field.m_cfunction, field.m_name );
             }
         }
 
@@ -114,14 +113,14 @@ namespace l_language
 			{
 				table.to<l_table>()->push(l_string::gc_new(m_vm.get_gc(), field.m_name), field.m_cfunction);
 			}				
-			m_vm_comp.add_global_variable(m_vm.m_threads[0], table, name);
+			m_vm_comp.add_global_variable(m_thread, table, name);
 		}
 
         //default
         l_program_language()
+        :m_thread(m_vm.get_new_thread())
+        ,m_vm_comp(&m_thread)
         {
-            //init vm
-            m_vm_comp.set_thread(&m_vm.get_new_thread());
         }
         
         //default

@@ -12,7 +12,7 @@ int l_print(l_language::l_thread* th,int args)
     for(size_t i=0; i!=args; ++i)
     {
         //
-        const l_language::l_variable& var = th->value(args-i-1);
+        const l_language::l_variable& var = th->value(i);
         //
         switch (var.m_type)
         {
@@ -66,7 +66,7 @@ int l_input(l_language::l_thread* th,int args)
 int l_to_int(l_language::l_thread* th,int args)
 {
     //get arg
-    l_language::l_variable& var = th->value(args-1);
+    l_language::l_variable& var = th->value(0);
     //cast
     int i = 0;
     //cast
@@ -86,7 +86,7 @@ int l_to_int(l_language::l_thread* th,int args)
 int l_to_float(l_language::l_thread* th,int args)
 {
     //get arg
-    l_language::l_variable& var = th->value(args-1);
+    l_language::l_variable& var = th->value(0);
     //cast
     float f = 0;
     //cast
@@ -106,8 +106,8 @@ int l_to_float(l_language::l_thread* th,int args)
 int l_mod(l_language::l_thread* th,int args)
 {
     //get arg
-    l_language::l_variable& var       = th->value(args-1);
-    l_language::l_variable& var_right = th->value(args-2);
+    l_language::l_variable& var       = th->value(0);
+    l_language::l_variable& var_right = th->value(1);
     //cases
     if(var.is_float() || var.is_float())
     {
@@ -128,7 +128,7 @@ int l_mod(l_language::l_thread* th,int args)
 int l_to_string(l_language::l_thread* th,int args)
 {
     //get arg
-    l_language::l_variable& var = th->value(args-1);
+    l_language::l_variable& var = th->value(0);
     //cast
     std::string  str;
     //cast
@@ -149,7 +149,7 @@ int l_type_of(l_language::l_thread* th,int args)
 {
     std::string str;
     //
-    auto type = th->value(args-1).m_type;
+    auto type = th->value(0).m_type;
     //
     switch (type)
     {
@@ -178,7 +178,7 @@ int l_global(l_language::l_thread* th,int args)
 int l_using(l_language::l_thread* th, int args)
 {
 	//get variable
-	auto& name = th->value(args - 1);
+	auto& name = th->value(0);
 	//gettable
 	auto& var_table = th->main_context().variable(name);
 	//table obj
