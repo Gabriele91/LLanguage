@@ -424,6 +424,15 @@ namespace l_language
             //name into table
             add_into_table(&m_vm->m_functions[thread.main_context().get_fun_id()], variable, variable_index(cfun_name));
         }
+
+		void add_global_variable(l_thread& thread,  const l_variable& g_variable, const std::string& var_name)
+		{
+			l_variable variable = l_string::const_new(thread.get_gc(), var_name);
+			//add variable
+			thread.main_context().variable(variable, g_variable);
+			//name into table
+			add_into_table(&m_vm->m_functions[thread.main_context().get_fun_id()], variable, variable_index(var_name));
+		}
         
         l_thread* compile(const l_syntactic_tree* tree)
         {

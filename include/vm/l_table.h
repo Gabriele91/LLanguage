@@ -9,6 +9,7 @@
 #include <map>
 #include <memory>
 #include <assert.h>
+#include <unordered_map>
 #include <l_variable.h>
 #include <l_gc.h>
 
@@ -28,17 +29,25 @@ namespace l_language
         //value compare
         struct l_value_compare
         {
+			size_t operator()(const l_variable& left) const
+			{
+				assert(left.is_string());
+				std::hash<std::string> f_hash;
+				return f_hash(left.string()->str());
+			}
+
             bool operator()(const l_variable& left,const l_variable& right) const 
             {
                 assert(left.is_string());
                 assert(right.is_string());
-                return left.string() < right.string();
+                return left.string()->str() == right.string()->str();
             }
         };
         //type
-        using l_map_object           = std::map< l_variable,
-                                                 l_variable,
-                                                 l_value_compare >;
+        using l_map_object           = std::unordered_map< l_variable,
+														   l_variable,
+														   l_value_compare,
+													       l_value_compare >;
         using l_map_object_it        = l_map_object::iterator;
         using l_map_object_const_it  = l_map_object::const_iterator;
         //table
@@ -107,6 +116,11 @@ namespace l_language
         
     public:
         
+		const l_map_object& raw() const
+		{
+			return m_map;
+		}
+
         size_t size() const
         {
             return m_map.size();

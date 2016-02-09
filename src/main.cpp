@@ -94,7 +94,7 @@ int main(int argc,const char* args[])
         //compiler object
         program_language it_compiler;
         //add libs
-        it_compiler.add_lib(l_language::l_base_lib);
+		it_compiler.add_lib("std", l_language::l_base_lib);
         //read code // "source.it"
         std::ifstream source_file(i_source);
         std::string source((std::istreambuf_iterator<char>(source_file)),

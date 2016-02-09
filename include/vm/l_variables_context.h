@@ -75,7 +75,6 @@ namespace l_language
                        const l_variable& variable)
             {
                 m_id = l_id;
-                m_constant_node = nullptr;
                 m_variable = variable;
             }
         };

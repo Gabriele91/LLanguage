@@ -106,7 +106,17 @@ namespace l_language
                 m_vm_comp.add_c_function( m_vm.m_threads[0], field.m_cfunction, field.m_name );
             }
         }
-        
+
+		void add_lib(const std::string& name,const l_extern_libary& libs)
+		{
+			l_variable table = l_table::const_new(m_vm.get_gc());
+			for (const lib_field& field : libs)
+			{
+				table.to<l_table>()->push(l_string::gc_new(m_vm.get_gc(), field.m_name), field.m_cfunction);
+			}				
+			m_vm_comp.add_global_variable(m_vm.m_threads[0], table, name);
+		}
+
         //default
         l_program_language()
         {

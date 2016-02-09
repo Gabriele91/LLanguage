@@ -175,6 +175,23 @@ int l_global(l_language::l_thread* th,int args)
     return 1;
 }
 
+int l_using(l_language::l_thread* th, int args)
+{
+	//get variable
+	auto& name = th->value(args - 1);
+	//gettable
+	auto& var_table = th->main_context().variable(name);
+	//table obj
+	auto& table = *var_table.to<l_language::l_table>();
+	//for each
+	for (auto it : table.raw())
+	{
+		th->main_context().variable(it.first) = it.second;
+	}
+	//number of return
+	return 0;
+}
+
 namespace l_language
 {
     l_language::l_program_language::l_extern_libary l_base_lib=
@@ -187,6 +204,7 @@ namespace l_language
         { "to_float",  l_to_float  },
         { "to_string", l_to_string },
         { "type_of",   l_type_of   },
-        { "mod",     l_mod       }
+        { "mod",       l_mod       },
+		{ "using",     l_using     }
     };
 }
