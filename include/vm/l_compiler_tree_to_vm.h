@@ -331,7 +331,7 @@ namespace l_language
                 case l_syntactic_tree::for_node::FOR_OF:
                 case l_syntactic_tree::for_node::FOR_IN:
                 {
-                    compile_assignable_get(fun,for_node->m_variable_right);
+                    compile_exp(fun,for_node->m_variable_right);
                     //get it
                     fun->push({ L_IT, 0, for_node->m_line });
                     //get line

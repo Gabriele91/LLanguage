@@ -1492,8 +1492,8 @@ namespace l_language
         {
             //parse for each
             l_syntactic_tree::for_node::type_for type_for = l_syntactic_tree::for_node::FOR_IN;
-            l_syntactic_tree::node* node_left = nullptr;
-            l_syntactic_tree::node* node_right = nullptr;
+            l_syntactic_tree::node*     node_left = nullptr;
+            l_syntactic_tree::exp_node* node_right = nullptr;
             //parse for
             if (!CSTRCMP_SKIP(ptr, "for"))
             {
@@ -1519,7 +1519,7 @@ namespace l_language
             //skip
             skip_space_end_comment(ptr);
             //parse
-            if(!parse_assignable(ptr, node_right))
+            if(!parse_exp(ptr, node_right))
             {
                 if(node_left) delete node_left;
                 return false;

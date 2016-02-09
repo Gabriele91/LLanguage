@@ -38,3 +38,12 @@ for v of a
 }
 
 std.println("-----------------------")
+std.println("-----------------------")
+
+
+for v of [2,3,"wooohhhh!?@#+*[]"]
+{
+    std.println(v)
+}
+
+std.println("-----------------------")

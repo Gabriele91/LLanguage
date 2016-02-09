@@ -187,7 +187,7 @@ namespace l_language
             //for variable in variable
             //for variable of variable
             assignable_node* m_variable_left  { nullptr };
-            assignable_node* m_variable_right { nullptr };
+            exp_node*        m_variable_right { nullptr };
             //staments
             list_nodes m_staments;
             
@@ -832,10 +832,10 @@ namespace l_language
             return node;
         }
         //for stament
-        static for_node* for_in(assignable_node* left = nullptr,assignable_node* right = nullptr, size_t line = 0, size_t ichar = 0)
+        static for_node* for_in(assignable_node* left = nullptr,exp_node* right = nullptr, size_t line = 0, size_t ichar = 0)
         {
             auto* node = new for_node;
-            node->m_type_for        = for_node::FOR_IN;
+            node->m_type_for       = for_node::FOR_IN;
             node->m_variable_left  = left;
             node->m_variable_right = right;
             node->m_line           = line;
@@ -843,7 +843,7 @@ namespace l_language
             return node;
         }
         //for stament
-        static for_node* for_of(assignable_node* left = nullptr,assignable_node* right = nullptr, size_t line = 0, size_t ichar = 0)
+        static for_node* for_of(assignable_node* left = nullptr,exp_node* right = nullptr, size_t line = 0, size_t ichar = 0)
         {
             auto* node = new for_node;
             node->m_type_for       = for_node::FOR_OF;
