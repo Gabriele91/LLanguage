@@ -45,8 +45,13 @@ namespace l_language
             }
             else
             {
-                //fun->push({ L_SET_LOCAL, get_table_id(fun, node) });
-                assert(0);
+                if(is_upper_value(fun,node))
+                    fun->push({ L_SET_UP_VALUE, get_var_id(fun, node), node->m_line });
+                else if(is_global_value(fun,node))
+                    fun->push({ L_SET_GLOBAL, get_var_id(fun, node), node->m_line });
+                else
+                    fun->push({ L_SET_LOCAL, get_var_id(fun, node), node->m_line });
+                //assert(0);
             }
             return true;
         }
@@ -59,7 +64,13 @@ namespace l_language
             }
             else
             {
-                assert(0);
+                if(is_upper_value(fun,node))
+                    fun->push({ L_GET_UP_VALUE, get_var_id(fun, node), node->m_line });
+                else if(is_global_value(fun,node))
+                    fun->push({ L_GET_GLOBAL, get_var_id(fun, node), node->m_line });
+                else
+                    fun->push({ L_GET_LOCAL, get_var_id(fun, node), node->m_line });
+                //assert(0);
             }
             return true;
         }
@@ -362,7 +373,7 @@ namespace l_language
             for(auto
                 it  = call_node->m_args.rbegin();
                 it != call_node->m_args.rend();
-              ++it)
+                ++it)
             {
                 compile_exp(fun, *it);
             }
@@ -370,6 +381,20 @@ namespace l_language
             compile_assignable_get(fun,call_node->m_assignable);
             //push call
             fun->push({ L_CALL, n_args, call_node->m_line });
+            //success
+            return true;
+        }
+        //compile fun
+        bool compile_function_def(l_function* fun,l_syntactic_tree::function_def_node* function_def_node)
+        {
+            //get function id
+            size_t function = ((size_t)function_def_node->m_data);
+            //compile staments
+            compile_statements(&m_vm->m_functions[function],function_def_node->m_staments);
+            //get fun id
+            fun->push({ L_CLOSER, get_function_id(fun, function_def_node), function_def_node->m_line });
+            //push call
+            compile_variable_set(fun,function_def_node->m_variable);
             //success
             return true;
         }
@@ -391,9 +416,12 @@ namespace l_language
                     break;
                     case l_syntactic_tree::FOR_NODE:
                         if(! compile_for(fun, node->to<l_syntactic_tree::for_node>()) ) return false;
-                    break;
+                        break;
                     case l_syntactic_tree::CALL_NODE:
                         if(! compile_call(fun,node->to<l_syntactic_tree::call_node>()) ) return false;
+                        break;
+                    case l_syntactic_tree::FUNCTION_DEF_NODE:
+                        if(! compile_function_def(fun,node->to<l_syntactic_tree::function_def_node>()) ) return false;
                     break;
                     default:  break;
                 }
@@ -417,47 +445,59 @@ namespace l_language
             //ptr to vm
             m_vm = thread->get_vm();
             //main function
+            m_vm->m_functions.reserve(255);
             m_vm->m_functions.resize(1);
             //set main
             set_main_function(&m_vm->m_functions[0]);
             //set gc
-            set_gc_from_vm(thread->get_vm());
+            set_vm(thread->get_vm());
         }
         
         void add_c_function(l_thread& thread,const l_cfunction function,const std::string& cfun_name)
         {
             l_variable variable = l_string::const_new(thread.get_gc(),cfun_name);
             //add variable
-            thread.main_context().variable(variable,function);
+            thread.main_context()->variable(variable,function);
             //name into table
-            add_into_table(&m_vm->m_functions[thread.main_context().get_fun_id()], variable, variable_index(cfun_name));
+            add_into_table(&m_vm->m_functions[thread.main_context()->get_fun_id()], variable, variable_index(cfun_name));
         }
 
 		void add_global_variable(l_thread& thread,  const l_variable& g_variable, const std::string& var_name)
 		{
 			l_variable variable = l_string::const_new(thread.get_gc(), var_name);
 			//add variable
-			thread.main_context().variable(variable, g_variable);
+			thread.main_context()->variable(variable, g_variable);
 			//name into table
-			add_into_table(&m_vm->m_functions[thread.main_context().get_fun_id()], variable, variable_index(var_name));
+			add_into_table(&m_vm->m_functions[thread.main_context()->get_fun_id()], variable, variable_index(var_name));
 		}
         
         l_thread* compile(const l_syntactic_tree* tree)
         {
             //build tablet
             build_variable_context_from_tree(m_vm, tree);
-            //ptr to fun table
-            auto& fun_table = m_funs_table[m_main];
-            //add info
-            m_main->m_args_size = 0;
-            m_main->m_up_val_size = 0;
-            //alloc values
-            m_main->m_costants.resize(fun_table.size());
-            //puth const
-            for(auto it : fun_table)
+            //push consts
+            for(size_t i=0; i!=m_vm->m_functions.size(); ++i)
             {
-                //save const
-                m_main->m_costants[it.second.m_id] = it.second.m_variable;
+                l_function* fun = &m_vm->m_functions[i];
+                //search in table
+                auto it_fun_table = m_funs_table.find(fun);
+                //if find
+                if(it_fun_table != m_funs_table.end())
+                {
+                    //ptr to fun table
+                    auto& fun_table = it_fun_table->second;
+                    //add info
+                    fun->m_args_size = 0;
+                    fun->m_up_val_size = 0;
+                    //alloc values
+                    fun->m_costants.resize(fun_table.size());
+                    //puth const
+                    for(auto& it : fun_table)
+                    {
+                        //save const
+                        fun->m_costants[it.second.m_id] = it.second.m_variable;
+                    }
+                }
             }
             //
             if(!compile_statements(m_main,tree->m_root->m_staments)) return nullptr;

@@ -90,7 +90,16 @@ namespace l_language
             {
                 m_vm_comp.compile(&it_tree);
                 //main bytecode
-                if(flags & DUMP)    m_vm.m_functions[0].dump_all_function();
+                if(flags & DUMP)
+                {
+                    for(size_t i=0;i!=m_vm.m_functions.size();++i)
+                    {
+                        std::cout<< "------------\n"
+                                    "Function["<<i<<"]:\n\n";
+                        m_vm.m_functions[i].dump_all_function();
+                        std::cout<< "\n";
+                    }
+                }
                 //start
                 if(flags & EXECUTE) m_vm.execute(&m_thread);
             }

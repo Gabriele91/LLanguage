@@ -25,11 +25,23 @@ namespace l_language
         
         //main context function
         l_function* m_main {  nullptr  };
-        //main context function
+        //gc
         l_gc*       m_gc {  nullptr  };
+        //vm
+        l_vm*       m_vm {  nullptr  };
         //const struct
         struct const_info
         {
+            //type
+            enum type_context
+            {
+                T_CTX_CAN_TO_BE_UPPER,
+                T_CTX_CAN_NOT_TO_BE_UPPER,
+                T_CTX_MUST_TO_BE_UPPER,
+                T_CTX_MUST_TO_BE_GLOBAL
+            };
+            type_context m_context_type{ T_CTX_CAN_TO_BE_UPPER };
+            //info
             unsigned int m_id { 0 };
             l_syntactic_tree::variable_node*   m_variable_node  { nullptr };
             l_syntactic_tree::constant_node*   m_constant_node  { nullptr };
@@ -109,6 +121,15 @@ namespace l_language
             return c_name;
         }
         
+        std::string function_index(const std::string& name)
+        {
+            return "function:"+name;
+        }
+        std::string function_index(l_syntactic_tree::function_def_node* fdef_node)
+        {
+            return "function:"+fdef_node->m_variable->m_name;
+        }
+        
         std::string variable_index(const std::string& name)
         {
             return "string:"+name;
@@ -119,18 +140,50 @@ namespace l_language
             return "string:"+var_node->m_name;
         }
         
+        
         void visit(l_function* fun, l_syntactic_tree::node* node)
         {
                 
             switch (node->m_type)
             {
-                case l_syntactic_tree::OP_NODE:     visit(fun,node->to<l_syntactic_tree::op_node>());    break;
-                case l_syntactic_tree::CALL_NODE:   visit(fun,node->to<l_syntactic_tree::call_node>());  break;
-                case l_syntactic_tree::IF_NODE:     visit(fun,node->to<l_syntactic_tree::if_node>());    break;
-                case l_syntactic_tree::WHILE_NODE:  visit(fun,node->to<l_syntactic_tree::while_node>()); break;
-                case l_syntactic_tree::FOR_NODE:    visit(fun,node->to<l_syntactic_tree::for_node>());   break;
+                case l_syntactic_tree::OP_NODE:              visit(fun,node->to<l_syntactic_tree::op_node>());            break;
+                case l_syntactic_tree::CALL_NODE:            visit(fun,node->to<l_syntactic_tree::call_node>());          break;
+                case l_syntactic_tree::IF_NODE:              visit(fun,node->to<l_syntactic_tree::if_node>());            break;
+                case l_syntactic_tree::WHILE_NODE:           visit(fun,node->to<l_syntactic_tree::while_node>());         break;
+                case l_syntactic_tree::FOR_NODE:             visit(fun,node->to<l_syntactic_tree::for_node>());           break;
+                case l_syntactic_tree::FUNCTION_DEF_NODE:    visit(fun,node->to<l_syntactic_tree::function_def_node>());  break;
+                case l_syntactic_tree::CONTEXT_TYPE_NODE:    visit(fun,node->to<l_syntactic_tree::context_type_node>());  break;
                 default: assert(0); break;
             }
+        }
+        
+        //function def
+        void visit(l_function* fun,l_syntactic_tree::function_def_node* node)
+        {
+            //alloc new function
+            l_function* new_fun = &m_vm->get_new_function();
+            //add data
+            node->m_data = (void*)(m_vm->m_functions.size()-1);
+            //add variable node
+            visit(fun, node->m_variable);
+            //alloc variable
+            add_into_table(fun, l_variable((l_function_id)(m_vm->m_functions.size()-1)), function_index(node));
+            //save id gen
+            unsigned int l_id_gen = m_gen_id;
+            //set to 0
+            m_gen_id = 0;
+            //args...
+            for(auto st : node->m_args)
+            {
+                visit(new_fun,st);
+            }
+            //staments
+            for(auto st : node->m_staments)
+            {
+                visit(new_fun,st);
+            }
+            //restore
+            m_gen_id = l_id_gen;
         }
         
         //assignable
@@ -227,12 +280,72 @@ namespace l_language
                 assert(0);
             }
         }
+        //is dec?
+        bool is_declared(l_function* fun, l_syntactic_tree::variable_node* variable_node)
+        {
+            auto& fun_table = m_funs_table[fun];
+            auto  it        = fun_table.find(variable_index(variable_node->m_name));
+            return it != fun_table.end();
+        }
+        //isn't an up value
+        void is_not_upper_value(l_function* fun, l_syntactic_tree::variable_node* variable_node)
+        {
+            //not dec?
+            if(!is_declared(fun,variable_node)) add_variable_into_table(fun, variable_node);
+            //get ref
+            auto& context_type = m_funs_table[fun][ variable_index(variable_node->m_name) ].m_context_type;
+            //if can change value
+            if( context_type == const_info::T_CTX_CAN_TO_BE_UPPER)
+            {
+                context_type = const_info::T_CTX_CAN_NOT_TO_BE_UPPER;
+            }
+        }
+        void must_to_be_upper_value(l_function* fun, l_syntactic_tree::variable_node* variable_node)
+        {
+            //not dec?
+            if(!is_declared(fun,variable_node)) add_variable_into_table(fun, variable_node);
+            //..
+            m_funs_table[fun][ variable_index(variable_node->m_name) ].m_context_type = const_info::T_CTX_MUST_TO_BE_UPPER;
+        }
+        void must_to_be_global_value(l_function* fun, l_syntactic_tree::variable_node* variable_node)
+        {
+            //not dec?
+            if(!is_declared(fun,variable_node)) add_variable_into_table(fun, variable_node);
+            //..
+            m_funs_table[fun][ variable_index(variable_node->m_name) ].m_context_type = const_info::T_CTX_MUST_TO_BE_GLOBAL;
+        }
         
         //op
         void visit(l_function* fun, l_syntactic_tree::op_node* op_node)
         {
+            //..
             visit(fun,op_node->m_assignable);
+            //.. is def
+            if(op_node->m_assignable->is_variable())
+            {
+                is_not_upper_value(fun,op_node->m_assignable->to_variable_node());
+            }
+            //..
             visit(fun,op_node->m_exp);
+        }
+        //type context
+        void visit(l_function*  fun, l_syntactic_tree::context_type_node* ctx_node)
+        {
+            //args
+            if(ctx_node->m_context_type == l_syntactic_tree::context_type_node::T_GLOBAL)
+            {
+                for (auto& variable : ctx_node->m_vars)
+                {
+                    must_to_be_global_value(fun,variable);
+                }
+            }
+            if(ctx_node->m_context_type == l_syntactic_tree::context_type_node::T_SUPER)
+            {
+                for (auto& variable : ctx_node->m_vars)
+                {
+                    must_to_be_upper_value(fun,variable);
+                }
+            }
         }
         
         //for
@@ -292,6 +405,12 @@ namespace l_language
             visit(m_main,tree->m_root);
         }
         
+        void set_vm(l_vm* vm)
+        {
+            m_vm = vm;
+            set_gc_from_vm(vm);
+        }
+        
         void set_main_function(l_function* main)
         {
             m_main = main;
@@ -349,6 +468,39 @@ namespace l_language
         int get_const_id(l_function* f_context,l_syntactic_tree::constant_node* c_node)
         {
             return get_table_id(f_context,const_index(c_node));
+        }
+        
+        int get_function_id(l_function* f_context,l_syntactic_tree::function_def_node* c_node)
+        {
+            return get_table_id(f_context,function_index(c_node));
+        }
+        
+        bool is_upper_value(l_function* f_context,l_syntactic_tree::variable_node* node)
+        {
+            //function map context
+            auto& f_table  = m_funs_table[f_context];
+            //find name
+            auto  id_const = f_table.find(variable_index(node));
+            //find name
+            if( id_const != f_table.end() )
+            {
+                return id_const->second.m_context_type == const_info::T_CTX_MUST_TO_BE_UPPER ||
+                       id_const->second.m_context_type == const_info::T_CTX_CAN_TO_BE_UPPER;
+            }
+            return false;
+        }
+        bool is_global_value(l_function* f_context,l_syntactic_tree::variable_node* node)
+        {
+            //function map context
+            auto& f_table  = m_funs_table[f_context];
+            //find name
+            auto  id_const = f_table.find(variable_index(node));
+            //find name
+            if( id_const != f_table.end() )
+            {
+                return id_const->second.m_context_type == const_info::T_CTX_MUST_TO_BE_GLOBAL;
+            }
+            return false;
         }
         
         int get_table_id(l_function* f_context,const std::string& name)

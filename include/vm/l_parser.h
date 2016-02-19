@@ -72,7 +72,9 @@ namespace l_language
     call        :=  assignable '(' [exp] {[ ',' exp ]} ')'
 	cicle       :=  while | for_each
 	while       := 'while' <exp> '{' staments '}'
-	for_each    := 'for' variable 'in' variable '{' staments '}'
+    for_each    := 'for' variable ('in'|'of') exp '{' staments '}'
+    def         := ('def'|'function') [variable] '(' [ variable {[',' variable]} ] ')' '{' staments '}'
+    type context:= ('global' | 'super') [ variable {[ ',' variable ]} ]
 	*/
 	class l_parser
 	{
@@ -912,7 +914,9 @@ namespace l_language
          call        :=  variable '(' [exp] {[ ',' exp ]} ')'
          cicle       :=  while | for_each
          while       := 'while' <exp> '{' staments '}'
-         for_each    := 'for' variable 'in' variable '{' staments '}'
+         for_each    := 'for' variable ('in'|'of') exp '{' staments '}'
+         def         := ('def'|'function') [variable] '(' [ variable {[',' variable]} ] ')' '{' staments '}'
+         type context:= ('global' | 'super') [ variable {[ ',' variable ]} ]
 		*/
 		//parse staments
 		bool parse_staments(const char*& ptr, l_syntactic_tree::list_nodes& nodes)
@@ -939,9 +943,11 @@ namespace l_language
 		{
 			//skip
 			skip_space_end_comment(ptr);
-			//staments
+            //staments
             if (CSTRCMP(ptr, "if"))									   return parse_if(ptr, node);
-            if (CSTRCMP(ptr, "while") || CSTRCMP(ptr, "for"))	       return parse_cicle(ptr, node);
+            if (CSTRCMP(ptr, "def")    || CSTRCMP(ptr, "function"))	   return parse_def(ptr, node);
+            if (CSTRCMP(ptr, "while")  || CSTRCMP(ptr, "for"))	       return parse_cicle(ptr, node);
+            if (CSTRCMP(ptr, "global") || CSTRCMP(ptr, "super"))	   return parse_type(ptr, node);
 			if (is_operation(ptr))								       return parse_operation(ptr, node);
 			//error
 			push_error("not valid stament");
@@ -1497,7 +1503,8 @@ namespace l_language
             //parse for
             if (!CSTRCMP_SKIP(ptr, "for"))
             {
-                push_error("not found \"}\" keyword");
+                push_error("not found \"for\" keyword");
+                return false;
             }
             //parse
             if(!parse_assignable(ptr, node_left)) return false;
@@ -1569,7 +1576,146 @@ namespace l_language
             if (CSTRCMP(ptr, "while"))		return parse_while(ptr, node);
             if (CSTRCMP(ptr, "for"))		return parse_for(ptr, node);
 			return false;
-		}
+        }
+        //parse typw
+        bool parse_type(const char*& ptr, l_syntactic_tree::node*& node)
+        {
+            l_syntactic_tree::context_type_node* l_context_type = nullptr;
+            //skip
+            skip_space_end_comment(ptr);
+            //global or super?
+            if(CSTRCMP_SKIP(ptr, "global"))
+            {
+                l_context_type = l_syntactic_tree::context_global(m_line);
+            }
+            else if(CSTRCMP_SKIP(ptr, "super"))
+            {
+                l_context_type = l_syntactic_tree::context_super(m_line);
+            }
+            else
+            {
+                push_error("not found \"global/super\" keyword");
+                return false;
+            }
+            //values...
+            do
+            {
+                //skip
+                skip_space_end_comment(ptr);
+                //variable node
+                l_syntactic_tree::node* l_variable = nullptr;
+                //parse variable
+                if(!parse_variable(ptr, l_variable))
+                {
+                    push_error("not found \"variable\" of args of def");
+                    //dealloc
+                    delete l_context_type;
+                    //false
+                    return false;
+                }
+                //push var
+                l_context_type->append((l_syntactic_tree::variable_node*)l_variable);
+                //skip
+                skip_space_end_comment(ptr);
+            }
+            while (CSTRCMP_SKIP(ptr, ","));
+            //skip
+            skip_space_end_comment(ptr);
+            //cast
+            node = (l_syntactic_tree::node*)l_context_type;
+            //success
+            return true;
+        }
+        //parse def
+        bool parse_def(const char*& ptr, l_syntactic_tree::node*& node)
+        {
+            l_syntactic_tree::node*              l_variable = nullptr;
+            l_syntactic_tree::function_def_node* l_def_node = nullptr;
+            //skip
+            skip_space_end_comment(ptr);
+            //serach def
+            if (!CSTRCMP_SKIP(ptr, "def") && !CSTRCMP_SKIP(ptr, "function"))
+            {
+                push_error("not found \"def/function\" keyword");
+                return false;
+            }
+            //skip
+            skip_space_end_comment(ptr);
+            //parse variable
+            if(!parse_variable(ptr, l_variable))
+            {
+                push_error("not found \"variable\" of def");
+                return false;
+            }
+            //cast
+            node = l_syntactic_tree::function_def(l_variable, m_line);
+            //alloc node
+            l_def_node = (l_syntactic_tree::function_def_node*)node;
+            //skip
+            skip_space_end_comment(ptr);
+            //parse args
+            if (CSTRCMP_SKIP(ptr, "("))
+            {
+                //skip
+                skip_space_end_comment(ptr);
+                //args...
+                if(!CSTRCMP_SKIP(ptr, ")"))
+                {
+                    //values...
+                    do
+                    {
+                        //skip
+                        skip_space_end_comment(ptr);
+                        //variable node
+                        l_syntactic_tree::node* l_variable = nullptr;
+                        //parse variable
+                        if(!parse_variable(ptr, l_variable))
+                        {
+                            push_error("not found \"variable\" of args of def");
+                            //false
+                            return false;
+                        }
+                        //push var
+                        l_def_node->append_arg((l_syntactic_tree::variable_node*)l_variable);
+                        //skip
+                        skip_space_end_comment(ptr);
+                    }
+                    while (CSTRCMP_SKIP(ptr, ","));
+                    //end?
+                    if(!CSTRCMP_SKIP(ptr, ")"))
+                    {
+                        push_error("not found \")\" of args of def");
+                        //dealloc
+                        delete l_def_node;
+                        //false
+                        return false;
+                    }
+                }
+            }
+            //...
+            //skip
+            skip_space_end_comment(ptr);
+            // '{'
+            if (!CSTRCMP_SKIP(ptr, "{"))
+            {
+                push_error("not found \"{\" keyword");
+                return false;
+            }
+            //skip
+            skip_space_end_comment(ptr);
+            //add sub nodes
+            if (!parse_staments(ptr, l_def_node->m_staments)) return false;
+            //skip
+            skip_space_end_comment(ptr);
+            // '}'
+            if (!CSTRCMP_SKIP(ptr, "}"))
+            {
+                push_error("not found \"}\" keyword");
+                return false;
+            }
+            //success
+            return true;
+        }
 		//parse itlanguage
 		bool parse_italanguage(const char*& ptr, l_syntactic_tree::root_node*& node)
 		{

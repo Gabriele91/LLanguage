@@ -40,11 +40,13 @@ namespace l_language
         L_NEW_ARRAY,//new array
         L_NEW_TABLE,//new table
         //Get
-        L_GET_UP_VAL,
+        L_GET_UP_VALUE,
+        L_GET_LOCAL,
         L_GET_GLOBAL,
         L_GET_AT_VAL,
         //Set
-        L_SET_UP_VAL,
+        L_SET_UP_VALUE,
+        L_SET_LOCAL,
         L_SET_GLOBAL,
         L_SET_AT_VAL,
         //for

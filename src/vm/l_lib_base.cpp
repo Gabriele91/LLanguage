@@ -170,7 +170,7 @@ int l_type_of(l_language::l_thread* th,int args)
 int l_global(l_language::l_thread* th,int args)
 {
     //push type
-    th->push_return(th->main_context().get_local_variables());
+    th->push_return(th->main_context()->get_local_variables());
     //number of return
     return 1;
 }
@@ -180,13 +180,13 @@ int l_using(l_language::l_thread* th, int args)
 	//get variable
 	auto& name = th->value(0);
 	//gettable
-	auto& var_table = th->main_context().variable(name);
+	auto& var_table = th->main_context()->variable(name);
 	//table obj
 	auto& table = *var_table.to<l_language::l_table>();
 	//for each
 	for (auto it : table.raw())
 	{
-		th->main_context().variable(it.first) = it.second;
+		th->main_context()->variable(it.first) = it.second;
 	}
 	//number of return
 	return 0;

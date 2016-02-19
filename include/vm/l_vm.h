@@ -25,9 +25,7 @@ namespace l_language
     {
 	public:
         //main function id
-        unsigned int m_main_fun_id { 0 };
-        //program counter
-        unsigned int m_pc { 0 };
+        l_function_id m_main_fun_id { 0 };
         //current index
         long m_top{ -1 };
         //temp variable
@@ -35,17 +33,26 @@ namespace l_language
         //save vm
         l_vm* m_vm;
         //contexts
-        l_list_call_function m_contexts;
+        l_variable m_main_ctx;
         //init (thread)
         l_thread(l_vm* vm = nullptr,
                  unsigned int main_id = 0,
                  size_t stack = 512);
         //access
         l_variable& global(int value_id);
+        l_variable& global(l_call_context& fun,int value_id);
         //access
-        l_call_context& main_context()
+        l_variable& local(l_call_context& this_context,int value_id);
+        //access
+        l_variable& strick_local(l_call_context& this_context,int value_id);
+        //access
+        l_call_context* main_context()
         {
-            return m_contexts[0];
+            return m_main_ctx.to<l_call_context>();
+        }
+        l_variable ref_main_context()
+        {
+            return m_main_ctx;
         }
         //get vm
         l_vm* get_vm();
@@ -70,6 +77,10 @@ namespace l_language
         }
         //get top
         l_variable& value(size_t x)
+        {
+            return m_stack[m_top-x];
+        }
+        l_variable& stack(size_t x)
         {
             return m_stack[m_top-x];
         }
@@ -107,7 +118,8 @@ namespace l_language
         {
             m_stack.resize(size);
         }
-        
+        //execute context
+        bool execute(l_call_context& id_context);
     };
     
     //list threads
@@ -133,6 +145,17 @@ namespace l_language
                                                    0,
                                                    64)));
             return m_threads[m_threads.size()-1];
+        }
+        //new function id
+        unsigned int get_new_function_id()
+        {
+            m_functions.resize(m_functions.size()+1);
+            return (unsigned int)m_functions.size()-1;
+        }
+        l_function& get_new_function()
+        {
+            unsigned int f_id = get_new_function_id();
+            return m_functions[f_id];
         }
         //get gc
         l_gc& get_gc();

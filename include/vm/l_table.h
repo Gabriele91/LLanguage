@@ -10,8 +10,8 @@
 #include <memory>
 #include <assert.h>
 #include <unordered_map>
+#include <l_object.h>
 #include <l_variable.h>
-#include <l_gc.h>
 
 namespace l_language
 {
@@ -19,13 +19,18 @@ namespace l_language
     class l_table;
     //table iterator
     class l_table_it;
+    class l_call_context;
     class l_vm;
+    class l_thread;
     
     //implementation
     class l_table : public l_obj
     {
         //friend class
         friend class l_table_it;
+        friend class l_call_context;
+        friend class l_vm;
+        friend class l_thread;
         //value compare
         struct l_value_compare
         {
@@ -113,6 +118,11 @@ namespace l_language
                 }
             }
         }
+        //clear map
+        void clear()
+        {
+            m_map.clear();
+        }
         
     public:
         
@@ -136,6 +146,12 @@ namespace l_language
         {
             assert(key.is_string());
             m_map[key] = value;
+        }
+        
+        bool exists(const l_variable& key) const
+        {
+            assert(key.is_string());
+            return m_map.find(key)!=m_map.end();
         }
         
         static l_variable gc_new(l_gc* gc);

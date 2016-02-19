@@ -33,7 +33,9 @@ namespace l_language
 			VARIABLE_NODE,
 			FIELD_NODE,
             ARRAY_NODE,
-            TABLE_NODE
+            TABLE_NODE,
+            FUNCTION_DEF_NODE,
+            CONTEXT_TYPE_NODE
 		};
 
 		//class declaretion
@@ -49,9 +51,12 @@ namespace l_language
         class variable_node;
         class array_node;
         class table_node;
-		class field_node;
+        class field_node;
+        class function_def_node;
+        class context_type_node;
 		//node list
         using list_nodes  = std::vector< node* >;
+        using list_vars   = std::vector< variable_node* >;
         using list_exps   = std::vector< exp_node* >;
         using list_exps2  = std::vector< std::array< exp_node*, 2 > >;
 
@@ -60,6 +65,7 @@ namespace l_language
 		{
 		public:
 
+            void*     m_data{ nullptr };
 			size_t    m_line{ 0 };
 			size_t    m_char{ 0 };
 			node_type m_type{ NONE_NODE };
@@ -549,11 +555,21 @@ namespace l_language
 			variable_node* to_variable_node() const
 			{
 				return (variable_node*) this;
-			}
-			//to field node
-			field_node* to_field_node() const
-			{
-				return (field_node*) this;
+            }
+            //to field node
+            field_node* to_field_node() const
+            {
+                return (field_node*) this;
+            }
+            //to array node
+            array_node* to_array_node() const
+            {
+                return (array_node*) this;
+            }
+            //to table node
+            table_node* to_table_node() const
+            {
+                return (table_node*) this;
             }
             //type
             bool is_variable() const
@@ -664,7 +680,84 @@ namespace l_language
                 if(m_exp)        delete m_exp;
             }
 		};
-
+        
+        class function_def_node : public node
+        {
+        public:
+            //var name
+            variable_node* m_variable { nullptr };
+            //statments
+            list_nodes     m_staments;
+            //vars
+            list_vars      m_args;
+            //root
+            function_def_node()
+            {
+                m_type = FUNCTION_DEF_NODE;
+            };
+            //append statment
+            virtual function_def_node* append(node* node)
+            {
+                m_staments.push_back(node);
+                return this;
+            }
+            virtual function_def_node* append_arg(variable_node* node)
+            {
+                m_args.push_back(node);
+                return this;
+            }
+            
+            virtual ~function_def_node()
+            {
+                if(m_variable)               delete m_variable;
+                for(auto& node : m_staments) delete node;
+                for(auto& node : m_args)     delete node;
+            }
+        };
+        //type context
+        class context_type_node : public node
+        {
+        public:
+            //is a operation
+            op_node* m_op{  nullptr };
+            //is a lit of variables
+            list_vars m_vars;
+            //type
+            enum context_type
+            {
+                T_NONE,
+                T_GLOBAL,
+                T_SUPER
+            };
+            context_type m_context_type { T_NONE };
+            //init
+            context_type_node()
+            {
+                m_type = CONTEXT_TYPE_NODE;
+            };
+            //is op node
+            bool is_op() const
+            {
+                return m_op;
+            }
+            //appen a variable node
+            virtual context_type_node* append(variable_node* node)
+            {
+                m_vars.push_back(node);
+                return this;
+            }
+            //..
+            size_t size() const
+            {
+                return m_vars.size();
+            }
+            //dealloc
+            virtual ~context_type_node()
+            {
+                if(m_op)                 delete m_op;
+                for(auto& node : m_vars) delete node;
+            }
+        };
 		//utilities
 
 		//variable
@@ -717,7 +810,33 @@ namespace l_language
 			node->m_char        = ichar;
 			return node;
 		}
-
+        
+        //type
+        static context_type_node* context_type(context_type_node::context_type type, size_t line = 0, size_t ichar = 0)
+        {
+            auto* node = new context_type_node;
+            node->m_context_type = type;
+            node->m_line         = line;
+            node->m_char         = ichar;
+            return node;
+        }
+        static context_type_node* context_global(size_t line = 0, size_t ichar = 0)
+        {
+            auto* node = new context_type_node;
+            node->m_context_type = context_type_node::T_GLOBAL;
+            node->m_line         = line;
+            node->m_char         = ichar;
+            return node;
+        }
+        static context_type_node* context_super(size_t line = 0, size_t ichar = 0)
+        {
+            auto* node = new context_type_node;
+            node->m_context_type = context_type_node::T_SUPER;
+            node->m_line         = line;
+            node->m_char         = ichar;
+            return node;
+        }
+        
 		//field
 		static field_node* field(assignable_node* var_to_field, exp_node* exp_field, size_t line = 0, size_t ichar = 0)
 		{
@@ -738,7 +857,25 @@ namespace l_language
 			node->m_char       = ichar;
 			return node;
 		}
-
+        //function def
+        static function_def_node* function_def(variable_node* variable, size_t line = 0, size_t ichar = 0)
+        {
+            auto* node = new function_def_node;
+            node->m_variable = variable;
+            node->m_line     = line;
+            node->m_char     = ichar;
+            return node;
+            
+        }
+        static function_def_node* function_def(node* variable, size_t line = 0, size_t ichar = 0)
+        {
+            auto* node = new function_def_node;
+            node->m_variable = (variable_node*)variable;
+            node->m_line     = line;
+            node->m_char     = ichar;
+            return node;
+            
+        }
 		//value
 		static value_node* value(variable_node* var_node, size_t line = 0, size_t ichar = 0)
 		{

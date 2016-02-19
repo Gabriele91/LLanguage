@@ -16,15 +16,6 @@
 namespace l_language
 {
     
-    
-    void l_call_context::init(unsigned int fun_id,l_thread *thread)
-    {
-        //save pointer
-        m_fun_id = fun_id;
-        //save thread
-        m_thread = thread;
-    }
-    
     l_thread::l_thread(l_vm* vm ,
                        unsigned int main_id,
                        size_t stack)
@@ -35,13 +26,13 @@ namespace l_language
         stack_size(stack);
         //set main id
         m_main_fun_id = main_id;
-        //main context
-        m_contexts.resize(1);
         //...
         if(m_vm)
         {
             //main alloc
-            m_contexts[0].init(m_main_fun_id,this);
+            m_main_ctx = l_call_context::gc_new(vm);
+            //init
+            main_context()->init(m_main_fun_id,this);
         }
     }
     
@@ -58,59 +49,59 @@ namespace l_language
     
     l_variable& l_thread::global(int i)
     {
-        l_call_context& main = m_contexts[0];
+        l_call_context& main = *main_context();
         l_variable& id = m_vm->m_functions[main.m_fun_id].m_costants[i];
         return main.variable(id);
     }
-    
-    //alloc vm
-    l_vm::l_vm()
+    l_variable& l_thread::global(l_call_context& fun,int i)
     {
-        m_gc = new l_gc(*this);
+        l_call_context& main = *main_context();
+        l_variable& id = m_vm->m_functions[fun.m_fun_id].m_costants[i];
+        return main.variable(id);
     }
-    //dealloc vm
-    l_vm::~l_vm()
+    //access
+    l_variable& l_thread::local(l_call_context& fun,int i)
     {
-        delete m_gc;
+        l_variable& id = m_vm->m_functions[fun.m_fun_id].m_costants[i];
+        //is in this table?
+        if(fun.exists(id))
+        {
+            return fun.variable(id);
+        }
+        //search before...
+        else
+        {
+            //get next
+            l_call_context* rec_fun = fun.next();
+            //search...
+            while(rec_fun)
+            {
+                if(rec_fun->exists(id)) return rec_fun->variable(id);
+                rec_fun = rec_fun->next();
+            }
+        }
+        //else alloc
+        return fun.variable(id);
+    }
+    //access
+    l_variable& l_thread::strick_local(l_call_context& fun,int i)
+    {
+        l_variable& id = m_vm->m_functions[fun.m_fun_id].m_costants[i];
+        return fun.variable(id);
     }
     
-    
-    //get gc
-    l_gc& l_vm::get_gc()
+    //execute context
+    bool l_thread::execute(l_call_context&  context)
     {
-        return *m_gc;
-    }
-    const l_gc& l_vm::get_gc() const
-    {
-        return *m_gc;
-    }
-    //
-    
-    void l_vm::execute(unsigned int id_thread)
-    {
-        execute(&m_threads[id_thread]);
-    }
-    
-    void l_vm::execute(l_thread* ptr_thread)
-    {
-        //get thread
-        l_thread& thread = *ptr_thread;
-        //current function
-        unsigned int function_id = thread.m_main_fun_id;
-        //main function
-        l_function& main_fun = m_functions[function_id];
+        //stack ptr
+        long             call_top = m_top;
         //pc...
-        unsigned int&    pc          =  thread.m_pc;
-        l_list_command&  commands    =  main_fun.m_commands;
+        unsigned int     pc       = 0;
+        l_function&      function = m_vm->m_functions[context.get_fun_id()];
+        l_list_command&  commands = function.m_commands;
         //macro
-        #define vconst(c)  m_functions[function_id].m_costants[c]
-        #define stack      thread.value
-        #define push       thread.push
-        #define top        thread.top
-        #define top_size   (thread.m_top+1)
-        #define pop        thread.pop
-        #define global     thread.global
-        #define register3  thread.register3
+        #define vconst(c)  function.m_costants[c]
+        #define top_size   (m_top+1)
         //for all commands
         for (pc = 0; pc < commands.size(); ++pc)
         {
@@ -121,14 +112,14 @@ namespace l_language
             {
                 case L_JMP: pc = cmp.m_arg - 1; break;
                     
-                
+                    
                 case L_IF:
                     if(top().is_true())
                     {
                         pc = cmp.m_arg - 1;
                     }
                     pop();
-                break;
+                    break;
                     
                 case L_IF0:
                     if(top().is_false())
@@ -136,87 +127,127 @@ namespace l_language
                         pc = cmp.m_arg - 1;
                     }
                     pop();
-                break;
+                    break;
                     
                 case L_PUSH:     push( stack(cmp.m_arg) ); break;
                 case L_PUSHK:    push( vconst(cmp.m_arg) ); break;
-                ////////////////////////////////////////////////////////////
+                case L_CLOSER:
+                {
+                    //get value
+                    l_variable& call_fun = vconst(cmp.m_arg);
+                    //...
+                    if(call_fun.m_type == l_variable::FUNCTION)
+                    {
+                     
+                        //new context
+                        l_variable context = l_call_context::gc_new(get_gc());
+                        //init context
+                        if(call_top < 0)
+                        context.to<l_call_context>()->init(call_fun.m_value.m_fid,
+                                                           this,
+                                                           m_main_ctx);
+                        else
+                        context.to<l_call_context>()->init(call_fun.m_value.m_fid,
+                                                           this,
+                                                           stack(call_top));
+                        //push context
+                        push(context);
+                    }
+                }
+                break;
+                    ////////////////////////////////////////////////////////////
                 case L_ADD:
                     stack(1) = stack(1) + stack(0);
                     pop();
-                break;
+                    break;
                     
                 case L_MUL:
                     stack(1) = stack(1) * stack(0);
                     pop();
-                break;
+                    break;
                     
                 case L_SUB:
                     stack(1) = stack(1) - stack(0);
                     pop();
-                break;
+                    break;
                     
                 case L_DIV:
                     stack(1) = stack(1) / stack(0);
                     pop();
-                break;
+                    break;
                     
                 case L_UNM:
                     stack(0) = -stack(0);
-                break;
-                ////////////////////////////////////////////////////////////
+                    break;
+                    ////////////////////////////////////////////////////////////
                 case L_EQ:
                     stack(1) = stack(1) == stack(0);
                     pop();
-                break;
+                    break;
                     
                 case L_NEQ:
                     stack(1) = stack(1) != stack(0);
                     pop();
-                break;
-                
+                    break;
+                    
                 case L_RT:
                     stack(1) = stack(1) > stack(0);
                     pop();
-                break;
+                    break;
                     
                 case L_RE:
                     stack(1) = stack(1) >= stack(0);
                     pop();
-                break;
-                
+                    break;
+                    
                 case L_LT:
                     stack(1) = stack(1) < stack(0);
                     pop();
-                break;
+                    break;
                     
                 case L_LE:
                     stack(1) = stack(1) <= stack(0);
                     pop();
-                break;
+                    break;
                     
                 case L_NOT:
                     stack(0) = !stack(0);
-                break;
+                    break;
                 ////////////////////////////////////////////////////////////
                 case L_OR:
                     stack(1) = stack(1) || stack(0);
                     pop();
-                break;
+                    break;
                     
                 case L_AND:
                     stack(1) = stack(1) && stack(0);
                     pop();
-                break;
-                
+                    break;
+                    
                 ////////////////////////////////////////////////////////////
                 case L_GET_GLOBAL:
-                    push( global(cmp.m_arg) );
-                break;
-                
+                    push( global(context,cmp.m_arg) );
+                    break;
+                    
                 case L_SET_GLOBAL:
-                    global(cmp.m_arg) = pop();
-                break;
+                    global(context,cmp.m_arg) = pop();
+                    break;
+                ////////////////////////////////////////////////////////////
+                case L_GET_LOCAL:
+                    push( strick_local(context,cmp.m_arg) );
+                    break;
+                    
+                case L_SET_LOCAL:
+                    strick_local(context,cmp.m_arg) = pop();
+                    break;
+                ////////////////////////////////////////////////////////////
+                case L_SET_UP_VALUE:
+                    local(context,cmp.m_arg) = pop();
+                    break;
+                    
+                case L_GET_UP_VALUE:
+                    push( local(context,cmp.m_arg) );
+                    break;
                 ////////////////////////////////////////////////////////////
                 case L_NEW_ARRAY:
                 {
@@ -256,8 +287,8 @@ namespace l_language
                         {
                             //push key and value
                             table->operator[](stack(1)) = stack(0);
-							//pop value
-							pop();
+                            //pop value
+                            pop();
                             //pop key
                             pop();
                         }
@@ -266,7 +297,7 @@ namespace l_language
                     push( register3(0) );
                 }
                 break;
-                
+                    
                 case L_GET_AT_VAL:
                 {
                     const l_variable& r_b = stack(1);
@@ -286,7 +317,7 @@ namespace l_language
                             //to size int
                             size_t index = 0;
                             //cast
-                                 if( r_c.m_type == l_variable::INT )  index= (size_t)r_c.m_value.m_i;
+                            if( r_c.m_type == l_variable::INT )  index= (size_t)r_c.m_value.m_i;
                             else if( r_c.m_type == l_variable::FLOAT )index= (size_t)r_c.m_value.m_f;
                             else assert(0);
                             //get
@@ -331,7 +362,7 @@ namespace l_language
                             //to size int
                             size_t index = 0;
                             //cast
-                                 if( r_b.m_type == l_variable::INT )  index= (size_t)r_b.m_value.m_i;
+                            if( r_b.m_type == l_variable::INT )  index= (size_t)r_b.m_value.m_i;
                             else if( r_b.m_type == l_variable::FLOAT )index= (size_t)r_b.m_value.m_f;
                             else assert(0);
                             //get and pop value
@@ -491,7 +522,7 @@ namespace l_language
                     }
                 }
                 break;
-                
+                    
                 case L_CALL:
                 {
                     //get index
@@ -500,7 +531,7 @@ namespace l_language
                     if(register3(0).m_type == l_variable::CFUNCTION)
                     {
                         //return size
-                        int n_return = register3(0).m_value.m_pcfun(&thread,cmp.m_arg);
+                        int n_return = register3(0).m_value.m_pcfun(this,cmp.m_arg);
                         //assert (1 return)
                         assert(n_return <= 1);
                         //error
@@ -513,6 +544,28 @@ namespace l_language
                         //if return
                         if(n_return) push(register3(2));
                     }
+                    else if(register3(0).m_type == l_variable::OBJECT)
+                    {
+                        //save stack
+                        long stack_top_bf_call = m_top;
+                        //get context
+                        l_call_context* ctx = register3(0).to<l_call_context>();
+                        //else assert
+                        if(!ctx){ assert(0); };
+                        //push context
+                        push(register3(0));
+                        //put arguments
+                        //todo
+                        //execute call
+                        if(!execute(*ctx))
+                        {
+                            assert(0);
+                        }
+                        //reset function table
+                        ctx->m_local_variables.clear();
+                        //restore stack
+                        m_top = stack_top_bf_call;
+                    }
                     else
                     {
                         assert(0);
@@ -523,5 +576,41 @@ namespace l_language
                 default:  break;
             }
         }
+
+        return true;
+    }
+    
+    //alloc vm
+    l_vm::l_vm()
+    {
+        m_gc = new l_gc(*this);
+    }
+    //dealloc vm
+    l_vm::~l_vm()
+    {
+        delete m_gc;
+    }
+    
+    
+    //get gc
+    l_gc& l_vm::get_gc()
+    {
+        return *m_gc;
+    }
+    const l_gc& l_vm::get_gc() const
+    {
+        return *m_gc;
+    }
+    //
+    
+    void l_vm::execute(unsigned int id_thread)
+    {
+        execute(&m_threads[id_thread]);
+    }
+    
+    void l_vm::execute(l_thread* ptr_thread)
+    {
+        //get thread
+        ptr_thread->execute(*ptr_thread->main_context());
     }
 };

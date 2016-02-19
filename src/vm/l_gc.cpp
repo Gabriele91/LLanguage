@@ -138,14 +138,8 @@ namespace  l_language
                     var.mark();
                 }
             }
-            //call context mark
-            for(l_call_context& call : thread.m_contexts)
-            {
-				l_obj* up_values       = &call.m_up_values;
-				l_obj* local_variables = &call.m_local_variables;
-				up_values->mark();
-				local_variables->mark();
-            }
+            //main context mark
+            thread.m_main_ctx.mark();
             //stack mark
             for(long i=0;i <= thread.m_top /* n.b. top can get -1 */;++i)
             {

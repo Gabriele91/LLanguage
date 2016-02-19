@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <assert.h>
-#include <l_gc.h>
+#include <l_object.h>
 #include <l_string.h>
 
 
@@ -19,8 +19,10 @@ namespace l_language
     class l_vm;
     class l_thread;
     class l_vector;
+    class l_gc;
     class l_table;
     typedef int (*l_cfunction) (l_thread*,int args);
+    typedef unsigned int l_function_id;
     //variable
     class l_variable
     {
@@ -43,6 +45,7 @@ namespace l_language
             float  	 	  m_f;
             l_obj*        m_pobj;
             l_cfunction   m_pcfun;
+            l_function_id m_fid;
         };
         
         //attributes
@@ -63,6 +66,12 @@ namespace l_language
         {
             m_type      = INT;
             m_value.m_i = i;
+        }
+        
+        l_variable(l_function_id f_id)
+        {
+            m_type        = FUNCTION;
+            m_value.m_fid = f_id;
         }
         
         l_variable(float f)
@@ -194,9 +203,13 @@ namespace l_language
         
         bool is_false()
         {
-            if (m_type == INT || m_type == FUNCTION)
+            if (m_type == INT)
             {
                 return m_value.m_i == 0;
+            }
+            if (m_type == FUNCTION)
+            {
+                return m_value.m_fid == 0;
             }
             if(m_type == FLOAT)
             {
