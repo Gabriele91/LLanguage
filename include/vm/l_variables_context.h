@@ -89,19 +89,67 @@ namespace l_language
                 m_id = l_id;
                 m_variable = variable;
             }
+        };        //function context, value map
+        struct function_table
+        {
+            //type
+            using table = std::map< std::string, const_info > ;
+            //field
+            table m_table;
+            //id generators
+            unsigned int m_var_gen_id { 0 };
+            //utility methos
+            unsigned int get_new_var_id()
+            {
+                return m_var_gen_id++;
+            }
+            //operators
+            const_info& operator[](const std::string& str)
+            {
+                return m_table[str];
+            }
+            
+            size_t size() const
+            {
+                return m_table.size();
+            }
+            //iterators
+            table::iterator begin()
+            {
+                return m_table.begin();
+            }
+            table::const_iterator begin() const
+            {
+                return m_table.begin();
+            }
+            table::iterator end()
+            {
+                return m_table.end();
+            }
+            table::const_iterator end() const
+            {
+                return m_table.end();
+            }
+            //find
+            table::iterator find(const std::string& str)
+            {
+                return m_table.find(str);
+            }
+            table::const_iterator find(const std::string& str) const
+            {
+                return m_table.find(str);
+            }
         };
-        //function context, value map
-        using function_table = std::map< std::string, const_info > ;
         //variable map
         using functions_var_table = std::map< l_function*, function_table >;
         //map
         functions_var_table m_funs_table;
         //id generators
         unsigned int m_gen_id { 0 };
-        //utility methos
-        unsigned int get_new_id()
+        //new id
+        unsigned int get_new_id(l_function* fun)
         {
-            return m_gen_id++;
+            return m_funs_table[fun].get_new_var_id();
         }
         
         //const to index
@@ -168,22 +216,19 @@ namespace l_language
             visit(fun, node->m_variable);
             //alloc variable
             add_into_table(fun, l_variable((l_function_id)(m_vm->m_functions.size()-1)), function_index(node));
-            //save id gen
-            unsigned int l_id_gen = m_gen_id;
-            //set to 0
-            m_gen_id = 0;
+            //n args
+            new_fun->m_args_size = (unsigned int)  node->m_args.size();
             //args...
-            for(auto st : node->m_args)
+            for(l_syntactic_tree::variable_node* variable : node->m_args)
             {
-                visit(new_fun,st);
+                add_variable_into_table(new_fun, variable);
+                is_not_upper_value(new_fun, variable);
             }
             //staments
-            for(auto st : node->m_staments)
+            for(l_syntactic_tree::node* st : node->m_staments)
             {
                 visit(new_fun,st);
             }
-            //restore
-            m_gen_id = l_id_gen;
         }
         
         //assignable
@@ -430,7 +475,7 @@ namespace l_language
             //find name
             if(f_table.find(key) == f_table.end())
             {
-                f_table[key] = const_info(m_gc, get_new_id(), var_value );
+                f_table[key] = const_info(m_gc, get_new_id(f_context), var_value );
             }
         }
         
@@ -444,7 +489,7 @@ namespace l_language
             //find name
             if(f_table.find(key) == f_table.end())
             {
-                f_table[key] = const_info(m_gc, get_new_id(), const_value );
+                f_table[key] = const_info(m_gc, get_new_id(f_context), const_value );
             }
         }
         
@@ -456,7 +501,7 @@ namespace l_language
             //find name
             if(f_table.find(const_name) == f_table.end())
             {
-                f_table[const_name] = const_info( get_new_id(), variable );
+                f_table[const_name] = const_info( get_new_id(f_context), variable );
             }
         } 
         //get

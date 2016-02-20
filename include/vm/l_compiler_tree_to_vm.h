@@ -486,9 +486,6 @@ namespace l_language
                 {
                     //ptr to fun table
                     auto& fun_table = it_fun_table->second;
-                    //add info
-                    fun->m_args_size = 0;
-                    fun->m_up_val_size = 0;
                     //alloc values
                     fun->m_costants.resize(fun_table.size());
                     //puth const

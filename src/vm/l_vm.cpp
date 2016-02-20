@@ -552,10 +552,20 @@ namespace l_language
                         l_call_context* ctx = register3(0).to<l_call_context>();
                         //else assert
                         if(!ctx){ assert(0); };
+                        //new function
+                        l_function& call_fun = m_vm->m_functions[ctx->get_fun_id()];
+                        //put arguments
+                        for(unsigned int arg = 0;
+                                         arg != cmp.m_arg;
+                                       ++arg)
+                        {
+                            if (arg < call_fun.m_args_size)
+                                ctx->variable( call_fun.constant(arg) ) = pop();
+                            else
+                                pop();
+                        }
                         //push context
                         push(register3(0));
-                        //put arguments
-                        //todo
                         //execute call
                         if(!execute(*ctx))
                         {
