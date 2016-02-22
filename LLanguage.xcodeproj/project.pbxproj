@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E00014121C7B59FD0014DD94 /* def2.ll in Sources */ = {isa = PBXBuildFile; fileRef = E00014111C7B59FD0014DD94 /* def2.ll */; };
 		E05F4B4C1C57FB8D00F7EB6A /* l_string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E05F4B4B1C57FB8D00F7EB6A /* l_string.cpp */; };
 		E05F4B4E1C58985500F7EB6A /* l_lib_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E05F4B4D1C58985500F7EB6A /* l_lib_base.cpp */; };
 		E05F4B511C589BB600F7EB6A /* l_compiler_utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E05F4B501C589BB600F7EB6A /* l_compiler_utilities.cpp */; };
@@ -36,6 +37,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E00014111C7B59FD0014DD94 /* def2.ll */ = {isa = PBXFileReference; explicitFileType = sourcecode.javascript; fileEncoding = 4; path = def2.ll; sourceTree = "<group>"; };
 		E05F4B4A1C57F52400F7EB6A /* l_string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_string.h; path = vm/l_string.h; sourceTree = "<group>"; };
 		E05F4B4B1C57FB8D00F7EB6A /* l_string.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_string.cpp; sourceTree = "<group>"; };
 		E05F4B4D1C58985500F7EB6A /* l_lib_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_lib_base.cpp; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 				E09524DC1C69FB7D00F523AB /* while.ll */,
 				E09524DE1C69FC2000F523AB /* for.ll */,
 				E07A57681C6B5B1300044EF1 /* def.ll */,
+				E00014111C7B59FD0014DD94 /* def2.ll */,
 			);
 			path = tests;
 			sourceTree = SOURCE_ROOT;
@@ -238,6 +241,7 @@
 				E07A57691C6B5B1300044EF1 /* def.ll in Sources */,
 				E09524DD1C69FB7D00F523AB /* while.ll in Sources */,
 				E071D70C1C4AC9D1008840D3 /* l_vm.cpp in Sources */,
+				E00014121C7B59FD0014DD94 /* def2.ll in Sources */,
 				E072DDDC1C35357A00B197A1 /* main.cpp in Sources */,
 				E09524DB1C69FB2F00F523AB /* fields.ll in Sources */,
 				E09599381C676A8900BF39F8 /* l_opcode.cpp in Sources */,

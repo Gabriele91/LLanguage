@@ -962,6 +962,8 @@ namespace l_language
 				skip_space_end_comment(ptr);
                 //jump commond
                 CSTRCMP_SKIP(ptr,";");
+                //skip
+                skip_space_end_comment(ptr);
 			}
 			return true;
 		}
@@ -1821,6 +1823,8 @@ namespace l_language
 				skip_space_end_comment(ptr);
                 //jump commond
                 CSTRCMP_SKIP(ptr, ";");
+                //skip
+                skip_space_end_comment(ptr);
 			}
 			return true;
         }

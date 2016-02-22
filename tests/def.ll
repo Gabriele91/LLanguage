@@ -54,3 +54,9 @@ def r
 r()
 std.println(n)
 
+def m { return { "array" : [ "start[",1,2,3,4,"]end" ] } }
+
+for v of m().array
+{
+    std.println(v)
+}
