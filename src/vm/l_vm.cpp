@@ -32,7 +32,7 @@ namespace l_language
             //main alloc
             m_main_ctx = l_call_context::gc_new(vm);
             //init
-            main_context()->init(m_main_fun_id,this);
+            main_context()->l_closer::init(m_main_fun_id,this);
         }
     }
     
@@ -154,9 +154,9 @@ namespace l_language
                     {
                      
                         //new context
-                        register3(0) = l_call_context::gc_new(get_gc());
+                        register3(0) = l_closer::gc_new(get_gc());
                         //init context
-                        register3(0).to<l_call_context>()->init(call_fun.m_value.m_fid, this, l_variable(&context));
+                        register3(0).to<l_closer>()->init(call_fun.m_value.m_fid, this, l_variable(&context));
                         //push context
                         push(register3(0));
                     }
@@ -554,18 +554,16 @@ namespace l_language
                     else if(register3(0).m_type == l_variable::OBJECT)
                     {
                         //get context
-                        l_call_context* ctx = register3(0).to<l_call_context>();
+                        l_closer* closer = register3(0).to<l_closer>();
                         //else assert
-                        if(!ctx){ assert(0); };
+                        if(!closer){ assert(0); };
                         //new function
-                        l_function& call_fun = m_vm->function(ctx->get_fun_id());
+                        l_function& call_fun = m_vm->function(closer->get_fun_id());
                         //new context
                         register3(1) = l_call_context::gc_new(get_gc());
                         l_call_context* new_ctx = register3(1).to<l_call_context>();
-                        //copy
-                        new_ctx->m_thread = ctx->m_thread;
-                        new_ctx->m_fun_id = ctx->m_fun_id;
-                        new_ctx->m_next   = ctx->m_next;
+                        //init
+                        new_ctx->init(*closer);
                         //lock context
                         new_ctx->lock();
                         //put arguments
