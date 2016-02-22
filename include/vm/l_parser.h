@@ -74,6 +74,7 @@ namespace l_language
 	while       := 'while' <exp> '{' staments '}'
     for_each    := 'for' variable ('in'|'of') exp '{' staments '}'
     def         := ('def'|'function') [variable] '(' [ variable {[',' variable]} ] ')' '{' staments '}'
+    return      := 'return' [exp]
     type context:= ('global' | 'super') [ variable {[ ',' variable ]} ]
 	*/
 	class l_parser
@@ -147,7 +148,7 @@ namespace l_language
 		void push_error(const std::string& error)
 		{
             if(m_push_errors) m_errors.push_front(error_info( m_line, error ));
-		}
+        }
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		//compare string
 		static bool strcmp(const char* left, const char* right, size_t len)
@@ -175,7 +176,33 @@ namespace l_language
 		//defines
         #define CSTRCMP(x,y) l_language::l_parser::strcmp(x,y,sizeof(y)-1)
         #define CSTRCMP_SKIP(x,y) l_language::l_parser::strcmp_skip(x,y,sizeof(y)-1)
-		///////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        bool is_keyword(const char* ptr)
+        {
+            static const char* keywords[]=
+            {
+                "if",
+                "else",
+                "def",
+                "function"
+                "while",
+                "for",
+                "super",
+                "global",
+                "of",
+                "in",
+                "return",
+            };
+            for(const char* keyword : keywords)
+            {
+                if(CSTRCMP(ptr,keyword))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        ///////////////////////////////////////////////////////////////////////////////////////////////
 		//static types
 		static bool is_line_space(char c)
 		{
@@ -948,6 +975,7 @@ namespace l_language
             if (CSTRCMP(ptr, "def")    || CSTRCMP(ptr, "function"))	   return parse_def(ptr, node);
             if (CSTRCMP(ptr, "while")  || CSTRCMP(ptr, "for"))	       return parse_cicle(ptr, node);
             if (CSTRCMP(ptr, "global") || CSTRCMP(ptr, "super"))	   return parse_type(ptr, node);
+            if (CSTRCMP(ptr, "return"))                                return parse_return(ptr, node);
 			if (is_operation(ptr))								       return parse_operation(ptr, node);
 			//error
 			push_error("not valid stament");
@@ -1244,8 +1272,24 @@ namespace l_language
             //it isn't an operation
             return false;
         }
+        bool is_operation_slow(const char* ptr,bool only_assignament = false)
+        {
+            l_syntactic_tree::node* node = nullptr;
+            //disable line count and push errors
+            m_count_lines = false;
+            m_push_errors = false;
+            //parse
+            bool status = parse_operation(ptr,node,only_assignament);
+            //delete node
+            delete node;
+            //enable count line and errors
+            m_count_lines = true;
+            m_push_errors = true;
+            //it isn't an operation
+            return status;
+        }
 		//parse operation
-		bool parse_operation(const char*& ptr, l_syntactic_tree::node*& node)
+		bool parse_operation(const char*& ptr, l_syntactic_tree::node*& node,bool only_assignament = false)
 		{
 			//exp
 			l_syntactic_tree::exp_node *exp = nullptr;
@@ -1273,9 +1317,15 @@ namespace l_language
                     //build node
                     node = l_syntactic_tree::assignment((l_syntactic_tree::assignable_node*)assignable_node, op_name, exp, m_line);
                 }
-                else
+                else if(!only_assignament)
                 {
                     node = assignable_node;
+                }
+                else
+                {
+                    delete assignable_node;
+                    push_error("not valid assignament");
+                    return false;
                 }
             }
 			//is parsed
@@ -1714,6 +1764,44 @@ namespace l_language
                 return false;
             }
             //success
+            return true;
+        }
+        //parse return
+        bool parse_return(const char*& ptr, l_syntactic_tree::node*& node)
+        {
+            //ptrs
+            l_syntactic_tree::return_node* return_node = nullptr;
+            //skip
+            skip_space_end_comment(ptr);
+            //...
+            if (!CSTRCMP_SKIP(ptr, "return"))
+            {
+                push_error("not found \"return\" keyword");
+                return false;
+            }
+            //skip
+            skip_space_end_comment(ptr);
+            //is void return?
+            bool void_return = CSTRCMP(ptr, "}")     ||
+                               is_keyword(ptr)       ||
+                               is_operation_slow(ptr,true);
+            //alloc and init
+            return_node = l_syntactic_tree::return_value(nullptr,m_line);
+            //void return
+            if(!void_return)
+            {
+                //skip
+                skip_space_end_comment(ptr);
+                //parse exp
+                if(!parse_exp(ptr,return_node->m_exp))
+                {
+                    delete return_node;
+                    return false;
+                }
+            }
+            //save return
+            node = return_node;
+            //go back
             return true;
         }
 		//parse itlanguage

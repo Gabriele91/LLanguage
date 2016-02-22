@@ -96,7 +96,7 @@ namespace l_language
                     {
                         std::cout<< "------------\n"
                                     "Function["<<i<<"]:\n\n";
-                        m_vm.m_functions[i].dump_all_function();
+                        m_vm.function((unsigned int)i).dump_all_function();
                         std::cout<< "\n";
                     }
                 }

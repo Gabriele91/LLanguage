@@ -35,6 +35,7 @@ namespace l_language
             ARRAY_NODE,
             TABLE_NODE,
             FUNCTION_DEF_NODE,
+            RETURN_NODE,
             CONTEXT_TYPE_NODE
 		};
 
@@ -53,6 +54,7 @@ namespace l_language
         class table_node;
         class field_node;
         class function_def_node;
+        class return_node;
         class context_type_node;
 		//node list
         using list_nodes  = std::vector< node* >;
@@ -714,6 +716,25 @@ namespace l_language
                 for(auto& node : m_args)     delete node;
             }
         };
+        //return node
+        class return_node : public node
+        {
+        public:
+            //exp return
+            exp_node* m_exp { nullptr };
+            //return node
+            return_node()
+            {
+                m_type = RETURN_NODE;
+            }
+            
+            virtual ~return_node()
+            {
+                if(m_exp) delete m_exp;
+            }
+            
+            
+        };
         //type context
         class context_type_node : public node
         {
@@ -875,6 +896,15 @@ namespace l_language
             node->m_char     = ichar;
             return node;
             
+        }
+        //return node
+        static return_node* return_value(node* exp, size_t line = 0, size_t ichar = 0)
+        {
+            auto* node = new return_node;
+            node->m_exp  = (exp_node*)exp;
+            node->m_line = line;
+            node->m_char = ichar;
+            return node;
         }
 		//value
 		static value_node* value(variable_node* var_node, size_t line = 0, size_t ichar = 0)

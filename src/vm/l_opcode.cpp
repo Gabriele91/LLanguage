@@ -67,7 +67,8 @@ namespace l_language
         
         //Function
         "CLOSER",    //make function/closer
-        "CALL"
+        "CALL",
+        "RETURN"
     };
 
 };

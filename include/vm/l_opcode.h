@@ -57,7 +57,8 @@ namespace l_language
         L_PUSH,
         //Function
         L_CLOSER,    //make function/closer
-        L_CALL       //call a clouser         CALL R(A) ARGS(R(A+1....B))
+        L_CALL,      //call a clouser         CALL R(A) ARGS(R(A+1....B))
+        L_RETURN
     };
 
     //op code strs

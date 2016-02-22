@@ -114,7 +114,7 @@ namespace l_language
         l_vm& m_vm;
         
         //allocations size
-        size_t m_max_size   { kbyte };
+        size_t m_max_size   { mbyte };
         size_t m_size_allocs{ 0     };
         
         //Object self delete

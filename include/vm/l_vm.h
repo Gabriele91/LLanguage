@@ -118,12 +118,23 @@ namespace l_language
         {
             m_stack.resize(size);
         }
+        //errors
+        std::vector < std::string > m_errors;
+        //execution return
+        enum type_return
+        {
+            T_RETURN_VOID,
+            T_RETURN_VALUE,
+            T_RETURN_ERROR
+        };
         //execute context
-        bool execute(l_call_context& id_context);
+        type_return execute(l_call_context& id_context);
     };
     
     //list threads
-    using l_list_threads = std::vector < l_thread >;
+    using l_list_threads     = std::vector < l_thread >;
+    //list threads
+    using l_list_threads_ref = std::vector < std::unique_ptr<l_thread> >;
     
     class l_vm
     {
@@ -135,27 +146,37 @@ namespace l_language
         l_vm();
         virtual ~l_vm();
         //thread list
-        l_list_threads   m_threads;
+        l_list_threads_ref   m_threads;
         //functions
-        l_list_function  m_functions;
+        l_list_functions_ref  m_functions;
         //get thread
         l_thread& get_new_thread()
         {
-            m_threads.push_back(std::move(l_thread(this,
-                                                   0,
-                                                   64)));
-            return m_threads[m_threads.size()-1];
+            //alloc
+            auto* alloc = new l_thread(this,  0, 64);
+            //push
+            m_threads.push_back(std::unique_ptr<l_thread>(alloc));
+            //return
+            return *alloc;
+        }
+        l_thread& thread(unsigned int i)
+        {
+            return *m_threads[i];
         }
         //new function id
         unsigned int get_new_function_id()
         {
-            m_functions.resize(m_functions.size()+1);
+            m_functions.push_back(std::unique_ptr<l_function>(new l_function));
             return (unsigned int)m_functions.size()-1;
         }
         l_function& get_new_function()
         {
             unsigned int f_id = get_new_function_id();
-            return m_functions[f_id];
+            return *m_functions[f_id];
+        }
+        l_function& function(unsigned int i)
+        {
+            return *m_functions[i];
         }
         //get gc
         l_gc& get_gc();

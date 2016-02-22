@@ -52,5 +52,6 @@ namespace l_language
         void dump_all_function();
     };
     //list functions
-    using l_list_function = std::vector < l_function >;
+    using l_list_functions     = std::vector < l_function >;
+    using l_list_functions_ref = std::vector < std::unique_ptr< l_function > >;
 };

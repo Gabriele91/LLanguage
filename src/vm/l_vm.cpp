@@ -50,19 +50,19 @@ namespace l_language
     l_variable& l_thread::global(int i)
     {
         l_call_context& main = *main_context();
-        l_variable& id = m_vm->m_functions[main.m_fun_id].m_costants[i];
+        l_variable& id = m_vm->function(main.m_fun_id).m_costants[i];
         return main.variable(id);
     }
     l_variable& l_thread::global(l_call_context& fun,int i)
     {
         l_call_context& main = *main_context();
-        l_variable& id = m_vm->m_functions[fun.m_fun_id].m_costants[i];
+        l_variable& id = m_vm->function(fun.m_fun_id).m_costants[i];
         return main.variable(id);
     }
     //access
     l_variable& l_thread::local(l_call_context& fun,int i)
     {
-        l_variable& id = m_vm->m_functions[fun.m_fun_id].m_costants[i];
+        l_variable& id = m_vm->function(fun.m_fun_id).m_costants[i];
         //is in this table?
         if(fun.exists(id))
         {
@@ -86,18 +86,18 @@ namespace l_language
     //access
     l_variable& l_thread::strick_local(l_call_context& fun,int i)
     {
-        l_variable& id = m_vm->m_functions[fun.m_fun_id].m_costants[i];
+        l_variable& id = m_vm->function(fun.m_fun_id).m_costants[i];
         return fun.variable(id);
     }
     
     //execute context
-    bool l_thread::execute(l_call_context&  context)
+    l_thread::type_return l_thread::execute(l_call_context&  context)
     {
-        //stack ptr
-        long             call_top = m_top;
+        //lock context
+        context.m_context_lock = true;
         //pc...
         unsigned int     pc       = 0;
-        l_function&      function = m_vm->m_functions[context.get_fun_id()];
+        l_function&      function = m_vm->function(context.get_fun_id());
         l_list_command&  commands = function.m_commands;
         //macro
         #define vconst(c)  function.m_costants[c]
@@ -111,8 +111,22 @@ namespace l_language
             switch (cmp.m_op_code)
             {
                 case L_JMP: pc = cmp.m_arg - 1; break;
-                    
-                    
+                case L_RETURN:
+                    //push return
+                    if(cmp.m_arg)
+                    {
+                        //get value
+                        register3(2) = pop();
+                        //return...
+                        return T_RETURN_VALUE;
+                    }
+                    else
+                    {
+                        //came back
+                        return T_RETURN_VOID;
+                    }
+                    //..
+                break;
                 case L_IF:
                     if(top().is_true())
                     {
@@ -140,18 +154,11 @@ namespace l_language
                     {
                      
                         //new context
-                        l_variable context = l_call_context::gc_new(get_gc());
+                        register3(0) = l_call_context::gc_new(get_gc());
                         //init context
-                        if(call_top < 0)
-                        context.to<l_call_context>()->init(call_fun.m_value.m_fid,
-                                                           this,
-                                                           m_main_ctx);
-                        else
-                        context.to<l_call_context>()->init(call_fun.m_value.m_fid,
-                                                           this,
-                                                           stack(call_top));
+                        register3(0).to<l_call_context>()->init(call_fun.m_value.m_fid, this, l_variable(&context));
                         //push context
-                        push(context);
+                        push(register3(0));
                     }
                 }
                 break;
@@ -546,35 +553,49 @@ namespace l_language
                     }
                     else if(register3(0).m_type == l_variable::OBJECT)
                     {
-                        //save stack
-                        long stack_top_bf_call = m_top;
                         //get context
                         l_call_context* ctx = register3(0).to<l_call_context>();
                         //else assert
                         if(!ctx){ assert(0); };
                         //new function
-                        l_function& call_fun = m_vm->m_functions[ctx->get_fun_id()];
+                        l_function& call_fun = m_vm->function(ctx->get_fun_id());
+                        //new context
+                        register3(1) = l_call_context::gc_new(get_gc());
+                        l_call_context* new_ctx = register3(1).to<l_call_context>();
+                        //copy
+                        new_ctx->m_thread = ctx->m_thread;
+                        new_ctx->m_fun_id = ctx->m_fun_id;
+                        new_ctx->m_next   = ctx->m_next;
+                        //lock context
+                        new_ctx->lock();
                         //put arguments
                         for(unsigned int arg = 0;
                                          arg != cmp.m_arg;
                                        ++arg)
                         {
                             if (arg < call_fun.m_args_size)
-                                ctx->variable( call_fun.constant(arg) ) = pop();
+                                new_ctx->variable( call_fun.constant(arg) ) = pop();
                             else
                                 pop();
                         }
-                        //push context
-                        push(register3(0));
+                        //save stack
+                        long stack_top_bf_call = m_top;
                         //execute call
-                        if(!execute(*ctx))
+                        type_return n_return = execute(*new_ctx);
+                        //error?
+                        if(n_return==T_RETURN_ERROR)
                         {
                             assert(0);
                         }
-                        //reset function table
-                        ctx->m_local_variables.clear();
+                        //unlock context
+                        new_ctx->unlock();
                         //restore stack
                         m_top = stack_top_bf_call;
+                        //return?
+                        if(n_return == T_RETURN_VALUE)
+                        {
+                            push(register3(2));
+                        }
                     }
                     else
                     {
@@ -587,7 +608,7 @@ namespace l_language
             }
         }
 
-        return true;
+        return T_RETURN_VOID;
     }
     
     //alloc vm
@@ -615,7 +636,7 @@ namespace l_language
     
     void l_vm::execute(unsigned int id_thread)
     {
-        execute(&m_threads[id_thread]);
+        execute(&thread(id_thread));
     }
     
     void l_vm::execute(l_thread* ptr_thread)

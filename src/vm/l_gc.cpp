@@ -69,9 +69,9 @@ namespace  l_language
     l_gc::~l_gc()
     {
         //dealloc consts
-        for(l_function&  fun : m_vm.m_functions)
+        for(auto&  fun : m_vm.m_functions)
         {
-            for(l_variable&  var : fun.m_costants)
+            for(l_variable&  var : fun->m_costants)
             {
                 if(var.is_string() && var.m_const)
                 {
@@ -128,10 +128,10 @@ namespace  l_language
     void  l_gc::mark_pool()
     {
         
-        for(l_thread& thread  : m_vm.m_threads)
+        for(auto& thread  : m_vm.m_threads)
         {
             //temporal register
-            for(l_variable& var : thread.m_register)
+            for(l_variable& var : thread->m_register)
             {
                 if(var.is_object() && var.is_unmarked())
                 {
@@ -139,11 +139,11 @@ namespace  l_language
                 }
             }
             //main context mark
-            thread.m_main_ctx.mark();
+            thread->m_main_ctx.mark();
             //stack mark
-            for(long i=0;i <= thread.m_top /* n.b. top can get -1 */;++i)
+            for(long i=0;i <= thread->m_top /* n.b. top can get -1 */;++i)
             {
-                l_variable& var  = thread.value(i);
+                l_variable& var  = thread->value(i);
                 
                 if(var.is_object() && var.is_unmarked())
                 {

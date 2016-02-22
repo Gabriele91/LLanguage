@@ -388,13 +388,23 @@ namespace l_language
         bool compile_function_def(l_function* fun,l_syntactic_tree::function_def_node* function_def_node)
         {
             //get function id
-            size_t function = ((size_t)function_def_node->m_data);
+            size_t id_function = ((size_t)function_def_node->m_data);
             //compile staments
-            compile_statements(&m_vm->m_functions[function],function_def_node->m_staments);
+            compile_statements(&m_vm->function((unsigned int)id_function),function_def_node->m_staments);
             //get fun id
             fun->push({ L_CLOSER, get_function_id(fun, function_def_node), function_def_node->m_line });
             //push call
             compile_variable_set(fun,function_def_node->m_variable);
+            //success
+            return true;
+        }
+        //compile return
+        bool compile_return(l_function* fun,l_syntactic_tree::return_node* return_node)
+        {
+            //compile exp
+            if(return_node->m_exp) compile_exp(fun, return_node->m_exp);
+            //get fun id
+            fun->push({ L_RETURN, return_node->m_exp ? 1:0, return_node->m_line });
             //success
             return true;
         }
@@ -423,6 +433,9 @@ namespace l_language
                     case l_syntactic_tree::FUNCTION_DEF_NODE:
                         if(! compile_function_def(fun,node->to<l_syntactic_tree::function_def_node>()) ) return false;
                     break;
+                    case l_syntactic_tree::RETURN_NODE:
+                        if(! compile_return(fun,node->to<l_syntactic_tree::return_node>()) ) return false;
+                    break;
                     default:  break;
                 }
             }
@@ -445,10 +458,9 @@ namespace l_language
             //ptr to vm
             m_vm = thread->get_vm();
             //main function
-            m_vm->m_functions.reserve(255);
-            m_vm->m_functions.resize(1);
+            thread->m_main_fun_id = m_vm->get_new_function_id();
             //set main
-            set_main_function(&m_vm->m_functions[0]);
+            set_main_function(&m_vm->function(thread->m_main_fun_id));
             //set gc
             set_vm(thread->get_vm());
         }
@@ -459,7 +471,7 @@ namespace l_language
             //add variable
             thread.main_context()->variable(variable,function);
             //name into table
-            add_into_table(&m_vm->m_functions[thread.main_context()->get_fun_id()], variable, variable_index(cfun_name));
+            add_into_table(&m_vm->function(thread.main_context()->get_fun_id()), variable, variable_index(cfun_name));
         }
 
 		void add_global_variable(l_thread& thread,  const l_variable& g_variable, const std::string& var_name)
@@ -468,7 +480,7 @@ namespace l_language
 			//add variable
 			thread.main_context()->variable(variable, g_variable);
 			//name into table
-			add_into_table(&m_vm->m_functions[thread.main_context()->get_fun_id()], variable, variable_index(var_name));
+			add_into_table(&m_vm->function(thread.main_context()->get_fun_id()), variable, variable_index(var_name));
 		}
         
         l_thread* compile(const l_syntactic_tree* tree)
@@ -478,7 +490,7 @@ namespace l_language
             //push consts
             for(size_t i=0; i!=m_vm->m_functions.size(); ++i)
             {
-                l_function* fun = &m_vm->m_functions[i];
+                l_function* fun = &m_vm->function((unsigned int)i);
                 //search in table
                 auto it_fun_table = m_funs_table.find(fun);
                 //if find
@@ -499,7 +511,7 @@ namespace l_language
             //
             if(!compile_statements(m_main,tree->m_root->m_staments)) return nullptr;
             //compile statemens
-            return &(m_vm->m_threads.back());
+            return m_vm->m_threads.back().get();
         }
     };
 }

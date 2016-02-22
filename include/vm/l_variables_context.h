@@ -200,6 +200,7 @@ namespace l_language
                 case l_syntactic_tree::WHILE_NODE:           visit(fun,node->to<l_syntactic_tree::while_node>());         break;
                 case l_syntactic_tree::FOR_NODE:             visit(fun,node->to<l_syntactic_tree::for_node>());           break;
                 case l_syntactic_tree::FUNCTION_DEF_NODE:    visit(fun,node->to<l_syntactic_tree::function_def_node>());  break;
+                case l_syntactic_tree::RETURN_NODE:          visit(fun,node->to<l_syntactic_tree::return_node>());        break;
                 case l_syntactic_tree::CONTEXT_TYPE_NODE:    visit(fun,node->to<l_syntactic_tree::context_type_node>());  break;
                 default: assert(0); break;
             }
@@ -418,6 +419,12 @@ namespace l_language
         {
             visit(fun,while_node->m_exp);
             for(auto& st_node : while_node->m_staments) visit(fun,st_node);
+        }
+        
+        //return
+        void visit(l_function* fun, l_syntactic_tree::return_node* return_node)
+        {
+            if(return_node->m_exp) visit(fun,return_node->m_exp);
         }
         
         //if

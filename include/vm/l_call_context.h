@@ -83,6 +83,35 @@ namespace l_language
         //unmark event
         virtual void unmark();
         
+        //context lock?
+        mutable bool m_context_lock { false };
+        //lock /unlock
+        void lock()
+        {
+            m_context_lock = true;
+        }
+        bool is_lock() const
+        {
+            return m_context_lock ;
+        }
+        void unlock()
+        {
+            m_context_lock = false;
+        }
+        bool is_unlock() const
+        {
+            return !m_context_lock ;
+        }
+        //get is mark
+        virtual bool is_marked() const
+        {
+            return l_obj::is_marked() || m_context_lock;
+        }
+        //get is unmark
+        virtual bool is_unmarked() const
+        {
+            return l_obj::is_unmarked() && !m_context_lock;
+        }
         //ptr to thread
         l_thread*   m_thread { nullptr };
         //call fun id
