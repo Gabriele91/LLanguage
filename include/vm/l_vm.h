@@ -119,7 +119,25 @@ namespace l_language
             m_stack.resize(size);
         }
         //errors
-        std::vector < std::string > m_errors;
+        struct error
+        {
+            std::string  m_error;
+            unsigned int m_code;
+            unsigned int m_line;
+        };
+        std::vector < error > m_errors;
+        //..
+        void push_error(const std::string& str,
+                        unsigned int code,
+                        unsigned int line)
+        {
+            m_errors.push_back
+            ({
+                str,
+                code,
+                line
+            });
+        }
         //execution return
         enum type_return
         {
@@ -182,8 +200,8 @@ namespace l_language
         l_gc& get_gc();
         const l_gc& get_gc() const;
         //execute
-        void execute(unsigned int id_thread);
-        void execute(l_thread* this_thread);
+        bool execute(unsigned int id_thread);
+        bool execute(l_thread* this_thread);
         //
     };
 }

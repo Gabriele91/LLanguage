@@ -235,6 +235,31 @@ namespace l_language
             return !is_false();
         }
         
+        bool can_do_math_op(const l_variable& var)
+        {
+            return (is_int()   && var.is_int())   ||
+                   (is_int()   && var.is_float()) ||
+                   (is_float() && var.is_int())   ||
+                   (is_float() && var.is_float());
+        }
+        
+        
+        bool can_do_str_op( const l_variable& var )
+        {
+            return ( is_string() && !var.is_object()) ||
+                   (!is_object() &&  var.is_string()) ;
+        }
+        
+        bool can_do_compare_op( const l_variable& var )
+        {
+            return  can_do_math_op(var) ;
+        }
+        
+        bool can_do_equals_op( const l_variable& var )
+        {
+            return  can_do_math_op(var) || (is_string() && var.is_string());
+        }
+        
         l_variable operator + (l_variable var)
         {
             if (m_type == INT && var.m_type == INT)

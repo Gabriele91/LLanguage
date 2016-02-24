@@ -101,7 +101,17 @@ namespace l_language
                     }
                 }
                 //start
-                if(flags & EXECUTE) m_vm.execute(&m_thread);
+                if(flags & EXECUTE)
+                    if(!m_vm.execute(&m_thread))
+                    {
+                        for(auto& err:m_thread.m_errors)
+                        {
+                            std::cout<< err.m_line
+                                     << ": "
+                                     << err.m_error
+                                     << std::endl;
+                        }
+                    }
             }
             //return...
             return output;

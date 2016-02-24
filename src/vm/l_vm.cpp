@@ -100,6 +100,11 @@ namespace l_language
         l_function&      function = m_vm->function(context.get_fun_id());
         l_list_command&  commands = function.m_commands;
         //macro
+        #define raise(str)\
+        {\
+            push_error(str, pc, (unsigned int)commands[pc].m_line);\
+            return T_RETURN_ERROR;\
+        }
         #define vconst(c)  function.m_costants[c]
         #define top_size   (m_top+1)
         //for all commands
@@ -164,55 +169,99 @@ namespace l_language
                 break;
                     ////////////////////////////////////////////////////////////
                 case L_ADD:
+                    if(!stack(1).can_do_math_op(stack(0)) && !stack(1).can_do_str_op(stack(0)))
+                    {
+                        raise("not valid operation");
+                    }
                     stack(1) = stack(1) + stack(0);
                     pop();
                     break;
                     
                 case L_MUL:
+                    if(!stack(1).can_do_math_op(stack(0)))
+                    {
+                        raise("not valid operation");
+                    }
                     stack(1) = stack(1) * stack(0);
                     pop();
                     break;
                     
                 case L_SUB:
+                    if(!stack(1).can_do_math_op(stack(0)))
+                    {
+                        raise("not valid operation");
+                    }
                     stack(1) = stack(1) - stack(0);
                     pop();
                     break;
                     
                 case L_DIV:
+                    if(!stack(1).can_do_math_op(stack(0)))
+                    {
+                        raise("not valid operation");
+                    }
                     stack(1) = stack(1) / stack(0);
                     pop();
                     break;
                     
                 case L_UNM:
+                    if(!stack(0).is_int() && !stack(0).is_float())
+                    {
+                        raise("not valid operation");
+                    }
                     stack(0) = -stack(0);
                     break;
                     ////////////////////////////////////////////////////////////
                 case L_EQ:
+                    if(!stack(1).can_do_equals_op(stack(0)))
+                    {
+                        raise("not valid operation");
+                    }
                     stack(1) = stack(1) == stack(0);
                     pop();
                     break;
                     
                 case L_NEQ:
+                    if(!stack(1).can_do_equals_op(stack(0)))
+                    {
+                        raise("not valid operation");
+                    }
                     stack(1) = stack(1) != stack(0);
                     pop();
                     break;
                     
                 case L_RT:
+                    if(!stack(1).can_do_compare_op(stack(0)))
+                    {
+                        raise("not valid operation");
+                    }
                     stack(1) = stack(1) > stack(0);
                     pop();
                     break;
                     
                 case L_RE:
+                    if(!stack(1).can_do_compare_op(stack(0)))
+                    {
+                        raise("not valid operation");
+                    }
                     stack(1) = stack(1) >= stack(0);
                     pop();
                     break;
                     
                 case L_LT:
+                    if(!stack(1).can_do_compare_op(stack(0)))
+                    {
+                        raise("not valid operation");
+                    }
                     stack(1) = stack(1) < stack(0);
                     pop();
                     break;
                     
-                case L_LE:
+                case L_LE:                
+                    if(!stack(1).can_do_compare_op(stack(0)))
+                    {
+                        raise("not valid operation");
+                    }
                     stack(1) = stack(1) <= stack(0);
                     pop();
                     break;
@@ -326,18 +375,20 @@ namespace l_language
                             //cast
                             if( r_c.m_type == l_variable::INT )  index= (size_t)r_c.m_value.m_i;
                             else if( r_c.m_type == l_variable::FLOAT )index= (size_t)r_c.m_value.m_f;
-                            else assert(0);
+                            else raise( "value isn't a valid key" );
                             //get
                             stack(1) = vector->operator[](index) ;
                         }
                         else if(table)
                         {
+                            //is a string?
+                            if(!r_c.is_string()) raise( "value isn't a valid key" );
                             //get and pop value
                             stack(1) = table->operator[](r_c);
                         }
                         else
                         {
-                            assert(0);
+                            raise( "value isn't a vector/table" );
                         }
                     }
                     else
@@ -369,20 +420,22 @@ namespace l_language
                             //to size int
                             size_t index = 0;
                             //cast
-                            if( r_b.m_type == l_variable::INT )  index= (size_t)r_b.m_value.m_i;
+                                 if( r_b.m_type == l_variable::INT )  index= (size_t)r_b.m_value.m_i;
                             else if( r_b.m_type == l_variable::FLOAT )index= (size_t)r_b.m_value.m_f;
-                            else assert(0);
+                            else raise( "value isn't a valid key" );
                             //get and pop value
                             vector->operator[](index) = pop();
                         }
                         else if(table)
                         {
+                            //is a string?
+                            if(!r_b.is_string()) raise( "value isn't a valid key" );
                             //get and pop value
                             table->operator[](r_b) = pop();
                         }
                         else
                         {
-                            assert(0);
+                            raise( "value isn't a vector/table" );
                         }
                     }
                     else
@@ -428,7 +481,7 @@ namespace l_language
                         }
                         else
                         {
-                            assert(0);
+                            raise( "this value not have a iterator" );
                         }
                     }
                     else
@@ -436,7 +489,7 @@ namespace l_language
                         //pop value
                         pop();
                         //..
-                        assert(0);
+                        raise( "value isn't a table/array/object" );
                     }
                 }
                 break;
@@ -515,7 +568,7 @@ namespace l_language
                         }
                         else
                         {
-                            assert(0);
+                            raise( "value isn't a valid iterator" );
                         }
                     }
                     else
@@ -525,7 +578,7 @@ namespace l_language
                         //and jump
                         pc = cmp.m_arg - 1;
                         //...
-                        assert(0);
+                        raise( "value isn't an iterator" );
                     }
                 }
                 break;
@@ -542,7 +595,14 @@ namespace l_language
                         //assert (1 return)
                         assert(n_return <= 1);
                         //error
-                        assert(n_return >= 0);
+                        if(n_return<0)
+                        {
+                            raise( "native call exception" );
+                        }
+                        else if(n_return>1)
+                        {
+                            raise( "native call can't return more than a value" );
+                        }
                         //pop args
                         for(int i=0; i < cmp.m_arg; ++i)
                         {
@@ -583,7 +643,7 @@ namespace l_language
                         //error?
                         if(n_return==T_RETURN_ERROR)
                         {
-                            assert(0);
+                            raise( "call exception" );
                         }
                         //unlock context
                         new_ctx->unlock();
@@ -597,7 +657,7 @@ namespace l_language
                     }
                     else
                     {
-                        assert(0);
+                        raise( "value isn't an function" );
                     }
                 }
                 break;
@@ -632,14 +692,14 @@ namespace l_language
     }
     //
     
-    void l_vm::execute(unsigned int id_thread)
+    bool l_vm::execute(unsigned int id_thread)
     {
-        execute(&thread(id_thread));
+        return execute(&thread(id_thread));
     }
     
-    void l_vm::execute(l_thread* ptr_thread)
+    bool l_vm::execute(l_thread* ptr_thread)
     {
         //get thread
-        ptr_thread->execute(*ptr_thread->main_context());
+        return ptr_thread->execute(*ptr_thread->main_context()) != l_thread::T_RETURN_ERROR;
     }
 };
