@@ -167,119 +167,74 @@ namespace l_language
                     }
                 }
                 break;
-                    ////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////
                 case L_ADD:
-                    if(!stack(1).can_do_math_op(stack(0)) && !stack(1).can_do_str_op(stack(0)))
-                    {
-                        raise("not valid operation");
-                    }
-                    stack(1) = stack(1) + stack(0);
+                    if(!stack(1).add(stack(0),stack(1))) raise("not valid operation");
                     pop();
                     break;
                     
                 case L_MUL:
-                    if(!stack(1).can_do_math_op(stack(0)))
-                    {
-                        raise("not valid operation");
-                    }
-                    stack(1) = stack(1) * stack(0);
+                    if(!stack(1).mul(stack(0),stack(1))) raise("not valid operation");
                     pop();
                     break;
                     
                 case L_SUB:
-                    if(!stack(1).can_do_math_op(stack(0)))
-                    {
-                        raise("not valid operation");
-                    }
-                    stack(1) = stack(1) - stack(0);
+                    if(!stack(1).sub(stack(0),stack(1))) raise("not valid operation");
                     pop();
                     break;
                     
                 case L_DIV:
-                    if(!stack(1).can_do_math_op(stack(0)))
-                    {
-                        raise("not valid operation");
-                    }
-                    stack(1) = stack(1) / stack(0);
+                    if(!stack(1).div(stack(0),stack(1))) raise("not valid operation");
                     pop();
                     break;
                     
                 case L_UNM:
-                    if(!stack(0).is_int() && !stack(0).is_float())
-                    {
-                        raise("not valid operation");
-                    }
-                    stack(0) = -stack(0);
+                    if(!stack(0).unm(stack(0))) raise("not valid operation");
                     break;
                     ////////////////////////////////////////////////////////////
                 case L_EQ:
-                    if(!stack(1).can_do_equals_op(stack(0)))
-                    {
-                        raise("not valid operation");
-                    }
-                    stack(1) = stack(1) == stack(0);
+                    if(!stack(1).equal(stack(0),stack(1))) raise("not valid operation");
                     pop();
                     break;
                     
                 case L_NEQ:
-                    if(!stack(1).can_do_equals_op(stack(0)))
-                    {
-                        raise("not valid operation");
-                    }
-                    stack(1) = stack(1) != stack(0);
+                    if(!stack(1).not_equal(stack(0),stack(1))) raise("not valid operation");
                     pop();
                     break;
                     
                 case L_RT:
-                    if(!stack(1).can_do_compare_op(stack(0)))
-                    {
-                        raise("not valid operation");
-                    }
-                    stack(1) = stack(1) > stack(0);
+                    if(!stack(1).rt(stack(0),stack(1))) raise("not valid operation");
                     pop();
                     break;
                     
                 case L_RE:
-                    if(!stack(1).can_do_compare_op(stack(0)))
-                    {
-                        raise("not valid operation");
-                    }
-                    stack(1) = stack(1) >= stack(0);
+                    if(!stack(1).re(stack(0),stack(1))) raise("not valid operation");
                     pop();
                     break;
                     
                 case L_LT:
-                    if(!stack(1).can_do_compare_op(stack(0)))
-                    {
-                        raise("not valid operation");
-                    }
-                    stack(1) = stack(1) < stack(0);
+                    if(!stack(1).lt(stack(0),stack(1))) raise("not valid operation");
                     pop();
                     break;
                     
-                case L_LE:                
-                    if(!stack(1).can_do_compare_op(stack(0)))
-                    {
-                        raise("not valid operation");
-                    }
-                    stack(1) = stack(1) <= stack(0);
+                case L_LE:
+                    if(!stack(1).le(stack(0),stack(1))) raise("not valid operation");
                     pop();
-                    break;
-                    
-                case L_NOT:
-                    stack(0) = !stack(0);
                     break;
                 ////////////////////////////////////////////////////////////
+                case L_NOT:
+                    if(!stack(0).not_value(stack(0))) raise("not valid operation");
+                    break;
+
                 case L_OR:
-                    stack(1) = stack(1) || stack(0);
+                    if(!stack(1).or_value(stack(0),stack(1))) raise("not valid operation");
                     pop();
                     break;
                     
                 case L_AND:
-                    stack(1) = stack(1) && stack(0);
+                    if(!stack(1).and_value(stack(0),stack(1))) raise("not valid operation");
                     pop();
                     break;
-                    
                 ////////////////////////////////////////////////////////////
                 case L_GET_GLOBAL:
                     push( global(context,cmp.m_arg) );

@@ -235,398 +235,528 @@ namespace l_language
             return !is_false();
         }
         
-        bool can_do_math_op(const l_variable& var)
-        {
-            return (is_int()   && var.is_int())   ||
-                   (is_int()   && var.is_float()) ||
-                   (is_float() && var.is_int())   ||
-                   (is_float() && var.is_float());
-        }
-        
-        
-        bool can_do_str_op( const l_variable& var )
-        {
-            return ( is_string() && !var.is_object()) ||
-                   (!is_object() &&  var.is_string()) ;
-        }
-        
-        bool can_do_compare_op( const l_variable& var )
-        {
-            return  can_do_math_op(var) ;
-        }
-        
-        bool can_do_equals_op( const l_variable& var )
-        {
-            return  can_do_math_op(var) || (is_string() && var.is_string());
-        }
-        
-        l_variable operator + (l_variable var)
+        bool add(l_variable& var,l_variable& output)
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return m_value.m_i + var.m_value.m_i;
+                output = m_value.m_i + var.m_value.m_i;
+                return true;
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return m_value.m_f + var.m_value.m_i;
+                output = m_value.m_f + var.m_value.m_i;
+                return true;
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return m_value.m_i + var.m_value.m_f;
+                output = m_value.m_i + var.m_value.m_f;
+                return true;
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return m_value.m_f + var.m_value.m_f;
+                output = m_value.m_f + var.m_value.m_f;
+                return true;
             }
             
             if (is_string() && var.is_string())
             {
-                return string()->gc_merge(var.string());
+                output = string()->gc_merge(var.string());
+                return true;
             }
             
             if (is_string()&& var.m_type == FLOAT)
             {
-                return string()->gc_merge(std::to_string(var.m_value.m_f));
+                output = string()->gc_merge(std::to_string(var.m_value.m_f));
+                return true;
             }
             
             if (is_string() && var.m_type == INT)
             {
-                return string()->gc_merge(std::to_string(var.m_value.m_i));
+                output = string()->gc_merge(std::to_string(var.m_value.m_i));
+                return true;
             }
             
             if (m_type == FLOAT && var.is_string())
             {
-                return var.string()->gc_merge_left(std::to_string(var.m_value.m_f));
+                output = var.string()->gc_merge_left(std::to_string(var.m_value.m_f));
+                return true;
             }
             
             if (m_type == INT && var.is_string())
             {
-                return var.string()->gc_merge_left(std::to_string(m_value.m_i));
+                output = var.string()->gc_merge_left(std::to_string(m_value.m_i));
+                return true;
             }
             
-            assert(0);
-            return l_variable();
+            return false;
         }
         
-        l_variable operator - (l_variable var)
+        bool sub(l_variable& var,l_variable& output)
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return m_value.m_i - var.m_value.m_i;
+                output = m_value.m_i - var.m_value.m_i;
+                return true;
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return m_value.m_f - var.m_value.m_i;
+                output = m_value.m_f - var.m_value.m_i;
+                return true;
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return m_value.m_i - var.m_value.m_f;
+                output = m_value.m_i - var.m_value.m_f;
+                return true;
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return m_value.m_f - var.m_value.m_f;
+                output = m_value.m_f - var.m_value.m_f;
+                return true;
             }
             
-            assert(0);
-            return l_variable();
+            return false;
         }
         
-        l_variable operator / (l_variable var)
+        bool mul(l_variable& var,l_variable& output)
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return m_value.m_i / var.m_value.m_i;
+                output = m_value.m_i * var.m_value.m_i;
+                return true;
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return m_value.m_f / var.m_value.m_i;
+                output = m_value.m_f * var.m_value.m_i;
+                return true;
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return m_value.m_i / var.m_value.m_f;
+                output = m_value.m_i * var.m_value.m_f;
+                return true;
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return m_value.m_f / var.m_value.m_f;
+                output = m_value.m_f * var.m_value.m_f;
+                return true;
             }
             
-            assert(0);
-            return l_variable();
+            return false;
         }
         
-        l_variable operator * (l_variable var)
+        bool div(l_variable& var,l_variable& output)
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return m_value.m_i * var.m_value.m_i;
+                output = m_value.m_i / var.m_value.m_i;
+                return true;
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return m_value.m_f * var.m_value.m_i;
+                output = m_value.m_f / var.m_value.m_i;
+                return true;
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return m_value.m_i * var.m_value.m_f;
+                output = m_value.m_i / var.m_value.m_f;
+                return true;
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return m_value.m_f * var.m_value.m_f;
+                output = m_value.m_f / var.m_value.m_f;
+                return true;
             }
             
-            assert(0);
-            return l_variable();
+            return false;
         }
         
-        l_variable operator == (l_variable var)
+        bool equal(l_variable& var,l_variable& output)
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return l_variable(m_value.m_i == var.m_value.m_i);
+                output = l_variable(m_value.m_i == var.m_value.m_i);
+                return true;
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return l_variable(m_value.m_f == var.m_value.m_i);
+                output = l_variable(m_value.m_f == var.m_value.m_i);
+                return true;
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return l_variable(m_value.m_i == var.m_value.m_f);
+                output = l_variable(m_value.m_i == var.m_value.m_f);
+                return true;
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return l_variable(m_value.m_f == var.m_value.m_f);
+                output = l_variable(m_value.m_f == var.m_value.m_f);
+                return true;
             }
             
             if (m_type == STRING && var.m_type == STRING)
             {
-                return l_variable(string()->str() == var.string()->str());
+                output = l_variable(string()->str() == var.string()->str());
+                return true;
             }
             
-            assert(0);
-            return l_variable();
+            output = false;
+            return false;
         }
         
-        l_variable operator != (l_variable var)
+        bool not_equal(l_variable& var,l_variable& output)
         {
             if (m_type == INT && var.m_type == INT)
             {
-                return l_variable(m_value.m_i != var.m_value.m_i);
+                output = l_variable(m_value.m_i != var.m_value.m_i);
+                return true;
             }
             
             if (m_type == FLOAT && var.m_type == INT)
             {
-                return l_variable(m_value.m_f != var.m_value.m_i);
+                output = l_variable(m_value.m_f != var.m_value.m_i);
+                return true;
             }
             
             if (m_type == INT && var.m_type == FLOAT)
             {
-                return l_variable(m_value.m_i != var.m_value.m_f);
+                output = l_variable(m_value.m_i != var.m_value.m_f);
+                return true;
             }
             
             if (m_type == FLOAT && var.m_type == FLOAT)
             {
-                return l_variable(m_value.m_f != var.m_value.m_f);
+                output = l_variable(m_value.m_f != var.m_value.m_f);
+                return true;
             }
             
             if (m_type == STRING && var.m_type == STRING)
             {
-                return l_variable(string()->str() != var.string()->str());
+                output = l_variable(string()->str() != var.string()->str());
+                return true;
             }
             
-            assert(0);
-            return true;
+            output = true;
+            return false;
         }
         
-        l_variable operator > (l_variable var)
-        {
-            if (m_type == INT && var.m_type == INT)
-            {
-                return l_variable(m_value.m_i > var.m_value.m_i);
-            }
-            
-            if (m_type == FLOAT && var.m_type == INT)
-            {
-                return l_variable(m_value.m_f > var.m_value.m_i);
-            }
-            
-            if (m_type == INT && var.m_type == FLOAT)
-            {
-                return l_variable(m_value.m_i > var.m_value.m_f);
-            }
-            
-            if (m_type == FLOAT && var.m_type == FLOAT)
-            {
-                return l_variable(m_value.m_f > var.m_value.m_f);
-            }
-            
-            assert(0);
-            return l_variable(false);
-        }
-        
-        l_variable operator >= (l_variable var)
-        {
-            if (m_type == INT && var.m_type == INT)
-            {
-                return l_variable(m_value.m_i >= var.m_value.m_i);
-            }
-            
-            if (m_type == FLOAT && var.m_type == INT)
-            {
-                return l_variable(m_value.m_f >= var.m_value.m_i);
-            }
-            
-            if (m_type == INT && var.m_type == FLOAT)
-            {
-                return l_variable(m_value.m_i >= var.m_value.m_f);
-            }
-            
-            if (m_type == FLOAT && var.m_type == FLOAT)
-            {
-                return l_variable(m_value.m_f >= var.m_value.m_f);
-            }
-            
-            assert(0);
-            return l_variable(false);
-        }
-        
-        l_variable operator < (l_variable var)
-        {
-            if (m_type == INT && var.m_type == INT)
-            {
-                return l_variable(m_value.m_i < var.m_value.m_i);
-            }
-            
-            if (m_type == FLOAT && var.m_type == INT)
-            {
-                return l_variable(m_value.m_f < var.m_value.m_i);
-            }
-            
-            if (m_type == INT && var.m_type == FLOAT)
-            {
-                return l_variable(m_value.m_i < var.m_value.m_f);
-            }
-            
-            if (m_type == FLOAT && var.m_type == FLOAT)
-            {
-                return l_variable(m_value.m_f < var.m_value.m_f);
-            }
-            
-            assert(0);
-            return l_variable(false);
-        }
-        
-        l_variable operator <= (l_variable var)
-        {
-            if (m_type == INT && var.m_type == INT)
-            {
-                return l_variable(m_value.m_i <= var.m_value.m_i);
-            }
-            
-            if (m_type == FLOAT && var.m_type == INT)
-            {
-                return l_variable(m_value.m_f <= var.m_value.m_i);
-            }
-            
-            if (m_type == INT && var.m_type == FLOAT)
-            {
-                return l_variable(m_value.m_i <= var.m_value.m_f);
-            }
-            
-            if (m_type == FLOAT && var.m_type == FLOAT)
-            {
-                return l_variable(m_value.m_f <= var.m_value.m_f);
-            }
-            
-            assert(0);
-            return l_variable(false);
-        }
-        
-        l_variable operator && (l_variable var)
-        {
-            if (m_type == INT && var.m_type == INT)
-            {
-                return l_variable(m_value.m_i && var.m_value.m_i);
-            }
-            
-            if (m_type == FLOAT && var.m_type == INT)
-            {
-                return l_variable(m_value.m_f && var.m_value.m_i);
-            }
-            
-            if (m_type == INT && var.m_type == FLOAT)
-            {
-                return l_variable(m_value.m_i && var.m_value.m_f);
-            }
-            
-            if (m_type == FLOAT && var.m_type == FLOAT)
-            {
-                return l_variable(m_value.m_f && var.m_value.m_f);
-            }
-            
-            assert(0);
-            return l_variable(false);
-        }
-        
-        l_variable operator || (l_variable var)
-        {
-            if (m_type == INT && var.m_type == INT)
-            {
-                return l_variable(m_value.m_i || var.m_value.m_i);
-            }
-            
-            if (m_type == FLOAT && var.m_type == INT)
-            {
-                return l_variable(m_value.m_f || var.m_value.m_i);
-            }
-            
-            if (m_type == INT && var.m_type == FLOAT)
-            {
-                return l_variable(m_value.m_i || var.m_value.m_f);
-            }
-            
-            if (m_type == FLOAT && var.m_type == FLOAT)
-            {
-                return l_variable(m_value.m_f || var.m_value.m_f);
-            }
-            
-            assert(0);
-            return l_variable(false);
-        }
-        
-        l_variable operator - (void)
+        bool unm(l_variable& output)
         {
             if (m_type == INT)
             {
-                return l_variable(-m_value.m_i);
+                output = l_variable(-m_value.m_i);
+                return true;
             }
             
             if (m_type == FLOAT)
             {
-                return l_variable(-m_value.m_f);
+                output = l_variable(-m_value.m_f);
+                return true;
             }
             
-            assert(0);
+            return false;
+        }
+        
+        bool not_value(l_variable& output)
+        {
+            output = l_variable(is_false());
+            return true;
+        }
+        
+        bool lt (l_variable& var, l_variable& output)
+        {
+            if (m_type == INT && var.m_type == INT)
+            {
+                output = l_variable(m_value.m_i < var.m_value.m_i);
+                return true;
+            }
             
-            return *this;
+            if (m_type == FLOAT && var.m_type == INT)
+            {
+                output = l_variable(m_value.m_f < var.m_value.m_i);
+                return true;
+            }
+            
+            if (m_type == INT && var.m_type == FLOAT)
+            {
+                output = l_variable(m_value.m_i < var.m_value.m_f);
+                return true;
+            }
+            
+            if (m_type == FLOAT && var.m_type == FLOAT)
+            {
+                output = l_variable(m_value.m_f < var.m_value.m_f);
+                return true;
+            }
+            
+            output = l_variable(false);
+            return false;
+        }
+        
+        
+        bool le (l_variable& var, l_variable& output)
+        {
+            if (m_type == INT && var.m_type == INT)
+            {
+                output = l_variable(m_value.m_i <= var.m_value.m_i);
+                return true;
+            }
+            
+            if (m_type == FLOAT && var.m_type == INT)
+            {
+                output = l_variable(m_value.m_f <= var.m_value.m_i);
+                return true;
+            }
+            
+            if (m_type == INT && var.m_type == FLOAT)
+            {
+                output = l_variable(m_value.m_i <= var.m_value.m_f);
+                return true;
+            }
+            
+            if (m_type == FLOAT && var.m_type == FLOAT)
+            {
+                output = l_variable(m_value.m_f <= var.m_value.m_f);
+                return true;
+            }
+            
+            output = l_variable(false);
+            return false;
+        }
+        
+        bool rt (l_variable& var, l_variable& output)
+        {
+            if (m_type == INT && var.m_type == INT)
+            {
+                output = l_variable(m_value.m_i > var.m_value.m_i);
+                return true;
+            }
+            
+            if (m_type == FLOAT && var.m_type == INT)
+            {
+                output = l_variable(m_value.m_f > var.m_value.m_i);
+                return true;
+            }
+            
+            if (m_type == INT && var.m_type == FLOAT)
+            {
+                output = l_variable(m_value.m_i > var.m_value.m_f);
+                return true;
+            }
+            
+            if (m_type == FLOAT && var.m_type == FLOAT)
+            {
+                output = l_variable(m_value.m_f > var.m_value.m_f);
+                return true;
+            }
+            
+            output = l_variable(false);
+            return false;
+        }
+        
+        
+        bool re (l_variable& var, l_variable& output)
+        {
+            if (m_type == INT && var.m_type == INT)
+            {
+                output = l_variable(m_value.m_i >= var.m_value.m_i);
+                return true;
+            }
+            
+            if (m_type == FLOAT && var.m_type == INT)
+            {
+                output = l_variable(m_value.m_f >= var.m_value.m_i);
+                return true;
+            }
+            
+            if (m_type == INT && var.m_type == FLOAT)
+            {
+                output = l_variable(m_value.m_i >= var.m_value.m_f);
+                return true;
+            }
+            
+            if (m_type == FLOAT && var.m_type == FLOAT)
+            {
+                output = l_variable(m_value.m_f >= var.m_value.m_f);
+                return true;
+            }
+            
+            output = l_variable(false);
+            return false;
+        }
+        
+        
+        bool and_value (l_variable& var, l_variable& output)
+        {
+            if (m_type == INT && var.m_type == INT)
+            {
+                output = l_variable(m_value.m_i && var.m_value.m_i);
+                return true;
+            }
+            
+            if (m_type == FLOAT && var.m_type == INT)
+            {
+                output = l_variable(m_value.m_f && var.m_value.m_i);
+                return true;
+            }
+            
+            if (m_type == INT && var.m_type == FLOAT)
+            {
+                output = l_variable(m_value.m_i && var.m_value.m_f);
+                return true;
+            }
+            
+            if (m_type == FLOAT && var.m_type == FLOAT)
+            {
+                output = l_variable(m_value.m_f && var.m_value.m_f);
+                return true;
+            }
+            
+            output = l_variable(false);
+            return false;
+        }
+        
+        
+        bool or_value (l_variable& var, l_variable& output)
+        {
+            if (m_type == INT && var.m_type == INT)
+            {
+                output = l_variable(m_value.m_i || var.m_value.m_i);
+                return true;
+            }
+            
+            if (m_type == FLOAT && var.m_type == INT)
+            {
+                output = l_variable(m_value.m_f || var.m_value.m_i);
+                return true;
+            }
+            
+            if (m_type == INT && var.m_type == FLOAT)
+            {
+                output = l_variable(m_value.m_i || var.m_value.m_f);
+                return true;
+            }
+            
+            if (m_type == FLOAT && var.m_type == FLOAT)
+            {
+                output = l_variable(m_value.m_f || var.m_value.m_f);
+                return true;
+            }
+            
+            output = l_variable(false);
+            return false;
+        }
+        
+        
+        l_variable operator + (l_variable var)
+        {
+            l_variable output;
+            add(var,output);
+            return output;
+        }
+        
+        l_variable operator - (l_variable var)
+        {
+            l_variable output;
+            sub(var,output);
+            return output;
+        }
+        
+        l_variable operator * (l_variable var)
+        {
+            l_variable output;
+            mul(var,output);
+            return output;
+        }
+        
+        l_variable operator / (l_variable var)
+        {
+            l_variable output;
+            div(var,output);
+            return output;
+        }
+        
+        l_variable operator == (l_variable var)
+        {
+            l_variable output;
+            equal(var,output);
+            return output;
+        }
+        
+        l_variable operator != (l_variable var)
+        {
+            l_variable output;
+            not_equal(var,output);
+            return output;
+        }
+        
+        l_variable operator - (void)
+        {
+            l_variable output;
+            unm(output);
+            return output;
+        }
+        
+        l_variable operator < (l_variable var)
+        {
+            l_variable output;
+            lt(var,output);
+            return output;
+        }
+        
+        l_variable operator <= (l_variable var)
+        {
+            l_variable output;
+            le(var,output);
+            return output;
+        }
+
+        l_variable operator > (l_variable var)
+        {
+            l_variable output;
+            rt(var,output);
+            return output;
+        }
+        
+        l_variable operator >= (l_variable var)
+        {
+            l_variable output;
+            re(var,output);
+            return output;
+        }
+        
+        l_variable operator && (l_variable var)
+        {
+            l_variable output;
+            and_value(var,output);
+            return output;
+        }
+        
+        l_variable operator || (l_variable var)
+        {
+            l_variable output;
+            or_value(var,output);
+            return output;
         }
         
         l_variable operator ! (void)
         {
-            return l_variable(is_false());
+            l_variable output;
+            not_value(output);
+            return output;
         }
         
         //gc methos
