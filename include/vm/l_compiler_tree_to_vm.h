@@ -255,10 +255,10 @@ namespace l_language
                 //+|-|*|/
                 if(opcode != L_NO_OP)
                 {
-                    fun->push({ opcode, 0, node->m_line });
+                    fun->push({ opcode, 0, node->m_assignable->m_line });
                 }
                 //pusn into array
-                fun->push({ L_SET_AT_VAL, 0, node->m_line });
+                fun->push({ L_SET_AT_VAL, 0, node->m_assignable->m_line });
             }
             
             return true;
