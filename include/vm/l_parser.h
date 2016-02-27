@@ -176,26 +176,68 @@ namespace l_language
 		//defines
         #define CSTRCMP(x,y) l_language::l_parser::strcmp(x,y,sizeof(y)-1)
         #define CSTRCMP_SKIP(x,y) l_language::l_parser::strcmp_skip(x,y,sizeof(y)-1)
+        #define KEYWORDCMP(x,key) l_language::l_parser::strcmp(x,get_keyword(K_ ## key))
+        #define KEYWORDCMP_SKIP(x,key) l_language::l_parser::strcmp_skip(x,get_keyword(K_ ## key))
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        bool is_keyword(const char* ptr)
+        enum keyword
         {
-            static const char* keywords[]=
+            K_IF,
+            K_ELSE,
+            K_DEF,
+            K_FUNCTION,
+            
+            K_WHILE,
+            K_FOR,
+            
+            K_SUPER,
+            K_GLOBAL,
+            
+            K_OF,
+            K_IN,
+            
+            K_RETURN,
+            
+            K_OR,
+            K_AND
+        };
+        static const char** get_keywords()
+        {
+            static const char* str_keywords[]=
             {
                 "if",
                 "else",
+                
                 "def",
-                "function"
+                "function",
+                
                 "while",
                 "for",
+                
                 "super",
                 "global",
+                
                 "of",
                 "in",
+                
                 "return",
+                
+                "or",
+                "and",
+                NULL,
             };
-            for(const char* keyword : keywords)
+            return str_keywords;
+        }
+        
+        static const char* get_keyword(keyword key)
+        {
+            return get_keywords()[key];
+        }
+        
+        bool is_keyword(const char* ptr)
+        {
+            for(const char** keyword = get_keywords(); *keyword; ++keyword)
             {
-                if(CSTRCMP(ptr,keyword))
+                if(CSTRCMP(ptr,*keyword))
                 {
                     return true;
                 }
@@ -892,19 +934,19 @@ namespace l_language
 			//skip
 			skip_space_end_comment(ptr);
 			//cicle
-			while (CSTRCMP(ptr, "and") ||
+			while (KEYWORDCMP(ptr, AND) ||
 				   CSTRCMP(ptr, "&&") ||
-				   CSTRCMP(ptr, "or") ||
+				   KEYWORDCMP(ptr, OR) ||
 				   CSTRCMP(ptr, "||")  )
 			{
 				//left node
 				left = opnode;
 				//op
-				if ( CSTRCMP_SKIP(ptr, "and") || CSTRCMP_SKIP(ptr, "&&") )
+				if ( KEYWORDCMP_SKIP(ptr, AND) || CSTRCMP_SKIP(ptr, "&&") )
 				{
 					opnode = l_syntactic_tree::exp(std::string("&&"), nullptr, m_line);
 				}
-				else if( CSTRCMP_SKIP(ptr, "or") || CSTRCMP_SKIP(ptr, "||") )
+				else if( KEYWORDCMP_SKIP(ptr, OR) || CSTRCMP_SKIP(ptr, "||") )
 				{
 					opnode = l_syntactic_tree::exp(std::string("||"), nullptr, m_line);
 				}
@@ -973,12 +1015,12 @@ namespace l_language
 			//skip
 			skip_space_end_comment(ptr);
             //staments
-            if (CSTRCMP(ptr, "if"))									   return parse_if(ptr, node);
-            if (CSTRCMP(ptr, "def")    || CSTRCMP(ptr, "function"))	   return parse_def(ptr, node);
-            if (CSTRCMP(ptr, "while")  || CSTRCMP(ptr, "for"))	       return parse_cicle(ptr, node);
-            if (CSTRCMP(ptr, "global") || CSTRCMP(ptr, "super"))	   return parse_type(ptr, node);
-            if (CSTRCMP(ptr, "return"))                                return parse_return(ptr, node);
-			if (is_operation(ptr))								       return parse_operation(ptr, node);
+            if (KEYWORDCMP(ptr, IF))					           return parse_if(ptr, node);
+            if (KEYWORDCMP(ptr, DEF) || KEYWORDCMP(ptr, FUNCTION)) return parse_def(ptr, node);
+            if (KEYWORDCMP(ptr, FOR) || KEYWORDCMP(ptr, WHILE))    return parse_cicle(ptr, node);
+            if (KEYWORDCMP(ptr, GLOBAL)||KEYWORDCMP(ptr, SUPER))   return parse_type(ptr, node);
+            if (KEYWORDCMP(ptr, RETURN))                           return parse_return(ptr, node);
+			if (is_operation(ptr))						           return parse_operation(ptr, node);
 			//error
 			push_error("not valid stament");
 			return false;
@@ -1407,7 +1449,7 @@ namespace l_language
                 {
                     case IF_STATE:
                         // "if"
-                        if ( !CSTRCMP_SKIP(ptr, "if") ||
+                        if ( !KEYWORDCMP_SKIP(ptr, IF) ||
                              !parse_exp(ptr, if_node->get_if_exp()) )
                         {
                             loop  = false;
@@ -1419,12 +1461,12 @@ namespace l_language
                     case ELSE_IF_STATE:
                     {
                         // "else if"
-                        bool unparse_else = !CSTRCMP_SKIP(ptr, "else");
+                        bool unparse_else = !KEYWORDCMP_SKIP(ptr, ELSE);
                         //skip
                         skip_space_end_comment(ptr);
                         //try to parse if
                         if ( unparse_else ||
-                             !CSTRCMP_SKIP(ptr, "if")   ||
+                             !KEYWORDCMP_SKIP(ptr, IF)   ||
                              !parse_exp(ptr, if_node->get_else_if_exp(else_if_id)) )
                         {
                             loop  = false;
@@ -1436,7 +1478,7 @@ namespace l_language
                     break;
                     case ELSE_STATE:
                         // "else"
-                        if ( !CSTRCMP_SKIP(ptr, "else") )
+                        if ( !KEYWORDCMP_SKIP(ptr, ELSE) )
                         {
                             loop  = false;
                             error = true;
@@ -1473,9 +1515,9 @@ namespace l_language
                 if( state != ELSE_STATE )
                 {
                     const char* l_ptr = ptr;
-                    bool        b_else= CSTRCMP_SKIP(l_ptr,"else");
+                    bool        b_else= KEYWORDCMP_SKIP(l_ptr,ELSE);
                     skip_space_end_comment(l_ptr,false);
-                    bool        b_if  = CSTRCMP_SKIP(l_ptr,"if");
+                    bool        b_if  = KEYWORDCMP_SKIP(l_ptr,IF);
                     //else if case
                     if( b_else && b_if )
                     {
@@ -1516,7 +1558,7 @@ namespace l_language
             //skip
             skip_space_end_comment(ptr);
             // 'mentre'
-            if (!CSTRCMP_SKIP(ptr, "while")) return false;
+            if (!KEYWORDCMP_SKIP(ptr, WHILE)) return false;
             // exp
             l_syntactic_tree::exp_node *exp = nullptr;
             if (!parse_exp(ptr, exp)) return false;
@@ -1553,7 +1595,7 @@ namespace l_language
             l_syntactic_tree::node*     node_left = nullptr;
             l_syntactic_tree::exp_node* node_right = nullptr;
             //parse for
-            if (!CSTRCMP_SKIP(ptr, "for"))
+            if (!KEYWORDCMP_SKIP(ptr, FOR))
             {
                 push_error("not found \"for\" keyword");
                 return false;
@@ -1563,12 +1605,12 @@ namespace l_language
             //skip
             skip_space_end_comment(ptr);
             //
-            if (!CSTRCMP_SKIP(ptr, "in"))
+            if (!KEYWORDCMP_SKIP(ptr, IN))
             {
                 //change type
                 type_for = l_syntactic_tree::for_node::FOR_OF;
                 //try
-                if (!CSTRCMP_SKIP(ptr, "of"))
+                if (!KEYWORDCMP_SKIP(ptr, OF))
                 {
                     push_error("not found \"in\"/\"of\" keyword");
                     if(node_left) delete node_left;
@@ -1625,8 +1667,8 @@ namespace l_language
 		//parse cicle
 		bool parse_cicle(const char*& ptr, l_syntactic_tree::node*& node)
         {
-            if (CSTRCMP(ptr, "while"))		return parse_while(ptr, node);
-            if (CSTRCMP(ptr, "for"))		return parse_for(ptr, node);
+            if (KEYWORDCMP(ptr, FOR))		return parse_for(ptr, node);
+            if (KEYWORDCMP(ptr, WHILE))		return parse_while(ptr, node);
 			return false;
         }
         //parse typw
@@ -1636,11 +1678,11 @@ namespace l_language
             //skip
             skip_space_end_comment(ptr);
             //global or super?
-            if(CSTRCMP_SKIP(ptr, "global"))
+            if(KEYWORDCMP_SKIP(ptr, GLOBAL))
             {
                 l_context_type = l_syntactic_tree::context_global(m_line);
             }
-            else if(CSTRCMP_SKIP(ptr, "super"))
+            else if(KEYWORDCMP_SKIP(ptr, SUPER))
             {
                 l_context_type = l_syntactic_tree::context_super(m_line);
             }
@@ -1686,7 +1728,7 @@ namespace l_language
             //skip
             skip_space_end_comment(ptr);
             //serach def
-            if (!CSTRCMP_SKIP(ptr, "def") && !CSTRCMP_SKIP(ptr, "function"))
+            if (!KEYWORDCMP_SKIP(ptr, DEF) && !KEYWORDCMP_SKIP(ptr, FUNCTION))
             {
                 push_error("not found \"def/function\" keyword");
                 return false;
@@ -1776,7 +1818,7 @@ namespace l_language
             //skip
             skip_space_end_comment(ptr);
             //...
-            if (!CSTRCMP_SKIP(ptr, "return"))
+            if (!KEYWORDCMP_SKIP(ptr, RETURN))
             {
                 push_error("not found \"return\" keyword");
                 return false;
