@@ -109,11 +109,11 @@ int l_mod(l_language::l_thread* th,int args)
     l_language::l_variable& var       = th->value(0);
     l_language::l_variable& var_right = th->value(1);
     //cases
-    if(var.is_float() || var.is_float())
+    if(var.is_float() || var_right.is_float())
     {
         th->push_return(l_language::l_variable(std::fmod(var.to_float(),var_right.to_float())));
     }
-    else if(var.is_int() && var.is_int())
+    else if(var.is_int() && var_right.is_int())
     {
         th->push_return(l_language::l_variable(var.to_int() % var_right.to_int()));
     }

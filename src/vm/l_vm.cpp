@@ -187,7 +187,12 @@ namespace l_language
                     if(!stack(1).div(stack(0),stack(1))) raise("not valid operation");
                     pop();
                     break;
-                    
+                
+                case L_MOD:
+                    if(!stack(1).mod(stack(0),stack(1))) raise("not valid operation");
+                    pop();
+                    break;
+                
                 case L_UNM:
                     if(!stack(0).unm(stack(0))) raise("not valid operation");
                     break;

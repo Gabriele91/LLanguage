@@ -15,15 +15,19 @@ else if 0
         std.println(v)
     }
 }
-else if 1
+else if 0
 {
     a=2+"<-is 2"
     std.println(a)
     a=a-1
 }
-else
+else if 0
 {
     a = {}
     a[1] = 0
     a.n = 3
+}
+else
+{
+    std.println(5.9%"str")
 }

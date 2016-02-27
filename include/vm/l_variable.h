@@ -6,7 +6,7 @@
 //  Copyright © 2016 Gabriele Di Bari. All rights reserved.
 //
 #pragma once
-
+#include <cmath>
 #include <vector>
 #include <assert.h>
 #include <l_object.h>
@@ -660,43 +660,60 @@ namespace l_language
             return false;
         }
         
+        bool mod (l_variable& var, l_variable& output)
+        {
+            if(is_int() && var.is_int())
+            {
+                output = (l_language::l_variable(to_int() % var.to_int()));
+                return true;
+            }
+            else if(is_float() && (var.is_float() || var.is_int()))
+            {
+                output = (l_language::l_variable(std::fmod(to_float(),var.to_float())));
+                return true;
+            }
+            
+            output = l_variable(false);
+            return false;
+        }
         
-        l_variable operator + (l_variable var)
+        
+        l_variable operator + (l_variable& var)
         {
             l_variable output;
             add(var,output);
             return output;
         }
         
-        l_variable operator - (l_variable var)
+        l_variable operator - (l_variable& var)
         {
             l_variable output;
             sub(var,output);
             return output;
         }
         
-        l_variable operator * (l_variable var)
+        l_variable operator * (l_variable& var)
         {
             l_variable output;
             mul(var,output);
             return output;
         }
         
-        l_variable operator / (l_variable var)
+        l_variable operator / (l_variable& var)
         {
             l_variable output;
             div(var,output);
             return output;
         }
         
-        l_variable operator == (l_variable var)
+        l_variable operator == (l_variable& var)
         {
             l_variable output;
             equal(var,output);
             return output;
         }
         
-        l_variable operator != (l_variable var)
+        l_variable operator != (l_variable& var)
         {
             l_variable output;
             not_equal(var,output);
@@ -710,42 +727,42 @@ namespace l_language
             return output;
         }
         
-        l_variable operator < (l_variable var)
+        l_variable operator < (l_variable& var)
         {
             l_variable output;
             lt(var,output);
             return output;
         }
         
-        l_variable operator <= (l_variable var)
+        l_variable operator <= (l_variable& var)
         {
             l_variable output;
             le(var,output);
             return output;
         }
 
-        l_variable operator > (l_variable var)
+        l_variable operator > (l_variable& var)
         {
             l_variable output;
             rt(var,output);
             return output;
         }
         
-        l_variable operator >= (l_variable var)
+        l_variable operator >= (l_variable& var)
         {
             l_variable output;
             re(var,output);
             return output;
         }
         
-        l_variable operator && (l_variable var)
+        l_variable operator && (l_variable& var)
         {
             l_variable output;
             and_value(var,output);
             return output;
         }
         
-        l_variable operator || (l_variable var)
+        l_variable operator || (l_variable& var)
         {
             l_variable output;
             or_value(var,output);
@@ -756,6 +773,13 @@ namespace l_language
         {
             l_variable output;
             not_value(output);
+            return output;
+        }
+        
+        l_variable operator % (l_variable& var)
+        {
+            l_variable output;
+            mod(var,output);
             return output;
         }
         

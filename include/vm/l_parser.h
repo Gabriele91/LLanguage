@@ -42,7 +42,7 @@ namespace l_language
 	logic      := compare {[ logic_op compare ]}
 	compare    := summinus [ logic_comp summinus ]
 	summinus   := timediv {[ ('+'|'-') timediv ]}
-	timediv    := oneop {[ ('*'|'/') oneop ]}
+	timediv    := oneop {[ ('*'|'/'|'%') oneop ]}
 	oneop      := ('-' value) | (logic_one value) | value
      
 	value      := '(' exp ')' 
@@ -518,7 +518,7 @@ namespace l_language
          logic      := compare {[ logic_op compare ]}
          compare    := summinus [ logic_comp summinus ]
          summinus   := timediv {[ ('+'|'-') timediv ]}
-         timediv    := oneop {[ ('*'|'/') oneop ]}
+         timediv    := oneop {[ ('*'|'/'|'%') oneop ]}
          oneop      := ('-' value) | (logic_one value) | value
          
          value      :=    '(' exp ')'
@@ -765,13 +765,13 @@ namespace l_language
 			//skip
 			skip_space_end_comment(ptr);
 			//cicle
-			while (*ptr == '*' || *ptr == '/')
+			while (*ptr == '*' || *ptr == '/' || *ptr == '%')
 			{
 				//left node
 				left   = opnode;
 				//node
 				opnode = l_syntactic_tree::exp(std::string() + *ptr, nullptr, m_line);
-				//jmp op (*|/)
+				//jmp op (*|/|%)
 				++ptr;
 				//compone node
 				opnode->m_left = left;

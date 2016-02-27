@@ -143,6 +143,7 @@ namespace l_language
                     else if(node->m_name == "-")  fun->push({ L_SUB, 0, node->m_line });
                     else if(node->m_name == "*")  fun->push({ L_MUL, 0, node->m_line });
                     else if(node->m_name == "/")  fun->push({ L_DIV, 0, node->m_line });
+                    else if(node->m_name == "%")  fun->push({ L_MOD, 0, node->m_line });
                     else if(node->m_name == "&&") fun->push({ L_AND, 0, node->m_line });
                     else if(node->m_name == "||") fun->push({ L_OR,  0, node->m_line });
                     else if(node->m_name == "==") fun->push({ L_EQ,  0, node->m_line });
