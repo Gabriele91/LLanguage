@@ -188,7 +188,19 @@ int l_using(l_language::l_thread* th, int args)
 	{
 		th->main_context()->variable(it.first) = it.second;
 	}
-	//number of return
+	//number of ret values
+	return 0;
+}
+
+int l_system(l_language::l_thread* th, int args)
+{
+	//get variable
+	auto& command = th->value(0);
+	//isn't a string?
+	if (!command.is_string()) return -1;
+	//else execute
+	system(command.to_string().c_str());
+	//number of ret values
 	return 0;
 }
 
@@ -205,6 +217,7 @@ namespace l_language
         { "to_string", l_to_string },
         { "type_of",   l_type_of   },
         { "mod",       l_mod       },
-		{ "using",     l_using     }
+		{ "using",     l_using     },
+		{ "system",    l_system    }
     };
 }

@@ -123,6 +123,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\vm\l_call_context.cpp" />
     <ClCompile Include="..\src\vm\l_compiler_utilities.cpp" />
     <ClCompile Include="..\src\vm\l_function.cpp" />
     <ClCompile Include="..\src\vm\l_gc.cpp" />
@@ -154,8 +155,12 @@
     <ClInclude Include="..\include\vm\l_vm.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\tests\def.ll" />
+    <None Include="..\tests\def2.ll" />
     <None Include="..\tests\fields.ll" />
     <None Include="..\tests\for.ll" />
+    <None Include="..\tests\lambda_function.ll" />
+    <None Include="..\tests\runtimeerrors.ll" />
     <None Include="..\tests\while.ll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

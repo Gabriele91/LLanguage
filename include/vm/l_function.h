@@ -7,6 +7,7 @@
 //
 #pragma once
 #include <vector>
+#include <memory>
 #include <l_opcode.h>
 #include <l_variable.h>
 #include <l_commands.h>

@@ -30,3 +30,5 @@ std.println(z1())
 std.println(z1())
 
 std.println(z2())
+
+std.system("pause")

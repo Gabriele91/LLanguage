@@ -48,6 +48,9 @@
     <ClCompile Include="..\src\vm\l_table.cpp">
       <Filter>File di origine\vm</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\vm\l_call_context.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\vm\l_gc.h">
@@ -116,6 +119,18 @@
       <Filter>File di risorse</Filter>
     </None>
     <None Include="..\tests\while.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\tests\def.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\tests\def2.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\tests\lambda_function.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\tests\runtimeerrors.ll">
       <Filter>File di risorse</Filter>
     </None>
   </ItemGroup>
