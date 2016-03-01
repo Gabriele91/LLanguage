@@ -14,3 +14,6 @@ std.println(e)
 c = 1
 e = c and 0 or 5
 std.println(e)
+
+tab = 0 or { "hello": 1 }
+std.println(tab.hello)
