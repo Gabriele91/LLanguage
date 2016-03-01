@@ -14,8 +14,10 @@ namespace l_language
     {
         "NO_OP",
         
-        "IF",      //IF .. GOTO B
-        "IF0",     //IF NOT(..) GOTO B
+        "IF",        //IF .. GOTO B
+        "IF0",       //IF NOT(..) GOTO B
+        "IF_OR_POP", //IF .. GOTO B OR POP FROM STACK
+        "IF0_OR_POP",//IF NOT(..) GOTO B OR POP FROM STACK
         "JMP",     //JMP TO A
         
         //Logic op

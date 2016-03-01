@@ -132,6 +132,7 @@ namespace l_language
                     }
                     //..
                 break;
+                    
                 case L_IF:
                     if(top().is_true())
                     {
@@ -146,6 +147,28 @@ namespace l_language
                         pc = cmp.m_arg - 1;
                     }
                     pop();
+                    break;
+                    
+                case L_IF_OR_POP:
+                    if(top().is_true())
+                    {
+                        pc = cmp.m_arg - 1;
+                    }
+                    else
+                    {
+                        pop();
+                    }
+                    break;
+                    
+                case L_IF0_OR_POP:
+                    if(top().is_false())
+                    {
+                        pc = cmp.m_arg - 1;
+                    }
+                    else
+                    {
+                        pop();
+                    }
                     break;
                     
                 case L_PUSH:     push( stack(cmp.m_arg) ); break;

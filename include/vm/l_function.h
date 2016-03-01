@@ -47,6 +47,16 @@ namespace l_language
         {
             return m_costants[i];
         }
+        //get size commands
+        size_t size_commands() const
+        {
+            return m_commands.size();
+        }
+        //get number of costants
+        size_t size_costants() const
+        {
+            return m_costants.size();
+        }
         //function dump
         void dump_asm_function();
         void dump_consts_function();

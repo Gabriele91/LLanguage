@@ -15,6 +15,8 @@ namespace l_language
         //IF
         L_IF,      //IF .. GOTO B
         L_IF0,     //IF NOT(..) GOTO B
+        L_IF_OR_POP, //IF .. GOTO B OR POP FROM STACK
+        L_IF0_OR_POP,//IF NOT(..) GOTO B OR POP FROM STACK
         //JMP
         L_JMP,     //JMP TO A
         //Logic op

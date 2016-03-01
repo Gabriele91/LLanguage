@@ -108,18 +108,18 @@ namespace l_language
             return compile_assignable(fun,node,false);
         }
         
-        //exp
-        bool compile_exp(l_function* fun,l_syntactic_tree::exp_node* node)
+        
+        bool compile_exp_aux(l_function* fun,l_syntactic_tree::exp_node* node)
         {
             if (node->m_type == l_syntactic_tree::EXP_NODE)
             {
                 if (node->is_link())
                 {
-                    return compile_exp(fun,node->m_left);
+                    return compile_exp_aux(fun,node->m_left);
                 }
                 if (node->is_one())
                 {
-                    compile_exp(fun,node->m_left);
+                    compile_exp_aux(fun,node->m_left);
                     
                     if(node->m_name == "!")
                     {
@@ -136,16 +136,23 @@ namespace l_language
                 }
                 else
                 {
-                    compile_exp(fun,node->m_left);
-                    compile_exp(fun,node->m_right);
-                    
-                         if(node->m_name == "+")  fun->push({ L_ADD, 0, node->m_line });
+                    //flag
+                    bool is_logic_op = true;
+                    //left
+                    compile_exp_aux(fun,node->m_left);
+                    //logic op
+                         if(node->m_name == "||") fun->push({ L_IF_OR_POP,   0, node->m_line });
+                    else if(node->m_name == "&&") fun->push({ L_IF0_OR_POP,  0, node->m_line });
+                    else is_logic_op = false;
+                    //right
+                    compile_exp_aux(fun,node->m_right);
+                    //math op
+                         if(is_logic_op)          return true;
+                    else if(node->m_name == "+")  fun->push({ L_ADD, 0, node->m_line });
                     else if(node->m_name == "-")  fun->push({ L_SUB, 0, node->m_line });
                     else if(node->m_name == "*")  fun->push({ L_MUL, 0, node->m_line });
                     else if(node->m_name == "/")  fun->push({ L_DIV, 0, node->m_line });
                     else if(node->m_name == "%")  fun->push({ L_MOD, 0, node->m_line });
-                    else if(node->m_name == "&&") fun->push({ L_AND, 0, node->m_line });
-                    else if(node->m_name == "||") fun->push({ L_OR,  0, node->m_line });
                     else if(node->m_name == "==") fun->push({ L_EQ,  0, node->m_line });
                     else if(node->m_name == "!=") fun->push({ L_NEQ,  0, node->m_line });
                     else if(node->m_name == ">")  fun->push({ L_RT,  0, node->m_line });
@@ -208,6 +215,32 @@ namespace l_language
                 return true;
             }
             return false;
+        }
+        
+        //exp
+        bool compile_exp(l_function* fun,l_syntactic_tree::exp_node* node)
+        {
+            //get op
+            size_t op0 = fun->size_commands();
+            //reconstruct jmp
+            bool status = compile_exp_aux(fun, node);
+            //invalid?
+            if(!status) return false;
+            //get last op
+            size_t opN = fun->size_commands();
+            //recostruct
+            for(size_t op = op0; op != opN; ++op)
+            {
+                switch (fun->command(op).m_op_code)
+                {
+                    case L_IF_OR_POP:
+                    case L_IF0_OR_POP:
+                        fun->command(op).m_arg = (unsigned int)opN;
+                    break;
+                    default:break;
+                }
+            }
+            return true;
         }
         
         //compile op
