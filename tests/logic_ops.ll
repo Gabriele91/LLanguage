@@ -15,5 +15,5 @@ c = 1
 e = c and 0 or 5
 std.println(e)
 
-tab = 0 or { "hello": 1 }
+tab = 0 || 1 && { "hello": "Jim" }
 std.println(tab.hello)

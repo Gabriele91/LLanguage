@@ -41,7 +41,7 @@
 
 /* Begin PBXFileReference section */
 		E00014111C7B59FD0014DD94 /* def2.ll */ = {isa = PBXFileReference; explicitFileType = sourcecode.javascript; fileEncoding = 4; path = def2.ll; sourceTree = "<group>"; };
-		E0441A501C85923800115C2C /* logic_ops.ll */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.llvm; path = logic_ops.ll; sourceTree = "<group>"; };
+		E0441A501C85923800115C2C /* logic_ops.ll */ = {isa = PBXFileReference; explicitFileType = sourcecode.javascript; fileEncoding = 4; path = logic_ops.ll; sourceTree = "<group>"; };
 		E05F4B4A1C57F52400F7EB6A /* l_string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_string.h; path = vm/l_string.h; sourceTree = "<group>"; };
 		E05F4B4B1C57FB8D00F7EB6A /* l_string.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_string.cpp; sourceTree = "<group>"; };
 		E05F4B4D1C58985500F7EB6A /* l_lib_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_lib_base.cpp; sourceTree = "<group>"; };
