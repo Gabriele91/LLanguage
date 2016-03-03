@@ -54,6 +54,7 @@ namespace l_language
         {
             return m_main_ctx;
         }
+        l_function* main_function();
         //get vm
         l_vm* get_vm();
         //get gc
@@ -202,6 +203,9 @@ namespace l_language
         //execute
         bool execute(unsigned int id_thread);
         bool execute(l_thread* this_thread);
+        bool execute_call(l_variable& v_return,
+                          l_variable& call,
+                          std::initializer_list<l_variable> args);
         //
     };
 }

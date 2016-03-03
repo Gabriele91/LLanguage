@@ -59,6 +59,10 @@ namespace l_language
         l_variable& id = m_vm->function(fun.m_fun_id).m_costants[i];
         return main.variable(id);
     }
+    l_function* l_thread::main_function()
+    {
+        return m_vm->m_functions[m_main_fun_id].get();
+    }
     //access
     l_variable& l_thread::local(l_call_context& fun,int i)
     {
@@ -684,5 +688,51 @@ namespace l_language
     {
         //get thread
         return ptr_thread->execute(*ptr_thread->main_context()) != l_thread::T_RETURN_ERROR;
+    }
+    
+    bool l_vm::execute_call(l_variable& v_return,
+                            l_variable& call,
+                            std::initializer_list<l_variable> args)
+    {
+        //get context
+        l_closer* closer = call.to<l_closer>();
+        //else assert
+        if(!closer){ return false; };
+        //new function
+        l_function& call_fun = function(closer->get_fun_id());
+        //new context
+        l_variable l_new_ctx = l_call_context::gc_new(get_gc());
+        l_call_context* new_ctx = l_new_ctx.to<l_call_context>();
+        //init
+        new_ctx->init(*closer);
+        //lock context
+        new_ctx->lock();
+        //..
+        unsigned int id_arg = 0;
+        //put arguments
+        for(auto arg : args)
+        {
+            if (id_arg < call_fun.m_args_size)
+                new_ctx->variable( call_fun.constant(id_arg++) ) = arg;
+            else
+                break;
+        }
+        //..
+        l_thread* thread = new l_thread(this);
+        //execute call
+        l_thread::type_return n_return = thread->execute(*new_ctx);
+        //error?
+        if(n_return==l_thread::T_RETURN_ERROR) return false;
+        //unlock context
+        new_ctx->unlock();
+        //return?
+        if(n_return == l_thread::T_RETURN_VALUE)
+        {
+            v_return = (thread->register3(2));
+        }
+        //dealloc
+        delete thread;
+        //..
+        return true;
     }
 };

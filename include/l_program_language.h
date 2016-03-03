@@ -117,6 +117,17 @@ namespace l_language
             return output;
         }
         
+        l_variable pcall(const std::string& function,
+                         std::initializer_list<l_variable> args)
+        {
+            l_variable name = l_string::const_new(m_vm, function);
+            l_variable call = m_thread.main_context()->variable(name);
+            l_variable r_value;
+            m_vm.execute_call(r_value,call,args);
+            //..
+            return r_value;
+        }
+        
         void add_lib(const l_extern_libary& libs)
         {
             for(const lib_field& field : libs)
