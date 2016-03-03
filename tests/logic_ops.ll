@@ -11,8 +11,8 @@ c = 1
 e = c and 0
 std.println(e)
 
-c = 1
-e = c and 0 or 5
+c = 2
+e = c and 1 or 5
 std.println(e)
 
 tab = 0 || 1 && { "hello": "Jim" }
