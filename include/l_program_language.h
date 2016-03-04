@@ -145,6 +145,16 @@ namespace l_language
 			}				
 			m_vm_comp.add_global_variable(m_thread, table, name);
 		}
+        
+        l_vm& get_vm()
+        {
+            return m_vm;
+        }
+        
+        const l_vm& get_vm() const
+        {
+            return m_vm;
+        }
 
         //default
         l_program_language()

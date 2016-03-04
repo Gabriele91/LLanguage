@@ -42,7 +42,7 @@ std::vector< std::string > s_tests_fails;
     else{ ++s_count_success; }\
 }
 
-#define TEST_ARRAY_INT(name, fun, return_test, ...)\
+#define TEST_ARRAY(name, fun, return_test, ...)\
 {\
     ++s_count_test;\
     std::initializer_list<l_language::l_variable> args=\
@@ -50,12 +50,12 @@ std::vector< std::string > s_tests_fails;
     __VA_ARGS__ \
     };\
     l_language::l_variable result = it_compiler.pcall(#fun, args );\
-    if(!test_array_int(result,return_test)){ s_tests_fails.push_back( std::string(name) ); }\
+    if(!test_array(result,return_test)){ s_tests_fails.push_back( std::string(name) ); }\
     else{ ++s_count_success; }\
 }
 
 
-bool test_array_int(l_language::l_variable& var,const std::vector<int>& validetor)
+bool test_array(l_language::l_variable& var,std::vector<l_language::l_variable>& validetor)
 {
     auto* l_array = var.to<l_language::l_vector>();
     //isn't array
@@ -63,7 +63,7 @@ bool test_array_int(l_language::l_variable& var,const std::vector<int>& valideto
     //else test values
     for(size_t i = 0; i != validetor.size(); ++i)
     {
-        if( l_array->operator[](i).to_int() != validetor[i] )
+        if( (l_array->operator[](i) == validetor[i]).is_false() )
         {
             return false;
         }
@@ -156,6 +156,22 @@ int main()
                  STRING,       // return type
                  0             // args
                  );
+    
+    std::vector<l_language::l_variable> array_test_values =
+    {
+        1.2f,
+        3,
+        l_language::l_string::const_new(it_compiler.get_vm(), "hello"),
+        l_language::l_string::const_new(it_compiler.get_vm(), "l"),
+        l_language::l_string::const_new(it_compiler.get_vm(), "language")
+    };
+    
+    TEST_ARRAY("generic test array",  // test name
+               array_test,            // function
+               array_test_values,     // return
+               0                      // args
+               );
+    
     //1-100
     int range_values = rand() % 100 + 1;
     
@@ -174,12 +190,16 @@ int main()
          start_values,range_values                       // args
          );
     
-    std::vector<int> array_values = { 1,3 };
+    std::vector<l_language::l_variable> array_range_values =
+    {
+        1,
+        3
+    };
     
-    TEST_ARRAY_INT("range(start,len,step)",  // test name
-         range_3,                            // function
-         array_values,                       // return
-         1,5,2                               // args
+    TEST_ARRAY("range(start,len,step)",  // test name
+         range_3,                        // function
+         array_range_values,             // return
+         1,5,2                           // args
          );
     
     //print success
