@@ -6,6 +6,7 @@
 //  Copyright © 2016 Gabriele Di Bari. All rights reserved.
 //
 #include <l_lib_base.h>
+#include <l_vector.h>
 #include <cmath>
 int l_print(l_language::l_thread* th,int args)
 {
@@ -125,6 +126,41 @@ int l_mod(l_language::l_thread* th,int args)
     return 1;
 }
 
+
+int l_range(l_language::l_thread* th,int args)
+{
+    int start = 0;
+    int stop  = 0;
+    int step  = 1;
+    //..
+    switch (args)
+    {
+        case 1: stop = th->value(0).to_int(); break;
+            
+        case 2: start = th->value(0).to_int();
+                stop  = th->value(1).to_int(); break;
+            
+        case 3: start = th->value(0).to_int();
+                stop  = th->value(1).to_int();
+                step  = th->value(2).to_int(); break;
+            
+        default: return -1; break;
+    }
+    //alloc
+    l_language::l_variable array = l_language::l_vector::gc_new(th->get_gc());
+    //add values
+    for(int value  = start;
+            value != stop;
+            value += step)
+    {
+        array.to<l_language::l_vector>()->push({ value });
+    }
+    //return
+    th->push_return(array);
+    //return
+    return 1;
+}
+
 int l_to_string(l_language::l_thread* th,int args)
 {
     //get arg
@@ -217,7 +253,8 @@ namespace l_language
         { "to_string", l_to_string },
         { "type_of",   l_type_of   },
         { "mod",       l_mod       },
-		{ "using",     l_using     },
+        { "using",     l_using     },
+        { "range",     l_range     },
 		{ "system",    l_system    }
     };
 }
