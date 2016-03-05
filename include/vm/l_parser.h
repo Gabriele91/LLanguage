@@ -1753,7 +1753,7 @@ namespace l_language
             if (KEYWORDCMP(ptr, WHILE))		return parse_while(ptr, node);
 			return false;
         }
-        //parse typw
+        //parse type
         bool parse_type(const char*& ptr, l_syntactic_tree::node*& node)
         {
             l_syntactic_tree::context_type_node* l_context_type = nullptr;
@@ -1773,28 +1773,44 @@ namespace l_language
                 push_error("not found \"global/super\" keyword");
                 return false;
             }
-            //values...
-            do
+            //is op?
+            if(is_operation_slow(ptr,true))
             {
-                //skip
-                skip_space_end_comment(ptr);
-                //variable node
-                l_syntactic_tree::node* l_variable = nullptr;
-                //parse variable
-                if(!parse_variable(ptr, l_variable))
+                //op node
+                l_syntactic_tree::node* op_node = nullptr;
+                //parse
+                if(!parse_operation(ptr,op_node,true))
                 {
-                    push_error("not found \"variable\" of args of def");
-                    //dealloc
-                    delete l_context_type;
-                    //false
                     return false;
                 }
-                //push var
-                l_context_type->append((l_syntactic_tree::variable_node*)l_variable);
-                //skip
-                skip_space_end_comment(ptr);
+                //save
+                l_context_type->m_op = (l_syntactic_tree::op_node*)op_node;
             }
-            while (CSTRCMP_SKIP(ptr, ","));
+            //values...
+            else
+            {
+                do
+                {
+                    //skip
+                    skip_space_end_comment(ptr);
+                    //variable node
+                    l_syntactic_tree::node* l_variable = nullptr;
+                    //parse variable
+                    if(!parse_variable(ptr, l_variable))
+                    {
+                        push_error("not found \"variable\" of args of def");
+                        //dealloc
+                        delete l_context_type;
+                        //false
+                        return false;
+                    }
+                    //push var
+                    l_context_type->append((l_syntactic_tree::variable_node*)l_variable);
+                    //skip
+                    skip_space_end_comment(ptr);
+                }
+                while (CSTRCMP_SKIP(ptr, ","));
+            }
             //skip
             skip_space_end_comment(ptr);
             //cast

@@ -476,6 +476,20 @@ namespace l_language
             //success
             return true;
         }
+        //compile context type
+        bool compile_context_type(l_function* fun,l_syntactic_tree::context_type_node* context_type_node)
+        {
+            if(context_type_node->is_op())
+            {
+                if(context_type_node->m_op->is(l_syntactic_tree::OP_NODE))
+                {
+                    return compile_op(fun, context_type_node->m_op);
+                }
+                else return false;
+            }
+            //else ignore...
+            return true;
+        }
         //compile a statements
         bool compile_statements(l_function* fun,l_syntactic_tree::list_nodes& nodes)
         {
@@ -503,6 +517,9 @@ namespace l_language
                     break;
                     case l_syntactic_tree::RETURN_NODE:
                         if(! compile_return(fun,node->to<l_syntactic_tree::return_node>()) ) return false;
+                    break;
+                    case l_syntactic_tree::CONTEXT_TYPE_NODE:
+                        if(! compile_context_type(fun,node->to<l_syntactic_tree::context_type_node>()) ) return false;
                     break;
                     default:  break;
                 }
