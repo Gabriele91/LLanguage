@@ -181,6 +181,13 @@ int main()
          range_values              // args
          );
     
+    TEST("for like c rand",        // test name
+         for_c_like,               // function
+         90,                       // return
+         0                         // args
+         );
+
+    
     //0-(range_values-1)
     int start_values = rand() % range_values - 1 ;
     

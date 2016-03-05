@@ -1600,53 +1600,134 @@ namespace l_language
                 push_error("not found \"for\" keyword");
                 return false;
             }
-            //parse
-            if(!parse_assignable(ptr, node_left)) return false;
             //skip
             skip_space_end_comment(ptr);
-            //
-            if (!KEYWORDCMP_SKIP(ptr, IN))
+            //parenthesis?
+            bool have_parenthesis = CSTRCMP_SKIP(ptr, "(");
+            //skip space?
+            if( have_parenthesis ) skip_space_end_comment(ptr);
+            //operation?
+            if(is_operation_slow(ptr,true) || CSTRCMP_SKIP(ptr, ";"))
             {
-                //change type
-                type_for = l_syntactic_tree::for_node::FOR_OF;
-                //try
-                if (!KEYWORDCMP_SKIP(ptr, OF))
+                //alloc new node
+                node = l_syntactic_tree::for_clike(m_line);
+                //parser
+                auto* for_c_node = (l_syntactic_tree::for_node*)node;
+                //parsing all init
+                while (!CSTRCMP_SKIP(ptr, ";"))
                 {
-                    push_error("not found \"in\"/\"of\" keyword");
+                    //parse op
+                    l_syntactic_tree::node* op_node = nullptr;
+                    //get op
+                    if(!parse_operation(ptr, op_node, true))
+                    {
+                        delete for_c_node;
+                        return false;
+                    }
+                    //add
+                    for_c_node->append_left((l_syntactic_tree::op_node*)op_node);
+                    //if find ',' skip
+                    CSTRCMP_SKIP(ptr, ",");
+                    //skip
+                    skip_space_end_comment(ptr);
+                }
+                //skip
+                skip_space_end_comment(ptr);
+                //parse exp
+                if(!CSTRCMP(ptr, ";"))
+                if(!parse_exp(ptr, for_c_node->m_exp))
+                {
+                    delete for_c_node;
+                    return false;
+                }
+                //skip ';'
+                if(!CSTRCMP_SKIP(ptr, ";"))
+                {
+                    push_error("not found \";\" character");
+                    delete for_c_node;
+                    return false;
+                }
+                //..
+                while (!CSTRCMP(ptr, "{") && !CSTRCMP(ptr, ")"))
+                {
+                    //parse op
+                    l_syntactic_tree::node* op_node = nullptr;
+                    //get op
+                    if(!parse_operation(ptr, op_node))
+                    {
+                        delete for_c_node;
+                        return false;
+                    }
+                    //add
+                    for_c_node->append_right((l_syntactic_tree::op_node*)op_node);
+                    //if find ',' skip
+                    CSTRCMP_SKIP(ptr, ",");
+                    //skip
+                    skip_space_end_comment(ptr);
+                }
+                    
+            }
+            else
+            {
+                //parse
+                if(!parse_assignable(ptr, node_left)) return false;
+                //skip
+                skip_space_end_comment(ptr);
+                //
+                if (!KEYWORDCMP_SKIP(ptr, IN))
+                {
+                    //change type
+                    type_for = l_syntactic_tree::for_node::FOR_OF;
+                    //try
+                    if (!KEYWORDCMP_SKIP(ptr, OF))
+                    {
+                        push_error("not found \"in\"/\"of\" keyword");
+                        if(node_left) delete node_left;
+                        return false;
+                    }
+                }
+                //skip
+                skip_space_end_comment(ptr);
+                //parse
+                if(!parse_exp(ptr, node_right))
+                {
                     if(node_left) delete node_left;
                     return false;
                 }
+                //static ptrs
+                auto* assignable_node_left = (l_syntactic_tree::assignable_node*)node_left;
+                auto* assignable_node_right = (l_syntactic_tree::assignable_node*)node_right;
+                //build node
+                if(type_for == l_syntactic_tree::for_node::FOR_IN)
+                {
+                    node = l_syntactic_tree::for_in(assignable_node_left,assignable_node_right, m_line);
+                }
+                else
+                {
+                    node = l_syntactic_tree::for_of(assignable_node_left,assignable_node_right, m_line);
+                }
             }
-            //skip
-            skip_space_end_comment(ptr);
-            //parse
-            if(!parse_exp(ptr, node_right))
+            //end of parenthesis
+            if (have_parenthesis)
+            if (!CSTRCMP_SKIP(ptr, ")"))
             {
-                if(node_left) delete node_left;
+                push_error("not found \")\" character");
+                if(node)  delete node;
                 return false;
+                
             }
             //skip
             skip_space_end_comment(ptr);
             // '{'
             if (!CSTRCMP_SKIP(ptr, "{"))
             {
-               push_error("not found \"{\" keyword");
-               return false;
+                push_error("not found \"{\" character");
+                if(node)  delete node;
+                return false;
             }
             //skip
             skip_space_end_comment(ptr);
-            //static ptrs
-            auto* assignable_node_left = (l_syntactic_tree::assignable_node*)node_left;
-            auto* assignable_node_right = (l_syntactic_tree::assignable_node*)node_right;
-            //build node
-            if(type_for == l_syntactic_tree::for_node::FOR_IN)
-            {
-                node = l_syntactic_tree::for_in(assignable_node_left,assignable_node_right, m_line);
-            }
-            else
-            {
-                node = l_syntactic_tree::for_of(assignable_node_left,assignable_node_right, m_line);
-            }
+            //add statements
             auto* for_node = (l_syntactic_tree::for_node*) (node);
             //add sub nodes
             if (!parse_staments(ptr, for_node->m_staments))
@@ -1659,6 +1740,7 @@ namespace l_language
             // '}'
             if (!CSTRCMP_SKIP(ptr, "}"))
             {
+                push_error("not found \"}\" character");
                 if(node)  delete node;
                 return false;
             }

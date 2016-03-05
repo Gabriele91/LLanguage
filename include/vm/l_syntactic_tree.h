@@ -58,6 +58,7 @@ namespace l_language
         class context_type_node;
 		//node list
         using list_nodes  = std::vector< node* >;
+        using list_ops    = std::vector< op_node* >;
         using list_vars   = std::vector< variable_node* >;
         using list_exps   = std::vector< exp_node* >;
         using list_exps2  = std::vector< std::array< exp_node*, 2 > >;
@@ -189,9 +190,9 @@ namespace l_language
             //set type
             type_for m_type_for{ FOR_IN };
             //for op, exp, op
-            op_node *  m_op_left{ nullptr };
-            exp_node*  m_exp{ nullptr };
-            op_node *  m_op_right{ nullptr };
+            list_ops    m_ops_left;
+            exp_node*   m_exp{ nullptr };
+            list_ops    m_ops_right;
             //for variable in variable
             //for variable of variable
             assignable_node* m_variable_left  { nullptr };
@@ -205,6 +206,18 @@ namespace l_language
                 m_type = FOR_NODE;
             }
             
+            //append ops
+            virtual for_node* append_left(op_node* node)
+            {
+                m_ops_left.push_back(node);
+                return this;
+            }
+            //append ops
+            virtual for_node* append_right(op_node* node)
+            {
+                m_ops_right.push_back(node);
+                return this;
+            }
             //append statment
             virtual for_node* append(node* node)
             {
@@ -214,12 +227,12 @@ namespace l_language
             
             virtual ~for_node()
             {
-                if(m_variable_left)           delete m_variable_left;
-                if(m_variable_right)          delete m_variable_right;
-                if(m_op_left)                 delete m_op_left;
-                if(m_exp)                     delete m_exp;
-                if(m_op_right)                delete m_op_right;
-                for(auto& node  : m_staments) delete node;
+                if (m_variable_left)                 delete m_variable_left;
+                if (m_variable_right)                delete m_variable_right;
+                for(auto* m_op_left : m_ops_left)    delete m_op_left;
+                if (m_exp)                           delete m_exp;
+                for(auto* m_op_right : m_ops_right)  delete m_op_right;
+                for(auto& node : m_staments)         delete node;
             }
             
         };
@@ -996,6 +1009,15 @@ namespace l_language
             node->m_exp  = if_exp;
             node->m_line = line;
             node->m_char = ichar;
+            return node;
+        }
+        //for stament
+        static for_node* for_clike(size_t line = 0, size_t ichar = 0)
+        {
+            auto* node = new for_node;
+            node->m_type_for  = for_node::FOR_C;
+            node->m_line      = line;
+            node->m_char      = ichar;
             return node;
         }
         //for stament

@@ -402,11 +402,19 @@ namespace l_language
                     
                 case l_syntactic_tree::for_node::FOR_OF:
                 case l_syntactic_tree::for_node::FOR_IN:
-                    
-                    visit(fun, for_node->m_variable_left);
-                    visit(fun, for_node->m_variable_right);
+                    if (for_node->m_variable_left)  visit(fun, for_node->m_variable_left);
+                    if (for_node->m_variable_right) visit(fun, for_node->m_variable_right);
                     for(auto& st_node : for_node->m_staments) visit(fun,st_node);
+                break;
+                case l_syntactic_tree::for_node::FOR_C:
                     
+                    for(auto& op_node : for_node->m_ops_left ) visit(fun,op_node);
+                    
+                    if (for_node->m_exp)                       visit(fun, for_node->m_exp);
+                    
+                    for(auto& op_node : for_node->m_ops_right) visit(fun,op_node);
+                    
+                    for(auto& st_node : for_node->m_staments ) visit(fun,st_node);
                 break;
                     
                 default: assert(0); break;

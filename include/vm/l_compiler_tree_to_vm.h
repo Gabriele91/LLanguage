@@ -394,7 +394,41 @@ namespace l_language
                     fun->command( for_it ).m_arg = (int)fun->m_commands.size();
                 }
                 break;
-                    
+                case l_syntactic_tree::for_node::FOR_C:
+                {
+                    //compile left values
+                    for(auto& node : for_node->m_ops_left)
+                    {
+                        compile_op(fun, node);
+                    }
+                    //get line
+                    int jmp_cmd_line = (int)fun->m_commands.size();
+                    //ptr to for
+                    size_t for_if = 0;
+                    //have a exp?
+                    if(for_node->m_exp)
+                    {
+                        //push exp
+                        compile_exp(fun, for_node->m_exp);
+                        //jmp to end
+                        for_if = fun->push({ L_IF0, 0, for_node->m_line });
+                    }
+                    //statement
+                    compile_statements(fun, for_node->m_staments);
+                    //compile right values
+                    for(auto& node : for_node->m_ops_right)
+                    {
+                        compile_op(fun, node);
+                    }
+                    //.. jmp
+                    fun->push({ L_JMP, jmp_cmd_line,  for_node->m_line});
+                    //set jump at the end
+                    if(for_node->m_exp)
+                    {
+                        fun->command( for_if ).m_arg = (int)fun->m_commands.size();
+                    }
+                }
+                    break;
                 default: assert(0); break;
             }
             return true;
