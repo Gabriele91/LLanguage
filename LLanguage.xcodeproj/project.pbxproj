@@ -11,14 +11,6 @@
 		E05F4B4E1C58985500F7EB6A /* l_lib_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E05F4B4D1C58985500F7EB6A /* l_lib_base.cpp */; };
 		E05F4B511C589BB600F7EB6A /* l_compiler_utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E05F4B501C589BB600F7EB6A /* l_compiler_utilities.cpp */; };
 		E071D70C1C4AC9D1008840D3 /* l_vm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E071D70B1C4AC9D1008840D3 /* l_vm.cpp */; };
-		E078AA011C88CB3300131C43 /* logic_ops.ll in Sources */ = {isa = PBXBuildFile; fileRef = E078A9F81C88CB3300131C43 /* logic_ops.ll */; };
-		E078AA021C88CB3300131C43 /* lambda_function.ll in Sources */ = {isa = PBXBuildFile; fileRef = E078A9F91C88CB3300131C43 /* lambda_function.ll */; };
-		E078AA031C88CB3300131C43 /* runtimeerrors.ll in Sources */ = {isa = PBXBuildFile; fileRef = E078A9FA1C88CB3300131C43 /* runtimeerrors.ll */; };
-		E078AA041C88CB3300131C43 /* def2.ll in Sources */ = {isa = PBXBuildFile; fileRef = E078A9FB1C88CB3300131C43 /* def2.ll */; };
-		E078AA051C88CB3300131C43 /* def.ll in Sources */ = {isa = PBXBuildFile; fileRef = E078A9FC1C88CB3300131C43 /* def.ll */; };
-		E078AA061C88CB3300131C43 /* for.ll in Sources */ = {isa = PBXBuildFile; fileRef = E078A9FD1C88CB3300131C43 /* for.ll */; };
-		E078AA071C88CB3300131C43 /* while.ll in Sources */ = {isa = PBXBuildFile; fileRef = E078A9FE1C88CB3300131C43 /* while.ll */; };
-		E078AA081C88CB3300131C43 /* fields.ll in Sources */ = {isa = PBXBuildFile; fileRef = E078A9FF1C88CB3300131C43 /* fields.ll */; };
 		E078AA1C1C88CC3700131C43 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E072DDDB1C35357A00B197A1 /* main.cpp */; };
 		E078AA241C88CCB400131C43 /* LLanguageLib.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E078AA231C88CCB400131C43 /* LLanguageLib.hpp */; };
 		E078AA261C88CCB400131C43 /* LLanguageLibPriv.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E078AA251C88CCB400131C43 /* LLanguageLibPriv.hpp */; };
@@ -33,7 +25,6 @@
 		E078AA331C88CCC000131C43 /* l_table.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0DBF2E51C679C0F00F9DA98 /* l_table.cpp */; };
 		E078AA341C88CCC000131C43 /* l_call_context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0F605F81C72299D00D5B90B /* l_call_context.cpp */; };
 		E0950C7E1C4AC50400845FEE /* l_gc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0950C7D1C4AC50400845FEE /* l_gc.cpp */; };
-		E09539921C8AC8CB00241553 /* for2.ll in Sources */ = {isa = PBXBuildFile; fileRef = E09539911C8AC8CB00241553 /* for2.ll */; };
 		E09599381C676A8900BF39F8 /* l_opcode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E09599371C676A8900BF39F8 /* l_opcode.cpp */; };
 		E0DBF2E41C678A4E00F9DA98 /* l_function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0DBF2E31C678A4E00F9DA98 /* l_function.cpp */; };
 		E0DBF2E61C679C0F00F9DA98 /* l_table.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0DBF2E51C679C0F00F9DA98 /* l_table.cpp */; };
@@ -319,24 +310,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				E071D70C1C4AC9D1008840D3 /* l_vm.cpp in Sources */,
-				E078AA081C88CB3300131C43 /* fields.ll in Sources */,
 				E09599381C676A8900BF39F8 /* l_opcode.cpp in Sources */,
-				E078AA041C88CB3300131C43 /* def2.ll in Sources */,
 				E0F605F91C72299D00D5B90B /* l_call_context.cpp in Sources */,
 				E05F4B4C1C57FB8D00F7EB6A /* l_string.cpp in Sources */,
 				E05F4B4E1C58985500F7EB6A /* l_lib_base.cpp in Sources */,
-				E078AA061C88CB3300131C43 /* for.ll in Sources */,
 				E0DBF2E61C679C0F00F9DA98 /* l_table.cpp in Sources */,
 				E0DBF2E41C678A4E00F9DA98 /* l_function.cpp in Sources */,
-				E078AA071C88CB3300131C43 /* while.ll in Sources */,
-				E078AA011C88CB3300131C43 /* logic_ops.ll in Sources */,
 				E078AA1C1C88CC3700131C43 /* main.cpp in Sources */,
-				E078AA051C88CB3300131C43 /* def.ll in Sources */,
 				E05F4B511C589BB600F7EB6A /* l_compiler_utilities.cpp in Sources */,
-				E078AA021C88CB3300131C43 /* lambda_function.ll in Sources */,
-				E09539921C8AC8CB00241553 /* for2.ll in Sources */,
 				E0950C7E1C4AC50400845FEE /* l_gc.cpp in Sources */,
-				E078AA031C88CB3300131C43 /* runtimeerrors.ll in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

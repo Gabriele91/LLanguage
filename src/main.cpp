@@ -18,6 +18,12 @@ int main(int argc,const char* args[])
     using program_language = l_language::l_program_language;
     using compiler_flags   = l_language::l_program_language::compiler_flags;
     using compiler_ouput   = l_language::l_program_language::compiler_ouput;
+    //bad case
+    if(argc <= 1)
+    {
+        MESSAGE( "Invalid input" );
+        return -1;
+    }
     //name app
     std::string name(args[0]);
     //C++ args
@@ -25,7 +31,7 @@ int main(int argc,const char* args[])
     //alloc args
     v_args.resize(argc-1);
     //copy args
-    for(size_t i=1;i!=argc;++i) v_args[i-1]=args[i];
+    for(int i=1;i<argc;++i) v_args[i-1]=args[i];
     //options
     bool         b_show_version  = false;
     int          f_compier_flags = compiler_flags::NONE;
