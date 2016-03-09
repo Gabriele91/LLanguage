@@ -1,7 +1,7 @@
 std.using("std")
 
 c = {}
-c.global = global
+c.global = get_global
 c["global"]().a = 1
 print(c.global()["a"],"\n")
 

@@ -203,7 +203,7 @@ int l_type_of(l_language::l_thread* th,int args)
     return 1;
 }
 
-int l_global(l_language::l_thread* th,int args)
+int l_get_global(l_language::l_thread* th,int args)
 {
     //push type
     th->push_return(th->main_context()->get_local_variables());
@@ -244,17 +244,17 @@ namespace l_language
 {
     l_language::l_program_language::l_extern_libary l_base_lib=
     {
-        { "global",    l_global    },
-        { "print",     l_print     },
-        { "println",   l_println   },
-        { "input",     l_input     },
-        { "to_int",    l_to_int    },
-        { "to_float",  l_to_float  },
-        { "to_string", l_to_string },
-        { "type_of",   l_type_of   },
-        { "mod",       l_mod       },
-        { "using",     l_using     },
-        { "range",     l_range     },
-		{ "system",    l_system    }
+        { "get_global", l_get_global    },
+        { "print",      l_print         },
+        { "println",    l_println       },
+        { "input",      l_input         },
+        { "to_int",     l_to_int        },
+        { "to_float",   l_to_float      },
+        { "to_string",  l_to_string     },
+        { "type_of",    l_type_of       },
+        { "mod",        l_mod           },
+        { "using",      l_using         },
+        { "range",      l_range         },
+		{ "system",     l_system        }
     };
 }
