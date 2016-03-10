@@ -63,7 +63,7 @@ namespace l_language
 	//statments
 	italanguage := staments
 	staments    := { stament }
-    stament		:=  if | call | cicle | operation
+    stament		:=  if | call | cicle | operation | def
     assignment  := '=' | '<-' | "+=" | "-=" | "*=" | "/="
     operation   := assignable assignament exp | call
     if			:= 'if' exp '{' staments '}' {[ else_if ]} [ else ]
@@ -569,6 +569,7 @@ namespace l_language
                          | assignable
                          | array_dec
                          | table_dec
+                         | def
          
          assignable :=   variable
                        | variable '[' exp ']'
@@ -615,15 +616,15 @@ namespace l_language
 				}
 				node = l_syntactic_tree::constant(value, m_line);
 			}
-			//is variable/field request
-			else if (is_an_assignable_attribute(ptr))
-			{
-				//get assignable attribute
-				l_syntactic_tree::node* var_field_node;
-				if (!parse_assignable(ptr, var_field_node)) return false;
+            //is variable/field request or call or exp def node
+            else if (is_an_assignable_attribute(ptr))
+            {
+                //get assignable attribute
+                l_syntactic_tree::node* var_field_node;
+                if (!parse_assignable_or_def(ptr, var_field_node)) return false;
                 //field node is a exp node
                 node = (l_syntactic_tree::exp_node*)var_field_node;
-			}
+            }
 			//is exp
 			else if (is_start_arg(*ptr))
 			{
@@ -752,6 +753,23 @@ namespace l_language
                 }
                 //field node is a exp node
                 node = (l_syntactic_tree::exp_node*)table_node;
+            }
+            //is a call?
+            if(is_call_args(ptr) && node)
+            {
+                //create call node
+                l_syntactic_tree::node* call_and_field_node;
+                //parse args
+                if(!parse_field_or_def_and_call(ptr,call_and_field_node,node))
+                {
+                    //delete call node
+                         if (call_and_field_node) delete call_and_field_node;
+                    else if (node)                delete node;
+                    //return false
+                    return false;
+                }
+                //save
+                node = (l_syntactic_tree::exp_node*)call_and_field_node;
             }
 			//return true...
 			return true;
@@ -974,7 +992,7 @@ namespace l_language
          //statments
          italanguage := staments
          staments    := { stament }
-         stament	 :=  if | call | cicle | operation
+         stament	 :=  if | call | cicle | operation | def
          assignment  := '=' | '<-'
          operation   := assignable assignament exp | call
          if			 := 'if' exp '{' staments '}' {[ else_if ]} [ else ]
@@ -1071,12 +1089,12 @@ namespace l_language
             return is_start_index(*ptr) || is_point(*ptr);
         }
 		//parse field
-        bool parse_field(const char*& ptr, l_syntactic_tree::node*& node)
+        bool parse_field_or_def_and_call(const char*& ptr,
+                                         l_syntactic_tree::node*& node,
+                                         l_syntactic_tree::node* variable_node = nullptr)
         {
             //flag
             bool m_do_loop = true;
-            //pase
-            l_syntactic_tree::node* variable_node = nullptr;
             //loop
             while (m_do_loop)
             {
@@ -1089,7 +1107,23 @@ namespace l_language
                 //is variable?
                 if(!variable_node)
                 {
-                    if(!parse_variable(ptr, variable_node)) return false;
+                    if(KEYWORDCMP(ptr, DEF) || KEYWORDCMP(ptr, FUNCTION))
+                    {
+                        //type of return
+                        l_syntactic_tree::node* def_node = nullptr;
+                        //
+                        if (!parse_def(ptr,def_node,true))
+                        {
+                            push_error("not valid lambda declaretion (value)");
+                            return false;
+                        }
+                        //cast
+                        variable_node = (l_syntactic_tree::node*)def_node;
+                    }
+                    else if(!parse_variable(ptr, variable_node))
+                    {
+                        return false;
+                    }
                     //skip
                     skip_space_end_comment(ptr);
                 }
@@ -1255,11 +1289,14 @@ namespace l_language
 			return is_variable(ptr);
 		}
 		//parse assignable
-		bool parse_assignable(const char*& ptr, l_syntactic_tree::node*& node)
+		bool parse_assignable_or_def(const char*& ptr, l_syntactic_tree::node*& node)
 		{
-			if (is_a_field(ptr) || is_variable(ptr))
+			if (KEYWORDCMP(ptr, DEF)      ||
+                KEYWORDCMP(ptr, FUNCTION) ||
+                is_a_field(ptr)           ||
+                is_variable(ptr))
 			{
-				if (parse_field(ptr, node)) return true;
+				if (parse_field_or_def_and_call(ptr, node)) return true;
 			}
 			//error
 			push_error("the assignable attribute isn't valid");
@@ -1344,7 +1381,7 @@ namespace l_language
                 // parse variable or field
                 l_syntactic_tree::node *assignable_node = nullptr;
 				// is a variable o field?
-                if (!parse_assignable(ptr, assignable_node)) return false;
+                if (!parse_assignable_or_def(ptr, assignable_node)) return false;
                 //skip space
                 skip_space_end_comment(ptr);
                 //find assignment ?
@@ -1670,7 +1707,7 @@ namespace l_language
             else
             {
                 //parse
-                if(!parse_assignable(ptr, node_left)) return false;
+                if(!parse_assignable_or_def(ptr, node_left)) return false;
                 //skip
                 skip_space_end_comment(ptr);
                 //
@@ -1819,7 +1856,7 @@ namespace l_language
             return true;
         }
         //parse def
-        bool parse_def(const char*& ptr, l_syntactic_tree::node*& node)
+        bool parse_def(const char*& ptr, l_syntactic_tree::node*& node, bool is_exp = false)
         {
             l_syntactic_tree::node*              l_variable = nullptr;
             l_syntactic_tree::function_def_node* l_def_node = nullptr;
@@ -1834,7 +1871,12 @@ namespace l_language
             //skip
             skip_space_end_comment(ptr);
             //parse variable
-            if(!parse_variable(ptr, l_variable))
+            if(is_exp && !is_variable(ptr))
+            {
+                //lambda
+                l_variable = nullptr;
+            }
+            else if(!parse_variable(ptr, l_variable))
             {
                 push_error("not found \"variable\" of def");
                 return false;

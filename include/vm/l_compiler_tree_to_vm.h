@@ -75,7 +75,7 @@ namespace l_language
             return true;
         }
         
-        bool compile_assignable(l_function* fun,l_syntactic_tree::assignable_node* node,int is_not_first = true)
+        bool compile_assignable_exp(l_function* fun,l_syntactic_tree::exp_node* node,int is_not_first = true)
         {
             //return variable
             if (node->m_type == l_syntactic_tree::VARIABLE_NODE)
@@ -86,8 +86,12 @@ namespace l_language
             {
                 return compile_call(fun,(l_syntactic_tree::call_node*)node);
             }
+            else if (node->m_type == l_syntactic_tree::FUNCTION_DEF_NODE)
+            {
+                return compile_function_def(fun,(l_syntactic_tree::function_def_node*)node,true);
+            }
             //rec call
-            compile_assignable(fun,node->to_field_node()->m_assignable);
+            compile_assignable_exp(fun,node->to_field_node()->m_assignable);
             //exp
             compile_exp(fun,node->to_field_node()->m_exp);
             //push
@@ -96,16 +100,16 @@ namespace l_language
             return true;
         }
         
-        bool compile_assignable_get(l_function* fun,l_syntactic_tree::assignable_node* node)
+        bool compile_assignable_exp_get(l_function* fun,l_syntactic_tree::exp_node* node)
         {
             //return
-            return compile_assignable(fun,node,true);
+            return compile_assignable_exp(fun,node,true);
         }
         
-        bool compile_assignable_set(l_function* fun,l_syntactic_tree::assignable_node* node)
+        bool compile_assignable_exp_set(l_function* fun,l_syntactic_tree::exp_node* node)
         {
             //return
-            return compile_assignable(fun,node,false);
+            return compile_assignable_exp(fun,node,false);
         }
         
         
@@ -178,7 +182,12 @@ namespace l_language
                      node->m_type == l_syntactic_tree::VARIABLE_NODE)
             {
                 auto*  assignable_node = node->to<l_syntactic_tree::assignable_node>();
-                return compile_assignable_get(fun,assignable_node);
+                return compile_assignable_exp_get(fun,assignable_node);
+            }
+            else if(node->m_type == l_syntactic_tree::FUNCTION_DEF_NODE)
+            {
+                //return true...
+                return compile_function_def(fun, (l_syntactic_tree::function_def_node*)node, true);
             }
             else if(node->m_type == l_syntactic_tree::CALL_NODE)
             {
@@ -276,12 +285,12 @@ namespace l_language
             }
             else
             {
-                if(!compile_assignable_set(fun,node->m_assignable)) return false;
+                if(!compile_assignable_exp_set(fun,node->m_assignable)) return false;
                 //is (+|-|*|/)=
                 if(opcode != L_NO_OP)
                 {
                     //get <var>
-                    if(!compile_assignable_get(fun,node->m_assignable)) return false;
+                    if(!compile_assignable_exp_get(fun,node->m_assignable)) return false;
                 }
                 //exp
                 if(!compile_exp(fun,node->m_exp)) return false;
@@ -446,14 +455,16 @@ namespace l_language
                 compile_exp(fun, *it);
             }
             //push call
-            compile_assignable_get(fun,call_node->m_assignable);
+            compile_assignable_exp_get(fun,call_node->m_exp_to_call);
             //push call
             fun->push({ L_CALL, n_args, call_node->m_line });
             //success
             return true;
         }
         //compile fun
-        bool compile_function_def(l_function* fun,l_syntactic_tree::function_def_node* function_def_node)
+        bool compile_function_def(l_function* fun,
+                                  l_syntactic_tree::function_def_node* function_def_node,
+                                  bool is_exp = false)
         {
             //get function id
             size_t id_function = ((size_t)function_def_node->m_data);
@@ -462,7 +473,21 @@ namespace l_language
             //get fun id
             fun->push({ L_CLOSER, get_function_id(fun, function_def_node), function_def_node->m_line });
             //push call
-            compile_variable_set(fun,function_def_node->m_variable);
+            if(function_def_node->m_variable)
+            {
+                //push value into variable def
+                compile_variable_set(fun,function_def_node->m_variable);
+                //get value for the exp
+                if(is_exp)
+                {
+                    compile_variable_get(fun,function_def_node->m_variable);
+                }
+            }
+            else if(!is_exp)
+            {
+                //not assignment
+                return false;
+            }
             //success
             return true;
         }

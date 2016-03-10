@@ -53,6 +53,7 @@ namespace l_language
         class array_node;
         class table_node;
         class field_node;
+        class call_node;
         class function_def_node;
         class return_node;
         class context_type_node;
@@ -416,19 +417,61 @@ namespace l_language
 			bool is_link() const
 			{
 				return is_one() && m_name == "";
-			}
+            }
+            //to call
+            exp_node* to_exp_node() const
+            {
+                return (exp_node*) this;
+            }
+            assignable_node* to_assignable_node() const
+            {
+                return (assignable_node*) this;
+            }
+            value_node* to_value_node() const
+            {
+                return (value_node*) this;
+            }
+            constant_node* to_constant_node() const
+            {
+                return (constant_node*) this;
+            }
+            variable_node* to_variable_node() const
+            {
+                return (variable_node*) this;
+            }
+            array_node* to_array_node() const
+            {
+                return (array_node*) this;
+            }
+            table_node* to_table_node() const
+            {
+                return (table_node*) this;
+            }
+            field_node* to_field_node() const
+            {
+                return (field_node*) this;
+            }
+            call_node* to_call_node() const
+            {
+                return (call_node*) this;
+            }
+            function_def_node* to_function_def_node() const
+            {
+                return (function_def_node*) this;
+            }
 			//overwrite
 			virtual bool is(node_type type) const
 			{
-				return EXP_NODE == type ||
-					   ASSIGNABLE_NODE == type ||
+                return EXP_NODE == type ||
+                       ASSIGNABLE_NODE == type ||
 					   VALUE_NODE == type ||
                        CONSTANT_NODE == type ||
                        VARIABLE_NODE == type ||
                        ARRAY_NODE == type ||
                        TABLE_NODE == type ||
-					   FIELD_NODE == type ||
-					   CALL_NODE == type;
+                       FIELD_NODE == type ||
+                       CALL_NODE == type||
+                       FUNCTION_DEF_NODE == type;
             }
             
             virtual ~exp_node()
@@ -444,8 +487,8 @@ namespace l_language
 		public:
 
 			//variable and exp
-			assignable_node* m_assignable{ nullptr };
-			list_exps        m_args;
+			exp_node*  m_exp_to_call{ nullptr };
+			list_exps  m_args;
 
 			//op node
 			call_node()
@@ -462,8 +505,8 @@ namespace l_language
             
             virtual ~call_node()
             {
-                if(m_assignable)            delete m_assignable;
-                for(auto& node : m_args)    delete node;
+                if(m_exp_to_call)         delete m_exp_to_call;
+                for(auto& node : m_args)  delete node;
             }
 		};
 
@@ -503,10 +546,20 @@ namespace l_language
             {
                 return m_exp->m_type == TABLE_NODE;
             }
-
-			bool is_exp() const
-			{
-				return m_exp->m_type == EXP_NODE;
+            
+            bool is_exp() const
+            {
+                return m_exp->m_type == EXP_NODE;
+            }
+            
+            bool is_call() const
+            {
+                return m_exp->m_type == CALL_NODE;
+            }
+            
+            bool is_function_def() const
+            {
+                return m_exp->m_type == FUNCTION_DEF_NODE;
             }
             
             template< class T >
@@ -696,7 +749,7 @@ namespace l_language
             }
 		};
         
-        class function_def_node : public node
+        class function_def_node : public exp_node
         {
         public:
             //var name
@@ -883,12 +936,12 @@ namespace l_language
 		}
 
 		//call
-		static call_node* call(assignable_node* var_to_call, size_t line = 0, size_t ichar = 0)
+		static call_node* call(exp_node* exp_to_call, size_t line = 0, size_t ichar = 0)
 		{
 			auto* node = new call_node;
-			node->m_assignable = var_to_call;
-			node->m_line       = line;
-			node->m_char       = ichar;
+			node->m_exp_to_call   = exp_to_call;
+			node->m_line          = line;
+			node->m_char          = ichar;
 			return node;
 		}
         //function def

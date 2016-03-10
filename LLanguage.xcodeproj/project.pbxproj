@@ -82,6 +82,7 @@
 		E09599361C676A5800BF39F8 /* l_opcode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_opcode.h; path = vm/l_opcode.h; sourceTree = "<group>"; };
 		E09599371C676A8900BF39F8 /* l_opcode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_opcode.cpp; sourceTree = "<group>"; };
 		E0A4DAA81C692D15007D5089 /* l_call_context.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_call_context.h; path = vm/l_call_context.h; sourceTree = "<group>"; };
+		E0A887061C9172770099CDC0 /* def3.ll */ = {isa = PBXFileReference; explicitFileType = sourcecode.javascript; fileEncoding = 4; path = def3.ll; sourceTree = "<group>"; };
 		E0DBF2E11C67893700F9DA98 /* l_commands.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_commands.h; path = vm/l_commands.h; sourceTree = "<group>"; };
 		E0DBF2E21C6789BB00F9DA98 /* l_function.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_function.h; path = vm/l_function.h; sourceTree = "<group>"; };
 		E0DBF2E31C678A4E00F9DA98 /* l_function.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_function.cpp; sourceTree = "<group>"; };
@@ -216,6 +217,7 @@
 				E078A9FE1C88CB3300131C43 /* while.ll */,
 				E078A9FF1C88CB3300131C43 /* fields.ll */,
 				E09539911C8AC8CB00241553 /* for2.ll */,
+				E0A887061C9172770099CDC0 /* def3.ll */,
 			);
 			path = samples;
 			sourceTree = SOURCE_ROOT;

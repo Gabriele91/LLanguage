@@ -214,6 +214,18 @@ namespace l_language
             //add data
             node->m_data = (void*)(m_vm->m_functions.size()-1);
             //add variable node
+            if(!node->m_variable)
+            {
+                static int anonim_function_id = 0;
+                node->m_variable =  l_syntactic_tree::variable
+                                    ("$"
+                                     "_anonymous"
+                                     "_function["
+                                     +std::to_string(++anonim_function_id)
+                                     +"]"
+                                    );
+            }
+            //...
             visit(fun, node->m_variable);
             //alloc variable
             add_into_table(fun, l_variable((l_function_id)(m_vm->m_functions.size()-1)), function_index(node));
@@ -270,7 +282,7 @@ namespace l_language
                 visit(fun,call_node->m_args[i]);
             }
             //visit call name
-            visit(fun,call_node->m_assignable);
+            visit(fun,call_node->m_exp_to_call);
         }
         
         //exp
@@ -285,6 +297,11 @@ namespace l_language
             {
                 l_syntactic_tree::constant_node* c_node = exp_node->to<l_syntactic_tree::constant_node>();
                 add_const_into_table(fun,c_node);
+            }
+            else if (exp_node->m_type == l_syntactic_tree::FUNCTION_DEF_NODE)
+            {
+                auto*  def_node = exp_node->to<l_syntactic_tree::function_def_node>();
+                visit(fun,def_node);
             }
             else if (exp_node->m_type == l_syntactic_tree::CALL_NODE)
             {
@@ -379,37 +396,37 @@ namespace l_language
         {
             if(ctx_node->is_op())
             {
-                l_syntactic_tree::assignable_node* assignable_node = nullptr;
+                l_syntactic_tree::exp_node* exp_to_call_node = nullptr;
                 //visit op
                 visit(fun, ctx_node->m_op);
-                assignable_node = ctx_node->m_op->m_assignable;
+                exp_to_call_node = ctx_node->m_op->m_assignable;
                 //assignable node
                 //get variable
-                while (assignable_node)
+                while (exp_to_call_node)
                 {
-                    if(assignable_node->is_variable()) break;
+                    if(exp_to_call_node->m_type == l_syntactic_tree::VARIABLE_NODE) break;
                     //is a call
-                    if(assignable_node->m_type == l_syntactic_tree::CALL_NODE )
+                    if(exp_to_call_node->m_type == l_syntactic_tree::CALL_NODE )
                     {
-                        assignable_node = assignable_node->to<l_syntactic_tree::call_node>()->m_assignable;
+                        exp_to_call_node = exp_to_call_node->to_call_node()->m_exp_to_call;
                     }
                     //is a field
                     else
                     {
-                        assignable_node = assignable_node->to_field_node()->m_assignable;
+                        exp_to_call_node = exp_to_call_node->to_field_node()->m_assignable;
                     }
                 }
                 //error?
-                if(!assignable_node) assert(0);
+                if(!exp_to_call_node) assert(0);
                 //cases
                 if(ctx_node->m_context_type == l_syntactic_tree::context_type_node::T_GLOBAL)
                 {
-                    must_to_be_global_value(fun,assignable_node->to_variable_node());
+                    must_to_be_global_value(fun,exp_to_call_node->to_variable_node());
                 }
                 else
                 if(ctx_node->m_context_type == l_syntactic_tree::context_type_node::T_SUPER)
                 {
-                    must_to_be_upper_value(fun,assignable_node->to_variable_node());
+                    must_to_be_upper_value(fun,exp_to_call_node->to_variable_node());
                 }
             }
             else
