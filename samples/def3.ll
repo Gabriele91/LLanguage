@@ -8,11 +8,7 @@ x = def fib ( n )
 
 std.println(x)
 
-l =  def
-     {
-        return [9]
-     }
-     ()[0] + 1
+l =  def { return [9]  } ( )[0] + 1
 
 std.println(l)
 
@@ -23,3 +19,7 @@ def c
 
 l = c()[0]
 std.println(l)
+
+
+s = (def  { return [2,3,4] }) () [0]  + 1
+std.println(s)

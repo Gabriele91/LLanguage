@@ -645,7 +645,26 @@ namespace l_language
 					return false;
 				}
 				//skip )
-				++ptr;
+                ++ptr;
+                //skip
+                skip_space_end_comment(ptr);
+                //is a call?
+                if(is_call_args(ptr) && node)
+                {
+                    //create call node
+                    l_syntactic_tree::node* call_and_field_node;
+                    //parse args
+                    if(!parse_field_or_def_and_call(ptr,call_and_field_node,node))
+                    {
+                        //delete call node
+                        if (call_and_field_node) delete call_and_field_node;
+                        else if (node)                delete node;
+                        //return false
+                        return false;
+                    }
+                    //save
+                    node = (l_syntactic_tree::exp_node*)call_and_field_node;
+                }
 			}		
 			//is array dec
 			else if(is_start_index(*ptr))
@@ -753,23 +772,6 @@ namespace l_language
                 }
                 //field node is a exp node
                 node = (l_syntactic_tree::exp_node*)table_node;
-            }
-            //is a call?
-            if(is_call_args(ptr) && node)
-            {
-                //create call node
-                l_syntactic_tree::node* call_and_field_node;
-                //parse args
-                if(!parse_field_or_def_and_call(ptr,call_and_field_node,node))
-                {
-                    //delete call node
-                         if (call_and_field_node) delete call_and_field_node;
-                    else if (node)                delete node;
-                    //return false
-                    return false;
-                }
-                //save
-                node = (l_syntactic_tree::exp_node*)call_and_field_node;
             }
 			//return true...
 			return true;
@@ -1154,6 +1156,8 @@ namespace l_language
                         //return false
                         return false;
                     }
+                    //skip
+                    skip_space_end_comment(ptr);
                     //do loop?
                     if(is_point(*ptr) || is_start_index(*ptr))
                     {
@@ -1184,6 +1188,8 @@ namespace l_language
             //parser
             while (true)
             {
+                //jmp space
+                skip_space_end_comment(ptr);
                 // . || [
                 if(is_point(*ptr))
                 {
