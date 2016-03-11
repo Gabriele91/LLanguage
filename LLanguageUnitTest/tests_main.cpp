@@ -55,7 +55,7 @@ std::vector< std::string > s_tests_fails;
 }
 
 
-bool test_array(l_language::l_variable& var,std::vector<l_language::l_variable>& validetor)
+inline bool test_array(l_language::l_variable& var,std::vector<l_language::l_variable>& validetor)
 {
     auto* l_array = var.to<l_language::l_vector>();
     //isn't array
@@ -71,7 +71,7 @@ bool test_array(l_language::l_variable& var,std::vector<l_language::l_variable>&
     return true;
 }
 
-int gauss(int rand)
+inline int gauss(int rand)
 {
     int success_values = rand*(rand+1) / 2;
     return success_values;
@@ -83,7 +83,7 @@ int main()
     using program_language = l_language::l_program_language;
     using compiler_flags   = l_language::l_program_language::compiler_flags;
     //source file
-    std::string i_source        = "tests/function.ll";
+    std::string i_source        = "scripts/function.ll";
     int         f_compier_flags = compiler_flags::EXECUTE;
     //compiler object
     program_language it_compiler;
@@ -209,6 +209,31 @@ int main()
          1,5,2                           // args
          );
     
+    //lambda calc test
+    int rand_l_c_1 = rand() % 100 - 1 ;
+    
+    TEST("lambda calc 1",   // test name
+          lambda_calc_1,    // function
+          rand_l_c_1,       // return
+          rand_l_c_1        // args
+         );
+    
+    int rand_l_2_n   = rand() % 100 - 1 ;
+    int rand_l_2_c   = rand() % 100 - 1 ;
+    int rand_l_2_d   = rand() % 100 - 1 ;
+    int rand_l_2_ret = rand_l_2_n*(rand_l_2_c+rand_l_2_d);
+    
+    TEST("lambda calc 2",                   // test name
+         lambda_calc_2,                     // function
+         rand_l_2_ret,                      // return
+         rand_l_2_n, rand_l_2_c, rand_l_2_d // args
+         );
+    
+    TEST("lambda calc fib",  // test name
+         lambda_calc_fib,    // function
+         89.0f,              // return
+         10.0f               // args
+         );
     //print success
     std::cout << s_count_success << " of " << s_count_test << " successes" << std::endl;
     //print fails

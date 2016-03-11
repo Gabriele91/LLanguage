@@ -23,3 +23,8 @@ std.println(l)
 
 s = (def  { return [2,3,4] }) () [0]  + 1
 std.println(s)
+
+r = 1
+n = 2
+c = def (x) { return x*(r+n) }
+std.println(c(4))
