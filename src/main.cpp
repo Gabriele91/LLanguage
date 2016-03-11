@@ -5,8 +5,8 @@
 #include <l_program_language.h>
 #include <l_lib_base.h>
 #define STR_VERSION_MAJOR "0"
-#define STR_VERSION_MINOR "3"
-#define STR_VERSION_MAINTENANCE "10"
+#define STR_VERSION_MINOR "4"
+#define STR_VERSION_MAINTENANCE "0"
 
 
 

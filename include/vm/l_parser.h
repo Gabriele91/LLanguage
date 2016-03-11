@@ -653,12 +653,14 @@ namespace l_language
                 {
                     //create call node
                     l_syntactic_tree::node* call_and_field_node;
-                    //parse args
+                    //parse args and fields
                     if(!parse_field_or_def_and_call(ptr,call_and_field_node,node))
                     {
                         //delete call node
-                        if (call_and_field_node) delete call_and_field_node;
+                             if (call_and_field_node) delete call_and_field_node;
                         else if (node)                delete node;
+                        //to null
+                        node = nullptr;
                         //return false
                         return false;
                     }
