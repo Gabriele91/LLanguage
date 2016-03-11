@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E01317AD1C92C28E00477C6A /* l_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E01317AC1C92C28E00477C6A /* l_parser.cpp */; };
+		E01317AE1C92C4E300477C6A /* l_parser.h in Headers */ = {isa = PBXBuildFile; fileRef = E095992F1C67508A00BF39F8 /* l_parser.h */; };
+		E01317AF1C92C4E700477C6A /* l_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E01317AC1C92C28E00477C6A /* l_parser.cpp */; };
 		E05F4B4C1C57FB8D00F7EB6A /* l_string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E05F4B4B1C57FB8D00F7EB6A /* l_string.cpp */; };
 		E05F4B4E1C58985500F7EB6A /* l_lib_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E05F4B4D1C58985500F7EB6A /* l_lib_base.cpp */; };
 		E05F4B511C589BB600F7EB6A /* l_compiler_utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E05F4B501C589BB600F7EB6A /* l_compiler_utilities.cpp */; };
@@ -44,6 +47,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E01317AC1C92C28E00477C6A /* l_parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_parser.cpp; sourceTree = "<group>"; };
 		E05F4B4A1C57F52400F7EB6A /* l_string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_string.h; path = vm/l_string.h; sourceTree = "<group>"; };
 		E05F4B4B1C57FB8D00F7EB6A /* l_string.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_string.cpp; sourceTree = "<group>"; };
 		E05F4B4D1C58985500F7EB6A /* l_lib_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_lib_base.cpp; sourceTree = "<group>"; };
@@ -201,6 +205,7 @@
 				E0DBF2E31C678A4E00F9DA98 /* l_function.cpp */,
 				E0DBF2E51C679C0F00F9DA98 /* l_table.cpp */,
 				E0F605F81C72299D00D5B90B /* l_call_context.cpp */,
+				E01317AC1C92C28E00477C6A /* l_parser.cpp */,
 			);
 			path = vm;
 			sourceTree = "<group>";
@@ -230,6 +235,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E078AA261C88CCB400131C43 /* LLanguageLibPriv.hpp in Headers */,
+				E01317AE1C92C4E300477C6A /* l_parser.h in Headers */,
 				E078AA241C88CCB400131C43 /* LLanguageLib.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -312,6 +318,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E071D70C1C4AC9D1008840D3 /* l_vm.cpp in Sources */,
+				E01317AD1C92C28E00477C6A /* l_parser.cpp in Sources */,
 				E09599381C676A8900BF39F8 /* l_opcode.cpp in Sources */,
 				E0F605F91C72299D00D5B90B /* l_call_context.cpp in Sources */,
 				E05F4B4C1C57FB8D00F7EB6A /* l_string.cpp in Sources */,
@@ -329,6 +336,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E078AA321C88CCC000131C43 /* l_function.cpp in Sources */,
+				E01317AF1C92C4E700477C6A /* l_parser.cpp in Sources */,
 				E078AA301C88CCC000131C43 /* l_compiler_utilities.cpp in Sources */,
 				E078AA281C88CCB400131C43 /* LLanguageLib.cpp in Sources */,
 				E078AA2C1C88CCC000131C43 /* l_lib_base.cpp in Sources */,
