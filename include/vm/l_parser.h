@@ -56,26 +56,28 @@ namespace l_language
                   | variable '[' exp ']'
                   | variable '.' variable
      
-     array_dec  := '[' [exp] {[ ',' exp ]} ']'
-     table_dec  := '{' [table_field] {[ ',' table_field ]} '}'
-     table_field:= (constant | variable) ':' exp
+     array_dec   := '[' [exp] {[ ',' exp ]} ']'
+     table_dec   := '{' [table_field] {[ ',' table_field ]} '}'
+     table_field := (constant | variable) ':' exp
 
 	//statments
-	italanguage := staments
-	staments    := { stament }
-    stament		:=  if | call | cicle | operation | def
-    assignment  := '=' | '<-' | "+=" | "-=" | "*=" | "/="
-    operation   := assignable assignament exp | call
-    if			:= 'if' exp '{' staments '}' {[ else_if ]} [ else ]
-    else_if     :=  else if exp '{' staments '}'
-    else        :=  else '{' staments '}'
-    call        :=  assignable '(' [exp] {[ ',' exp ]} ')'
-	cicle       :=  while | for_each
-	while       := 'while' <exp> '{' staments '}'
-    for_each    := 'for' variable ('in'|'of') exp '{' staments '}'
-    def         := ('def'|'function') [variable] '(' [ variable {[',' variable]} ] ')' '{' staments '}'
-    return      := 'return' [exp]
-    type context:= ('global' | 'super') [ variable {[ ',' variable ]} ]
+	italanguage  := staments
+	staments     := { stament }
+    stament		 := if | call | cicle | operation | def
+    assignment   := '=' | '<-' | "+=" | "-=" | "*=" | "/="
+    operation    := assignable assignament exp | call
+    if			 := 'if' exp '{' staments '}' {[ else_if ]} [ else ]
+    else_if      := else if exp '{' staments '}'
+    else         := else '{' staments '}'
+    call         := assignable '(' [exp] {[ ',' exp ]} ')'
+	cicle        := while | for
+	while        := 'while' <exp> '{' staments '}'
+    for_c_args   := operation {[','] operation} ';' exp ';' operation {[','] operation}
+    for_each_args:= variable ('in'|'of') exp
+    for          := 'for' (for_each_args | for_c_args | '(' (for_each_args | for_c_args ) ')') '{' staments '}'
+    def          := ('def'|'function') [variable] '(' [ variable {[',' variable]} ] ')' '{' staments '}'
+    return       := 'return' [exp]
+    type context := ('global' | 'super') [ variable {[ ',' variable ]} ]
 	*/
 	class l_parser
 	{
@@ -207,36 +209,9 @@ namespace l_language
         bool parse_cstring(const char* in, const char** cout, std::string& out,bool count_lines = true);
 		//parsing a name (variable/keyword)
         bool parse_name(const char* in, const char** cout, std::string& out);
+        ///////////////////////////////////////////////////////////////////////////////////////////////
 		//parser exp
-        /*
-         //operators
-         logic_op   := ('and'|'&&'|'or'|'||')
-         logic_comp := ('<'|'>'|'=='|'<='|'>=')
-         logic_one  := ('!')
-         
-         exp		:= logic
-         logic      := compare {[ logic_op compare ]}
-         compare    := summinus [ logic_comp summinus ]
-         summinus   := timediv {[ ('+'|'-') timediv ]}
-         timediv    := oneop {[ ('*'|'/'|'%') oneop ]}
-         oneop      := ('-' value) | (logic_one value) | value
-         
-         value      :=    '(' exp ')'
-                         | constant
-                         | call
-                         | assignable
-                         | array_dec
-                         | table_dec
-                         | def
-         
-         assignable :=   variable
-                       | variable '[' exp ']'
-                       | variable '.' variable
-         
-         array_dec  := '[' [exp] {[ ',' exp ]} ']'
-         table_dec  := '{' [table_field] {[ ',' table_field ]} '}'
-         table_field:= (constant | variable) ':' exp
-		*/
+        
 		//parse value
 		bool parse_value(const char*& ptr, l_syntactic_tree::exp_node*& node)
 		{
@@ -650,24 +625,10 @@ namespace l_language
 			/* none */
 			return parse_logic(ptr, node);
 		}
-		/*
-         //statments
-         italanguage := staments
-         staments    := { stament }
-         stament	 :=  if | call | cicle | operation | def
-         assignment  := '=' | '<-'
-         operation   := assignable assignament exp | call
-         if			 := 'if' exp '{' staments '}' {[ else_if ]} [ else ]
-         else_if     :=  else if exp '{' staments '}'
-         else        :=  else '{' staments '}'
-         call        :=  variable '(' [exp] {[ ',' exp ]} ')'
-         cicle       :=  while | for_each
-         while       := 'while' <exp> '{' staments '}'
-         for_each    := 'for' variable ('in'|'of') exp '{' staments '}'
-         def         := ('def'|'function') [variable] '(' [ variable {[',' variable]} ] ')' '{' staments '}'
-         type context:= ('global' | 'super') [ variable {[ ',' variable ]} ]
-		*/
-		//parse staments
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        //statments
+        
+        //parse staments
 		bool parse_staments(const char*& ptr, l_syntactic_tree::list_nodes& nodes)
 		{
 			//skip
@@ -1676,6 +1637,7 @@ namespace l_language
 			}
 			return true;
         }
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         //pre build list
         using list_functions = std::vector<std::string>;
         using list_variables = std::vector<std::string>;
