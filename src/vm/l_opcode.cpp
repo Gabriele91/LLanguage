@@ -40,6 +40,9 @@ namespace l_language
         "UNM",     // -
         
         //Loads
+        "PUSH_NULL",
+        "PUSH_TRUE",
+        "PUSH_FALSE",
         "PUSHK",
         
         //Allocs

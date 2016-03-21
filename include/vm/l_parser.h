@@ -163,7 +163,11 @@ namespace l_language
             K_RETURN,
             
             K_OR,
-            K_AND
+            K_AND,
+            
+            K_NULL,
+            K_TRUE,
+            K_FALSE
         };
         static const char** get_keywords();
         static const char* get_keyword(keyword key);
@@ -216,8 +220,22 @@ namespace l_language
 		bool parse_value(const char*& ptr, l_syntactic_tree::exp_node*& node)
 		{
             skip_space_end_comment(ptr);
+            //const null
+            if(KEYWORDCMP_SKIP(ptr, NULL))
+            {
+                node = l_syntactic_tree::constant_null(m_line);
+            }
+            //const true/false
+            else if(KEYWORDCMP_SKIP(ptr, TRUE))
+            {
+                node = l_syntactic_tree::constant_bool(true,m_line);
+            }
+            else if(KEYWORDCMP_SKIP(ptr, FALSE))
+            {
+                node = l_syntactic_tree::constant_bool(false,m_line);
+            }
             //costant int
-            if (is_int_number(ptr))
+            else if (is_int_number(ptr))
             {
                 int value = 0;
                 if (!parse_int_number(ptr, value))
@@ -918,7 +936,16 @@ namespace l_language
 		//parse assignable
 		bool parse_assignable_or_def(const char*& ptr, l_syntactic_tree::node*& node)
 		{
-			if (KEYWORDCMP(ptr, DEF)      ||
+            if(KEYWORDCMP(ptr,NULL) ||
+               KEYWORDCMP(ptr,TRUE) ||
+               KEYWORDCMP(ptr,FALSE) )
+            {
+                //error
+                push_error("the assignable attribute isn't valid, is a keyword");
+                return false;
+            }
+			else
+            if (KEYWORDCMP(ptr, DEF)      ||
                 KEYWORDCMP(ptr, FUNCTION) ||
                 is_a_field(ptr)           ||
                 is_variable(ptr))

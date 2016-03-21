@@ -174,7 +174,21 @@ namespace l_language
                 //cast
                 l_syntactic_tree::constant_node* c_node = node->to<l_syntactic_tree::constant_node>();
                 //push command
-                fun->push({ L_PUSHK,  get_const_id(fun, c_node), node->m_line });
+                if(c_node->is_push_null_or_true_or_false())
+                {
+                    if(c_node->m_const_type == l_syntactic_tree::constant_node::CNULL)
+                    {
+                        fun->push({ L_PUSH_NULL,  0, node->m_line });
+                    }
+                    else if( c_node->m_const_type == l_syntactic_tree::constant_node::CBOOL )
+                    {
+                        fun->push({ c_node->m_value.m_bool ? L_PUSH_TRUE : L_PUSH_FALSE,  0, node->m_line });
+                    }
+                    else
+                        assert(0);
+                }
+                else
+                    fun->push({ L_PUSHK,  get_const_id(fun, c_node), node->m_line });
                 //success
                 return true;
             }

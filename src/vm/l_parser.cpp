@@ -26,6 +26,11 @@ namespace l_language
             
             "or",
             "and",
+            
+            "null",
+            "true",
+            "false",
+            
             NULL,
         };
         return str_keywords;

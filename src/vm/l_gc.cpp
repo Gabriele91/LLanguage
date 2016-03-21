@@ -11,7 +11,7 @@
 #include <l_gc.h>
 #include <l_vm.h>
 #include <l_variable.h>
-#include <l_vector.h>
+#include <l_array.h>
 
 
 namespace  l_language
@@ -48,9 +48,9 @@ namespace  l_language
                     (unsigned)it->m_size,
                     (unsigned)it->m_id);
                  //if is a vector?
-                 l_vector*  vector = dynamic_cast< l_vector* >(it->m_obj);
+                 l_array*  vector = dynamic_cast< l_array* >(it->m_obj);
                  //if is a vector?
-                 l_vector_it*  vector_it = dynamic_cast< l_vector_it* >(it->m_obj);
+                 l_array_it*  vector_it = dynamic_cast< l_array_it* >(it->m_obj);
                  //print vector
                  if(vector)
                  {

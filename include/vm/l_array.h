@@ -1,5 +1,5 @@
 //
-//  l_vector.h
+//  l_array.h
 //  LLanguage
 //
 //  Created by Gabriele on 16/01/16.
@@ -13,22 +13,22 @@
 namespace l_language
 {
     //vector
-    class l_vector;
+    class l_array;
     //vector iterator
-    class l_vector_it;
+    class l_array_it;
     
     //implement vector
-    class l_vector : public l_obj
+    class l_array : public l_obj
     {
         
         //friend class
-        friend class l_vector_it;
+        friend class l_array_it;
         
         //implement  object
         class l_pool_object
         {
             //friend class
-            friend class l_vector_it;
+            friend class l_array_it;
             //attributes
             l_variable m_variable;
             
@@ -125,12 +125,12 @@ namespace l_language
         
         static l_variable gc_new(l_gc* gc)
         {
-            return  gc->new_obj< l_vector >();
+            return  gc->new_obj< l_array >();
         }
         
         static l_variable gc_new(l_gc& gc)
         {
-            return  gc.new_obj< l_vector >();
+            return  gc.new_obj< l_array >();
         }
         
         static l_variable gc_new(l_vm* vm)
@@ -147,10 +147,10 @@ namespace l_language
         
     };
     
-    class l_vector_it : public l_obj
+    class l_array_it : public l_obj
     {
-        l_vector*                       m_vector;
-        l_vector::l_pool_object_list_it m_iterator;
+        l_array*                       m_vector;
+        l_array::l_pool_object_list_it m_iterator;
         
         //mark event
         virtual void mark()
@@ -174,12 +174,12 @@ namespace l_language
         
     public:
         
-        l_vector_it(l_variable vector)
+        l_array_it(l_variable vector)
         {
             if( vector.m_type == l_variable::OBJECT )
             {
                 //get vector
-                m_vector = dynamic_cast< l_vector* >(vector.m_value.m_pobj);
+                m_vector = dynamic_cast< l_array* >(vector.m_value.m_pobj);
                 //if is a vector
                 if( m_vector )
                 {
@@ -192,7 +192,7 @@ namespace l_language
             assert(0);
         }
         
-        l_vector_it(l_vector* vector)
+        l_array_it(l_array* vector)
         {
             //save vector
             m_vector = vector;
@@ -200,51 +200,51 @@ namespace l_language
             m_iterator = m_vector->m_pool.begin();
         }
         
-        l_vector_it(const l_vector::l_pool_object_list_it& c_it)
+        l_array_it(const l_array::l_pool_object_list_it& c_it)
         {
             //get iterator
             m_iterator = c_it;
             assert(0);
         }
         
-        static l_variable gc_new(l_gc* gc,l_vector* vector)
+        static l_variable gc_new(l_gc* gc,l_array* vector)
         {
-            return  gc->new_obj< l_vector_it >(vector);
+            return  gc->new_obj< l_array_it >(vector);
         }
         
-        static l_variable gc_new(l_gc& gc,l_vector* vector)
+        static l_variable gc_new(l_gc& gc,l_array* vector)
         {
-            return  gc.new_obj< l_vector_it >(vector);
+            return  gc.new_obj< l_array_it >(vector);
         }
         
-        static l_variable gc_new(l_vm* vm,l_vector* vector)
+        static l_variable gc_new(l_vm* vm,l_array* vector)
         {
-            return  vm->get_gc().new_obj< l_vector_it >(vector);
+            return  vm->get_gc().new_obj< l_array_it >(vector);
         }
         
-        static l_variable gc_new(l_vm& vm,l_vector* vector)
+        static l_variable gc_new(l_vm& vm,l_array* vector)
         {
-            return  vm.get_gc().new_obj< l_vector_it >(vector);
+            return  vm.get_gc().new_obj< l_array_it >(vector);
         }
         
-        static l_variable gc_new(l_gc* gc,l_vector::l_pool_object_list_it c_it)
+        static l_variable gc_new(l_gc* gc,l_array::l_pool_object_list_it c_it)
         {
-            return  gc->new_obj< l_vector_it >(c_it);
+            return  gc->new_obj< l_array_it >(c_it);
         }
         
-        static l_variable gc_new(l_gc& gc,l_vector::l_pool_object_list_it c_it)
+        static l_variable gc_new(l_gc& gc,l_array::l_pool_object_list_it c_it)
         {
-            return  gc.new_obj< l_vector_it >(c_it);
+            return  gc.new_obj< l_array_it >(c_it);
         }
         
-        static l_variable gc_new(l_vm* vm,l_vector::l_pool_object_list_it c_it)
+        static l_variable gc_new(l_vm* vm,l_array::l_pool_object_list_it c_it)
         {
-            return  vm->get_gc().new_obj< l_vector_it >(c_it);
+            return  vm->get_gc().new_obj< l_array_it >(c_it);
         }
         
-        static l_variable gc_new(l_vm& vm,l_vector::l_pool_object_list_it c_it)
+        static l_variable gc_new(l_vm& vm,l_array::l_pool_object_list_it c_it)
         {
-            return  vm.get_gc().new_obj< l_vector_it >(c_it);
+            return  vm.get_gc().new_obj< l_array_it >(c_it);
         }
         
         l_variable get() const
@@ -254,7 +254,7 @@ namespace l_language
         
         l_variable get_id()
         {
-            l_vector::l_pool_object_list_it begin = m_vector->m_pool.begin();
+            l_array::l_pool_object_list_it begin = m_vector->m_pool.begin();
             auto difference = std::distance(begin,m_iterator);
             return l_variable((int)difference);
         }
@@ -267,7 +267,7 @@ namespace l_language
         l_variable next()
         {
             //next
-            return l_vector_it::gc_new(get_gc(),m_iterator+1);
+            return l_array_it::gc_new(get_gc(),m_iterator+1);
         }
         
         void self_next()
@@ -278,8 +278,8 @@ namespace l_language
     };
     
     //get iterator
-    inline l_variable l_vector::get_it()
+    inline l_variable l_array::get_it()
     {
-        return l_vector_it::gc_new(get_gc(), this);
+        return l_array_it::gc_new(get_gc(), this);
     }
 };

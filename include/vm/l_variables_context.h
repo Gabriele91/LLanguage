@@ -61,9 +61,15 @@ namespace l_language
                 if(m_constant_node)
                     switch (m_constant_node->m_const_type)
                     {
+                        case l_syntactic_tree::constant_node::CNULL:
+                            m_variable=l_variable();
+                        break;
+                        case l_syntactic_tree::constant_node::CBOOL:
+                            m_variable=l_variable(m_constant_node->m_value.m_bool);
+                        break;
                         case l_syntactic_tree::constant_node::INT:
                             m_variable=l_variable(m_constant_node->m_value.m_int);
-                            break;
+                        break;
                         case l_syntactic_tree::constant_node::FLOAT:
                             m_variable=l_variable(m_constant_node->m_value.m_float);
                         break;
@@ -160,6 +166,8 @@ namespace l_language
             //name
             switch (const_value->m_const_type)
             {
+                case l_syntactic_tree::constant_node::CNULL:  c_name = "null:null"; break;
+                case l_syntactic_tree::constant_node::CBOOL:  c_name = "bool:"+std::string(const_value->m_value.m_bool ? "true" : "false"); break;
                 case l_syntactic_tree::constant_node::FLOAT:  c_name = "float:"+std::to_string(const_value->m_value.m_float); break;
                 case l_syntactic_tree::constant_node::INT:    c_name = "int:"+std::to_string(const_value->m_value.m_int); break;
                 case l_syntactic_tree::constant_node::STRING: c_name = "string:"+const_value->m_value.m_string; break;
@@ -296,7 +304,11 @@ namespace l_language
             else if (exp_node->m_type == l_syntactic_tree::CONSTANT_NODE)
             {
                 l_syntactic_tree::constant_node* c_node = exp_node->to<l_syntactic_tree::constant_node>();
-                add_const_into_table(fun,c_node);
+                //is push k
+                if(c_node->is_push_k())
+                {
+                    add_const_into_table(fun,c_node);
+                }
             }
             else if (exp_node->m_type == l_syntactic_tree::FUNCTION_DEF_NODE)
             {

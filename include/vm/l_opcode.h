@@ -37,6 +37,9 @@ namespace l_language
         L_MOD,     // %
         L_UNM,     // -
         //Loads
+        L_PUSH_NULL,
+        L_PUSH_TRUE,
+        L_PUSH_FALSE,
         L_PUSHK,
         //Allocs
         L_NEW_ARRAY,//new array

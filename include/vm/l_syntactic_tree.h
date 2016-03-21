@@ -586,7 +586,9 @@ namespace l_language
 			//costant type
 			enum constant_type
 			{
-				INT,
+                CNULL,
+				CBOOL,
+                INT,
 				FLOAT,
 				STRING
 			};
@@ -597,6 +599,7 @@ namespace l_language
 				{
 					float m_float{ 0 };
 					int   m_int;
+                    bool  m_bool;
 				};
 				std::string m_string;
 			};
@@ -608,6 +611,15 @@ namespace l_language
 			{
 				m_type = CONSTANT_NODE;
 			};
+            //
+            bool is_push_null_or_true_or_false() const
+            {
+                return m_const_type == CNULL || m_const_type == CBOOL;
+            }
+            bool is_push_k() const
+            {
+                return m_const_type != CNULL && m_const_type != CBOOL;
+            }
 		};
 		//assignable
 		class assignable_node : public exp_node
@@ -857,16 +869,16 @@ namespace l_language
 			return node;
 		}
 
-		//constant
-		static constant_node* constant(int value, size_t line = 0, size_t ichar = 0)
-		{
-			auto* node = new constant_node;
-			node->m_value.m_int = value;
-			node->m_const_type = constant_node::constant_type::INT;
-			node->m_line = line;
-			node->m_char = ichar;
-			return node;
-		}
+        //constant
+        static constant_node* constant(int value, size_t line = 0, size_t ichar = 0)
+        {
+            auto* node = new constant_node;
+            node->m_value.m_int = value;
+            node->m_const_type = constant_node::constant_type::INT;
+            node->m_line = line;
+            node->m_char = ichar;
+            return node;
+        }
 		static constant_node* constant(float value, size_t line = 0, size_t ichar = 0)
 		{
 			auto* node = new constant_node;
@@ -896,7 +908,25 @@ namespace l_language
 			node->m_line        = line;
 			node->m_char        = ichar;
 			return node;
-		}
+        }
+        static constant_node* constant_null(size_t line = 0, size_t ichar = 0)
+        {
+            auto* node = new constant_node;
+            node->m_value.m_int = 0;
+            node->m_const_type = constant_node::constant_type::CNULL;
+            node->m_line = line;
+            node->m_char = ichar;
+            return node;
+        }
+        static constant_node* constant_bool(bool value,size_t line = 0, size_t ichar = 0)
+        {
+            auto* node = new constant_node;
+            node->m_value.m_bool = value;
+            node->m_const_type = constant_node::constant_type::CBOOL;
+            node->m_line = line;
+            node->m_char = ichar;
+            return node;
+        }
         
         //type
         static context_type_node* context_type(context_type_node::context_type type, size_t line = 0, size_t ichar = 0)

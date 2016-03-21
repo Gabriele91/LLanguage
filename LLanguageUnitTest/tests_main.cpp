@@ -9,7 +9,7 @@
 #include <fstream>
 #include <sstream>
 #include <l_program_language.h>
-#include <l_vector.h>
+#include <l_array.h>
 #include <l_lib_base.h>
 
 //errors vector
@@ -57,7 +57,7 @@ std::vector< std::string > s_tests_fails;
 
 inline bool test_array(l_language::l_variable& var,std::vector<l_language::l_variable>& validetor)
 {
-    auto* l_array = var.to<l_language::l_vector>();
+    auto* l_array = var.to<l_language::l_array>();
     //isn't array
     if(!l_array || l_array->size() != validetor.size()) return false;
     //else test values

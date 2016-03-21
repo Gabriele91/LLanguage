@@ -6,7 +6,7 @@
 //  Copyright © 2016 Gabriele Di Bari. All rights reserved.
 //
 #include <l_lib_base.h>
-#include <l_vector.h>
+#include <l_array.h>
 #include <cmath>
 int l_print(l_language::l_thread* th,int args)
 {
@@ -17,6 +17,8 @@ int l_print(l_language::l_thread* th,int args)
         //
         switch (var.m_type)
         {
+            case l_language::l_variable::LNULL: printf("null"); break;
+            case l_language::l_variable::LBOOL: printf("%s",var.m_value.m_b?"true":"false"); break;
             case l_language::l_variable::INT: printf("%d",var.m_value.m_i); break;
             case l_language::l_variable::FLOAT: printf("%g",var.m_value.m_f); break;
             case l_language::l_variable::STRING:
@@ -27,6 +29,10 @@ int l_print(l_language::l_thread* th,int args)
             case l_language::l_variable::FUNCTION:
             {
                 printf("function: %d",var.m_value.m_i);
+            }
+            case l_language::l_variable::CLOSER:
+            {
+                printf("closer: %p",(void*)var.m_value.m_pobj);
             }
             break;
             case l_language::l_variable::CFUNCTION:
@@ -147,13 +153,13 @@ int l_range(l_language::l_thread* th,int args)
         default: return -1; break;
     }
     //alloc
-    l_language::l_variable array = l_language::l_vector::gc_new(th->get_gc());
+    l_language::l_variable array = l_language::l_array::gc_new(th->get_gc());
     //add values
     for(int value  = start;
             value != stop;
             value += step)
     {
-        array.to<l_language::l_vector>()->push({ value });
+        array.to<l_language::l_array>()->push({ value });
     }
     //return
     th->push_return(array);
@@ -189,12 +195,17 @@ int l_type_of(l_language::l_thread* th,int args)
     //
     switch (type)
     {
-        case l_language::l_variable::INT: str="INT"; break;
-        case l_language::l_variable::FLOAT: str="FLOAT"; break;
-        case l_language::l_variable::STRING: str="STRING"; break;
-        case l_language::l_variable::FUNCTION: str="FUNCTION"; break;
-        case l_language::l_variable::CFUNCTION: str="CFUNCTION"; break;
-        case l_language::l_variable::OBJECT: str = "OBJECT"; break;
+        case l_language::l_variable::LNULL:     str ="null";     break;
+        case l_language::l_variable::LBOOL:     str ="bool";     break;
+        case l_language::l_variable::INT:       str ="int";      break;
+        case l_language::l_variable::FLOAT:     str ="float";    break;
+        case l_language::l_variable::STRING:    str ="string";   break;
+        case l_language::l_variable::FUNCTION:  str ="function"; break;
+        case l_language::l_variable::CFUNCTION: str ="cfunction";break;
+        case l_language::l_variable::ARRAY:     str ="array";    break;
+        case l_language::l_variable::TABLE:     str ="table";    break;
+        case l_language::l_variable::OBJECT:    str ="object";   break;
+        case l_language::l_variable::COBJECT:   str ="cobject";  break;
         default: assert(0); break;
     }
     //push type

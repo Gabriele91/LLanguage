@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <l_vm.h>
 #include <l_gc.h>
-#include <l_vector.h>
+#include <l_array.h>
 #include <l_table.h>
 #include <iostream>
 
@@ -175,14 +175,17 @@ namespace l_language
                     }
                     break;
                     
-                case L_PUSH:     push( stack(cmp.m_arg) ); break;
-                case L_PUSHK:    push( vconst(cmp.m_arg) ); break;
+                case L_PUSH:          push( stack(cmp.m_arg) );  break;
+                case L_PUSH_NULL:     push( l_variable() );      break;
+                case L_PUSH_TRUE:     push( l_variable(true) );  break;
+                case L_PUSH_FALSE:    push( l_variable(false) ); break;
+                case L_PUSHK:         push( vconst(cmp.m_arg) ); break;
                 case L_CLOSER:
                 {
                     //get value
                     l_variable& call_fun = vconst(cmp.m_arg);
                     //...
-                    if(call_fun.m_type == l_variable::FUNCTION)
+                    if(call_fun.is_function())
                     {
                      
                         //new context
@@ -294,14 +297,14 @@ namespace l_language
                 ////////////////////////////////////////////////////////////
                 case L_NEW_ARRAY:
                 {
-                    register3(0) = l_vector::gc_new(get_gc());
+                    register3(0) = l_array::gc_new(get_gc());
                     //init ?
                     if( cmp.m_arg > 0 )
                     {
                         //get object
                         l_obj* this_obj = (l_obj*)register3(0).m_value.m_pobj;
                         //types
-                        l_vector* vector = dynamic_cast< l_vector* > ( this_obj );
+                        l_array* vector = dynamic_cast< l_array* > ( this_obj );
                         //put stack into vector
                         for(int i = cmp.m_arg-1; i >= 0; --i)
                         {
@@ -346,28 +349,28 @@ namespace l_language
                     const l_variable& r_b = stack(1);
                     const l_variable& r_c = stack(0);
                     //try
-                    if ( r_b.m_type == l_variable::type::OBJECT )
+                    if ( r_b.is_object() )
                     {
                         //get object
                         l_obj* this_obj = (l_obj*)r_b.m_value.m_pobj;
-                        //types
-                        l_vector* vector = dynamic_cast< l_vector* > ( this_obj );
-                        //types
-                        l_table* table = dynamic_cast< l_table* > ( this_obj );
                         //is a vector
-                        if(vector)
+                        if(r_b.is_array())
                         {
+                            //types
+                            l_array* vector = dynamic_cast< l_array* > ( this_obj );
                             //to size int
                             size_t index = 0;
                             //cast
-                            if( r_c.m_type == l_variable::INT )  index= (size_t)r_c.m_value.m_i;
-                            else if( r_c.m_type == l_variable::FLOAT )index= (size_t)r_c.m_value.m_f;
+                                 if( r_c.is_int() )  index= (size_t)r_c.m_value.m_i;
+                            else if( r_c.is_float() )index= (size_t)r_c.m_value.m_f;
                             else raise( "value isn't a valid key" );
                             //get
                             stack(1) = vector->operator[](index) ;
                         }
-                        else if(table)
+                        else if(r_b.is_table())
                         {
+                            //types
+                            l_table* table = dynamic_cast< l_table* > ( this_obj );
                             //is a string?
                             if(!r_c.is_string()) raise( "value isn't a valid key" );
                             //get and pop value
@@ -380,7 +383,7 @@ namespace l_language
                     }
                     else
                     {
-                        stack(1) = l_variable();
+                        raise( "value isn't a vector/table/object" );
                     }
                     //pop index
                     pop();
@@ -393,28 +396,28 @@ namespace l_language
                     //get index
                     const l_variable& r_b = stack(1);
                     //try
-                    if ( r_a.m_type == l_variable::type::OBJECT )
+                    if ( r_a.is_object() )
                     {
                         //get object
                         l_obj* this_obj = (l_obj*)r_a.m_value.m_pobj;
-                        //types
-                        l_vector* vector = dynamic_cast< l_vector* > ( this_obj );
-                        //types
-                        l_table* table = dynamic_cast< l_table* > ( this_obj );
                         //is a vector
-                        if(vector)
+                        if(r_a.is_array())
                         {
+                            //types
+                            l_array* vector = dynamic_cast< l_array* > ( this_obj );
                             //to size int
                             size_t index = 0;
                             //cast
-                                 if( r_b.m_type == l_variable::INT )  index= (size_t)r_b.m_value.m_i;
-                            else if( r_b.m_type == l_variable::FLOAT )index= (size_t)r_b.m_value.m_f;
+                                 if( r_b.is_int()   ) index= (size_t)r_b.m_value.m_i;
+                            else if( r_b.is_float() ) index= (size_t)r_b.m_value.m_f;
                             else raise( "value isn't a valid key" );
                             //get and pop value
                             vector->operator[](index) = pop();
                         }
-                        else if(table)
+                        else if(r_a.is_table())
                         {
+                            //types
+                            l_table* table = dynamic_cast< l_table* > ( this_obj );
                             //is a string?
                             if(!r_b.is_string()) raise( "value isn't a valid key" );
                             //get and pop value
@@ -443,24 +446,24 @@ namespace l_language
                     l_variable& r_a = top();
                     //..
                     //try
-                    if ( r_a.m_type == l_variable::type::OBJECT )
+                    if ( r_a.is_object() )
                     {
                         //get object
                         l_obj* this_obj = (l_obj*)r_a.m_value.m_pobj;
-                        //types
-                        l_vector* vector = dynamic_cast< l_vector* > ( this_obj );
-                        //types
-                        l_table* table = dynamic_cast< l_table* > ( this_obj );
                         //is a vector
-                        if(vector)
+                        if(r_a.is_array())
                         {
+                            //types
+                            l_array* vector = dynamic_cast< l_array* > ( this_obj );
                             //pop value
                             pop();
                             //push it
                             push( vector->get_it() );
                         }
-                        else if (table)
+                        else if (r_a.is_table())
                         {
+                            //types
+                            l_table* table = dynamic_cast< l_table* > ( this_obj );
                             //pop value
                             pop();
                             //push it
@@ -487,12 +490,12 @@ namespace l_language
                     //get index
                     l_variable& r_it = top();
                     //try
-                    if ( r_it.m_type == l_variable::type::OBJECT )
+                    if ( r_it.is_object() )
                     {
                         //get object
                         l_obj* this_obj = (l_obj*)r_it.m_value.m_pobj;
                         //types
-                        l_vector_it* a_it = dynamic_cast< l_vector_it* > ( this_obj );
+                        l_array_it* a_it = dynamic_cast< l_array_it* > ( this_obj );
                         //types
                         l_table_it* t_it = dynamic_cast< l_table_it* > ( this_obj );
                         //is array it
@@ -575,7 +578,7 @@ namespace l_language
                     //get index
                     register3(0) = pop();
                     //get args
-                    if(register3(0).m_type == l_variable::CFUNCTION)
+                    if( register3(0).is_cfunction() )
                     {
                         //return size
                         int n_return = register3(0).m_value.m_pcfun(this,cmp.m_arg);
@@ -598,7 +601,7 @@ namespace l_language
                         //if return
                         if(n_return) push(register3(2));
                     }
-                    else if(register3(0).m_type == l_variable::OBJECT)
+                    else if( register3(0).is_closer() )
                     {
                         //get context
                         l_closer* closer = register3(0).to<l_closer>();

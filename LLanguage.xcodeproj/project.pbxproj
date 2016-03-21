@@ -27,6 +27,8 @@
 		E078AA321C88CCC000131C43 /* l_function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0DBF2E31C678A4E00F9DA98 /* l_function.cpp */; };
 		E078AA331C88CCC000131C43 /* l_table.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0DBF2E51C679C0F00F9DA98 /* l_table.cpp */; };
 		E078AA341C88CCC000131C43 /* l_call_context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0F605F81C72299D00D5B90B /* l_call_context.cpp */; };
+		E07F58591C9DDCC000C5BF71 /* l_variable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E07F58581C9DDCC000C5BF71 /* l_variable.cpp */; };
+		E07F585A1C9DDCC400C5BF71 /* l_variable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E07F58581C9DDCC000C5BF71 /* l_variable.cpp */; };
 		E0950C7E1C4AC50400845FEE /* l_gc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0950C7D1C4AC50400845FEE /* l_gc.cpp */; };
 		E09599381C676A8900BF39F8 /* l_opcode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E09599371C676A8900BF39F8 /* l_opcode.cpp */; };
 		E0DBF2E41C678A4E00F9DA98 /* l_function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0DBF2E31C678A4E00F9DA98 /* l_function.cpp */; };
@@ -69,9 +71,10 @@
 		E078AA231C88CCB400131C43 /* LLanguageLib.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LLanguageLib.hpp; sourceTree = "<group>"; };
 		E078AA251C88CCB400131C43 /* LLanguageLibPriv.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LLanguageLibPriv.hpp; sourceTree = "<group>"; };
 		E078AA271C88CCB400131C43 /* LLanguageLib.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LLanguageLib.cpp; sourceTree = "<group>"; };
+		E07F58581C9DDCC000C5BF71 /* l_variable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_variable.cpp; sourceTree = "<group>"; };
 		E0891CC71C5A62AD00FB37F6 /* l_variable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = l_variable.h; path = vm/l_variable.h; sourceTree = "<group>"; };
 		E0950C761C4A871700845FEE /* l_vm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = l_vm.h; path = vm/l_vm.h; sourceTree = "<group>"; };
-		E0950C771C4A877800845FEE /* l_vector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_vector.h; path = vm/l_vector.h; sourceTree = "<group>"; };
+		E0950C771C4A877800845FEE /* l_array.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_array.h; path = vm/l_array.h; sourceTree = "<group>"; };
 		E0950C781C4A87E800845FEE /* l_gc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_gc.h; path = vm/l_gc.h; sourceTree = "<group>"; };
 		E0950C7D1C4AC50400845FEE /* l_gc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_gc.cpp; sourceTree = "<group>"; };
 		E0950C7F1C4AC58800845FEE /* l_object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_object.h; path = vm/l_object.h; sourceTree = "<group>"; };
@@ -183,7 +186,7 @@
 				E0A4DAA81C692D15007D5089 /* l_call_context.h */,
 				E09599361C676A5800BF39F8 /* l_opcode.h */,
 				E0950C761C4A871700845FEE /* l_vm.h */,
-				E0950C771C4A877800845FEE /* l_vector.h */,
+				E0950C771C4A877800845FEE /* l_array.h */,
 				E0950C781C4A87E800845FEE /* l_gc.h */,
 				E0950C7F1C4AC58800845FEE /* l_object.h */,
 				E05F4B4A1C57F52400F7EB6A /* l_string.h */,
@@ -206,6 +209,7 @@
 				E0DBF2E51C679C0F00F9DA98 /* l_table.cpp */,
 				E0F605F81C72299D00D5B90B /* l_call_context.cpp */,
 				E01317AC1C92C28E00477C6A /* l_parser.cpp */,
+				E07F58581C9DDCC000C5BF71 /* l_variable.cpp */,
 			);
 			path = vm;
 			sourceTree = "<group>";
@@ -325,6 +329,7 @@
 				E05F4B4E1C58985500F7EB6A /* l_lib_base.cpp in Sources */,
 				E0DBF2E61C679C0F00F9DA98 /* l_table.cpp in Sources */,
 				E0DBF2E41C678A4E00F9DA98 /* l_function.cpp in Sources */,
+				E07F58591C9DDCC000C5BF71 /* l_variable.cpp in Sources */,
 				E078AA1C1C88CC3700131C43 /* main.cpp in Sources */,
 				E05F4B511C589BB600F7EB6A /* l_compiler_utilities.cpp in Sources */,
 				E0950C7E1C4AC50400845FEE /* l_gc.cpp in Sources */,
@@ -343,6 +348,7 @@
 				E078AA341C88CCC000131C43 /* l_call_context.cpp in Sources */,
 				E078AA2F1C88CCC000131C43 /* l_string.cpp in Sources */,
 				E078AA2D1C88CCC000131C43 /* l_gc.cpp in Sources */,
+				E07F585A1C9DDCC400C5BF71 /* l_variable.cpp in Sources */,
 				E078AA2E1C88CCC000131C43 /* l_vm.cpp in Sources */,
 				E078AA331C88CCC000131C43 /* l_table.cpp in Sources */,
 				E078AA311C88CCC000131C43 /* l_opcode.cpp in Sources */,
