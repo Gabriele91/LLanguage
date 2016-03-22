@@ -6,7 +6,7 @@
 #include <l_lib_base.h>
 #define STR_VERSION_MAJOR "0"
 #define STR_VERSION_MINOR "4"
-#define STR_VERSION_MAINTENANCE "0"
+#define STR_VERSION_MAINTENANCE "1"
 
 
 

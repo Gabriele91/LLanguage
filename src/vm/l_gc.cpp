@@ -22,7 +22,6 @@ namespace  l_language
     {
         m_max_size = max_alloc;
     }
-
     //execute garbage collector
     void  l_gc::delete_garbage()
     {
@@ -49,17 +48,15 @@ namespace  l_language
                     (unsigned)it->m_id);
                  //if is a vector?
                  l_array*  vector = dynamic_cast< l_array* >(it->m_obj);
+                 l_table*  table  = dynamic_cast< l_table* >(it->m_obj);
                  //if is a vector?
                  l_array_it*  vector_it = dynamic_cast< l_array_it* >(it->m_obj);
+                 l_table_it*  table_it  = dynamic_cast< l_table_it* >(it->m_obj);
                  //print vector
-                 if(vector)
-                 {
-                     printf("vector[%u]\n", (unsigned)vector->size());
-                 }
-                 if(vector_it)
-                 {
-                     printf("vector_it\n");
-                 }
+                      if(vector)    printf("array[%u]\n", (unsigned)vector->size());
+                 else if(table)     printf("table[%u]\n", (unsigned)table->size());
+                 else if(vector_it) printf("array it\n");
+                 else if(table_it)  printf("table it\n");
             )
             free(it);
         }
