@@ -2,11 +2,11 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <l_program_language.h>
+#include <l_vm.h>
 #include <l_lib_base.h>
 #define STR_VERSION_MAJOR "0"
 #define STR_VERSION_MINOR "4"
-#define STR_VERSION_MAINTENANCE "1"
+#define STR_VERSION_MAINTENANCE "3"
 
 
 
@@ -15,9 +15,9 @@
 int main(int argc,const char* args[])
 {
     //fast access
-    using program_language = l_language::l_program_language;
-    using compiler_flags   = l_language::l_program_language::compiler_flags;
-    using compiler_ouput   = l_language::l_program_language::compiler_ouput;
+    using l_vmachine       = l_language::l_vm;
+    using compiler_flags   = l_language::l_vm::compiler_flags;
+    using compiler_ouput   = l_language::l_vm::compiler_ouput;
     //bad case
     if(argc <= 1)
     {
@@ -98,7 +98,7 @@ int main(int argc,const char* args[])
     //COMPILER
     {
         //compiler object
-        program_language it_compiler;
+        l_vmachine it_compiler;
         //add libs
 		it_compiler.add_lib("std", l_language::l_base_lib);
         //read code // "source.it"
@@ -106,10 +106,10 @@ int main(int argc,const char* args[])
         std::string source((std::istreambuf_iterator<char>(source_file)),
                            (std::istreambuf_iterator<char>()));
         //compile
-        program_language::compiler_ouput compiler_ouput;
+        l_language::l_vm::compiler_ouput compiler_ouput;
         compiler_ouput = it_compiler.compile(source,f_compier_flags);
         //ouput:
-        if(compiler_ouput.m_type & program_language::ERRORS)
+        if(compiler_ouput.m_type & l_language::l_vm::ERRORS)
         {
             std::cout << compiler_ouput.m_errors;
         }

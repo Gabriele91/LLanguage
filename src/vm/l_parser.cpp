@@ -36,12 +36,13 @@ namespace l_language
         return str_keywords;
     }
     
+    
     const char* l_parser::get_keyword(keyword key)
     {
         return get_keywords()[key];
     }
     
-    bool l_parser::is_keyword(const char* ptr)
+    bool l_parser::is_a_keyword(const char* ptr)
     {
         for(const char** keyword = get_keywords(); *keyword; ++keyword)
         {
@@ -51,6 +52,12 @@ namespace l_language
             }
         }
         return false;
+    }
+    bool l_parser::is_a_value_keyword(const char* ptr)
+    {
+        return KEYWORDCMP(ptr, NULL) ||
+               KEYWORDCMP(ptr, TRUE) ||
+               KEYWORDCMP(ptr, FALSE) ;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //put variable

@@ -6,9 +6,9 @@
 //  Copyright © 2016 Gabriele Di Bari. All rights reserved.
 //
 #pragma once
-#include <l_program_language.h>
+#include <l_vm.h>
 
 namespace l_language
 {
-    extern l_program_language::l_extern_libary l_base_lib;
+    extern l_vm::l_extern_libary l_base_lib;
 };

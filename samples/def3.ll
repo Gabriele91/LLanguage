@@ -1,3 +1,15 @@
+std.using("std")
+
+function fun(x,y)
+{
+    return x*y
+}
+
+y = 1
+x = eval("return fun(y,9)")
+println(x)
+println(":)")
+
 
 x = def fib ( n )
 {

@@ -251,9 +251,21 @@ int l_system(l_language::l_thread* th, int args)
 	return 0;
 }
 
+int l_eval(l_language::l_thread* th, int args)
+{
+    //get variable
+    auto& command = th->value(0);
+    //isn't a string?
+    if (!command.is_string()) return -1;
+    //else execute
+    th->push_return(th->get_vm()->eval(command.to_string().c_str()));
+    //number of ret values
+    return 1;
+}
+
 namespace l_language
 {
-    l_language::l_program_language::l_extern_libary l_base_lib=
+    l_language::l_vm::l_extern_libary l_base_lib=
     {
         { "get_global", l_get_global    },
         { "print",      l_print         },
@@ -266,6 +278,7 @@ namespace l_language
         { "mod",        l_mod           },
         { "using",      l_using         },
         { "range",      l_range         },
-		{ "system",     l_system        }
+        { "system",     l_system        },
+        { "eval",       l_eval          }
     };
 }

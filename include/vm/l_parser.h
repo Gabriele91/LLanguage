@@ -171,7 +171,12 @@ namespace l_language
         };
         static const char** get_keywords();
         static const char* get_keyword(keyword key);
-        bool is_keyword(const char* ptr);
+        bool is_a_keyword(const char* ptr);
+        bool is_a_value_keyword(const char* ptr);
+        bool is_a_keyword_but_not_value(const char* ptr)
+        {
+            return !is_a_value_keyword(ptr) && is_a_keyword(ptr);
+        }
         ///////////////////////////////////////////////////////////////////////////////////////////////
 		//static types
         static bool is_line_space(char c);
@@ -1620,8 +1625,8 @@ namespace l_language
             //skip
             skip_space_end_comment(ptr);
             //is void return?
-            bool void_return = CSTRCMP(ptr, "}")     ||
-                               is_keyword(ptr)       ||
+            bool void_return = CSTRCMP(ptr, "}")               ||
+                               is_a_keyword_but_not_value(ptr) ||
                                is_operation_slow(ptr,true);
             //alloc and init
             return_node = l_syntactic_tree::return_value(nullptr,m_line);

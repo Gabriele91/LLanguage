@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <l_program_language.h>
+#include <l_vm.h>
 #include <l_array.h>
 #include <l_lib_base.h>
 
@@ -25,7 +25,8 @@ std::vector< std::string > s_tests_fails;
         __VA_ARGS__ \
     };\
     l_language::l_variable r_test(return_test);\
-    l_language::l_variable result = it_compiler.pcall(#fun, args );\
+    l_language::l_variable result;\
+    it_compiler.pcall(result, #fun, args );\
     if((result==r_test).is_false()){ s_tests_fails.push_back( std::string(name) ); }\
     else{ ++s_count_success; }\
 }
@@ -37,7 +38,8 @@ std::vector< std::string > s_tests_fails;
     {\
     __VA_ARGS__ \
     };\
-    l_language::l_variable result = it_compiler.pcall(#fun, args );\
+    l_language::l_variable result;\
+    it_compiler.pcall(result, #fun, args );\
     if(result.m_type != l_language::l_variable::type){ s_tests_fails.push_back( std::string(name) ); }\
     else{ ++s_count_success; }\
 }
@@ -49,7 +51,8 @@ std::vector< std::string > s_tests_fails;
     {\
     __VA_ARGS__ \
     };\
-    l_language::l_variable result = it_compiler.pcall(#fun, args );\
+    l_language::l_variable result;\
+    it_compiler.pcall(result, #fun, args );\
     if(!test_array(result,return_test)){ s_tests_fails.push_back( std::string(name) ); }\
     else{ ++s_count_success; }\
 }
@@ -80,8 +83,8 @@ inline int gauss(int rand)
 int main()
 {
     //fast access
-    using program_language = l_language::l_program_language;
-    using compiler_flags   = l_language::l_program_language::compiler_flags;
+    using program_language = l_language::l_vm;
+    using compiler_flags   = l_language::l_vm::compiler_flags;
     //source file
     std::string i_source        = "scripts/function.ll";
     int         f_compier_flags = compiler_flags::EXECUTE;
@@ -161,9 +164,9 @@ int main()
     {
         1.2f,
         3,
-        l_language::l_string::const_new(it_compiler.get_vm(), "hello"),
-        l_language::l_string::const_new(it_compiler.get_vm(), "l"),
-        l_language::l_string::const_new(it_compiler.get_vm(), "language")
+        l_language::l_string::const_new(it_compiler.get_gc(), "hello"),
+        l_language::l_string::const_new(it_compiler.get_gc(), "l"),
+        l_language::l_string::const_new(it_compiler.get_gc(), "language")
     };
     
     TEST_ARRAY("generic test array",  // test name
