@@ -65,7 +65,7 @@ def for_in_test
 def for_range_1_rand(len)
 {
     sum = 0
-    for ( x of std.range(len) )
+    for ( x of range(len) )
     {
         sum += x
     }
@@ -75,7 +75,7 @@ def for_range_1_rand(len)
 def for_range_2_rand(start,len)
 {
     sum = 0
-    for x of std.range(start,len)
+    for x of range(start,len)
     {
         sum += x
     }
@@ -84,7 +84,7 @@ def for_range_2_rand(start,len)
 
 def range_3(start,len, step)
 {
-    return std.range(start,len, step)
+    return range(start,len, step)
 }
 
 def for_c_like

@@ -1,4 +1,4 @@
-std.using("std")
+using("io")
 
 function fun(x,y)
 {
@@ -10,7 +10,6 @@ x = eval("return fun(y,9)")
 println(x)
 println(":)")
 
-
 x = def fib ( n )
 {
     if n <= 1 { return 1 }
@@ -18,15 +17,15 @@ x = def fib ( n )
 } (5)
 
 
-std.println(x,"\t",std.type_of(x))
+println(x,"\t",type_of(x))
 
-std.println(null, " ",true, " ",false)
+println(null, " ",true, " ",false)
 
 l =  def { return [9]  } ( )[0] + 1
-std.println(l)
+println(l)
 
 val = "cal"
-std.println(std.type_of(true && val == "val"))
+println(type_of(true && val == "val"))
 
 def c
 {
@@ -34,16 +33,16 @@ def c
 }
 
 l = c()[0]
-std.println(l)
+println(l)
 
 
 s = (def  { return [2,3,4] }) () [0]  + 1
-std.println(s)
+println(s)
 
 r = 1
 n = 2
 c = def (x) { return x*(r+n) }
-std.println(c(4))
+println(c(4))
 
 
 s = 0
@@ -53,7 +52,7 @@ def spp
 }
 spp()
 spp()
-std.println(s)
+println(s)
 
 def some_objects ()
 {
@@ -62,7 +61,7 @@ def some_objects ()
         "name" : "none",
         "print_name" : def
         {
-            std.println(std.to_string(this.name))
+            println(to_string(this.name))
         },
         "set_name" : def ( name )
         {

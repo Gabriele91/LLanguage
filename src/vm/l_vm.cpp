@@ -132,6 +132,8 @@ namespace l_language
                     {
                         output.m_errors += std::to_string( error.m_line ) + ":" + error.m_error + "\n";
                     }
+                    //fail
+                    output.m_type = ERRORS;
                 }
         }
         //return...

@@ -10,7 +10,9 @@
 #include <sstream>
 #include <l_vm.h>
 #include <l_array.h>
-#include <l_lib_base.h>
+#include <l_os_lib.h>
+#include <l_io_lib.h>
+#include <l_base_lib.h>
 
 //errors vector
 size_t                     s_count_test    = 0;
@@ -91,7 +93,9 @@ int main()
     //compiler object
     program_language it_compiler;
     //add libs
-    it_compiler.add_lib("std", l_language::l_base_lib);
+    it_compiler.add_lib(l_language::l_base_lib);
+    it_compiler.add_lib("io", l_language::l_io_lib);
+    it_compiler.add_lib("os", l_language::l_os_lib);
     //read code // "source.it"
     std::ifstream source_file(i_source);
     std::string source((std::istreambuf_iterator<char>(source_file)),

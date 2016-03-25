@@ -3,7 +3,9 @@
 #include <fstream>
 #include <sstream>
 #include <l_vm.h>
-#include <l_lib_base.h>
+#include <l_base_lib.h>
+#include <l_io_lib.h>
+#include <l_os_lib.h>
 #define STR_VERSION_MAJOR "0"
 #define STR_VERSION_MINOR "4"
 #define STR_VERSION_MAINTENANCE "3"
@@ -100,7 +102,9 @@ int main(int argc,const char* args[])
         //compiler object
         l_vmachine it_compiler;
         //add libs
-		it_compiler.add_lib("std", l_language::l_base_lib);
+        it_compiler.add_lib(l_language::l_base_lib);
+        it_compiler.add_lib("io",l_language::l_io_lib);
+        it_compiler.add_lib("os",l_language::l_os_lib);
         //read code // "source.it"
         std::ifstream source_file(i_source);
         std::string source((std::istreambuf_iterator<char>(source_file)),

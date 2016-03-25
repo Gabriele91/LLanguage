@@ -1,74 +1,14 @@
 //
-//  l_lib_base.cpp
+//  l_base_lib.cpp
 //  LLanguage
 //
 //  Created by Gabriele on 27/01/16.
 //  Copyright © 2016 Gabriele Di Bari. All rights reserved.
 //
-#include <l_lib_base.h>
+#include <l_base_lib.h>
 #include <l_array.h>
 #include <cmath>
-int l_print(l_language::l_thread* th,int args)
-{
-    for(size_t i=0; i!=args; ++i)
-    {
-        //
-        const l_language::l_variable& var = th->value(i);
-        //
-        switch (var.m_type)
-        {
-            case l_language::l_variable::LNULL: printf("null"); break;
-            case l_language::l_variable::LBOOL: printf("%s",var.m_value.m_b?"true":"false"); break;
-            case l_language::l_variable::INT: printf("%d",var.m_value.m_i); break;
-            case l_language::l_variable::FLOAT: printf("%g",var.m_value.m_f); break;
-            case l_language::l_variable::STRING:
-            {
-                printf("%s",var.string()->c_str());
-            }
-            break;
-            case l_language::l_variable::FUNCTION:
-            {
-                printf("function: %d",var.m_value.m_i);
-            }
-            case l_language::l_variable::CLOSER:
-            {
-                printf("closer: %p",(void*)var.m_value.m_pobj);
-            }
-            break;
-            case l_language::l_variable::CFUNCTION:
-            {
-                printf("cfuncrion: %p",(void*)var.m_value.m_pcfun);
-            }
-            break;
-            case l_language::l_variable::OBJECT:
-            {
-                printf("object: %p",(void*)var.m_value.m_pobj);
-            }
-            break;
-            default: break;
-        }
-    }
-    //number of return
-    return 0;
-}
 
-int l_println(l_language::l_thread* th,int args)
-{
-    int output = l_print(th, args);
-    printf("\n");
-    return output;
-}
-
-int l_input(l_language::l_thread* th,int args)
-{
-    //str
-    std::string str;
-    std::cin >> str;
-    //push string
-    th->push_return(l_language::l_string::gc_new(th->m_vm->get_gc(), str));
-    //return
-    return 1;
-}
 
 int l_to_int(l_language::l_thread* th,int args)
 {
@@ -79,6 +19,8 @@ int l_to_int(l_language::l_thread* th,int args)
     //cast
     switch (var.m_type)
     {
+        case l_language::l_variable::LNULL: i = 0; break;
+        case l_language::l_variable::LBOOL: i = var.m_value.m_b ? 1 : 0; break;
         case l_language::l_variable::INT: i = var.m_value.m_i; break;
         case l_language::l_variable::FLOAT: i = (int)var.m_value.m_f; break;
         case l_language::l_variable::STRING: i = std::atoi(var.string()->c_str()); break;
@@ -99,39 +41,18 @@ int l_to_float(l_language::l_thread* th,int args)
     //cast
     switch (var.m_type)
     {
+        case l_language::l_variable::LNULL: f = 0.0f; break;
+        case l_language::l_variable::LBOOL: f = var.m_value.m_b ? 1.0 : 0.0; break;
         case l_language::l_variable::INT: f = (float)var.m_value.m_i; break;
         case l_language::l_variable::FLOAT: f = var.m_value.m_f; break;
         case l_language::l_variable::STRING: f = (float)std::atof(var.string()->c_str()); break;
-        default: assert(0); break;
+        default: return -1; break;
     }
     //push string
     th->push_return(l_language::l_variable(f));
     //return
     return 1;
 }
-
-int l_mod(l_language::l_thread* th,int args)
-{
-    //get arg
-    l_language::l_variable& var       = th->value(0);
-    l_language::l_variable& var_right = th->value(1);
-    //cases
-    if(var.is_float() || var_right.is_float())
-    {
-        th->push_return(l_language::l_variable(std::fmod(var.to_float(),var_right.to_float())));
-    }
-    else if(var.is_int() && var_right.is_int())
-    {
-        th->push_return(l_language::l_variable(var.to_int() % var_right.to_int()));
-    }
-    else
-    {
-        th->push_return(l_language::l_variable(0));
-    }
-    //return
-    return 1;
-}
-
 
 int l_range(l_language::l_thread* th,int args)
 {
@@ -176,10 +97,12 @@ int l_to_string(l_language::l_thread* th,int args)
     //cast
     switch (var.m_type)
     {
+        case l_language::l_variable::LNULL: str = "null"; break;
+        case l_language::l_variable::LBOOL: str = var.m_value.m_b ? "true" : "false"; break;
         case l_language::l_variable::INT: str = std::to_string(var.m_value.m_i); break;
         case l_language::l_variable::FLOAT: str = std::to_string(var.m_value.m_f); break;
         case l_language::l_variable::STRING: str = var.string()->c_str(); break;
-        default: assert(0); break;
+        default: return -1; break;
     }
     //push string
     th->push_return(l_language::l_string::gc_new(th->m_vm->get_gc(), str));
@@ -239,17 +162,6 @@ int l_using(l_language::l_thread* th, int args)
 	return 0;
 }
 
-int l_system(l_language::l_thread* th, int args)
-{
-	//get variable
-	auto& command = th->value(0);
-	//isn't a string?
-	if (!command.is_string()) return -1;
-	//else execute
-	system(command.to_string().c_str());
-	//number of ret values
-	return 0;
-}
 
 int l_eval(l_language::l_thread* th, int args)
 {
@@ -268,17 +180,12 @@ namespace l_language
     l_language::l_vm::l_extern_libary l_base_lib=
     {
         { "get_global", l_get_global    },
-        { "print",      l_print         },
-        { "println",    l_println       },
-        { "input",      l_input         },
         { "to_int",     l_to_int        },
         { "to_float",   l_to_float      },
         { "to_string",  l_to_string     },
         { "type_of",    l_type_of       },
-        { "mod",        l_mod           },
         { "using",      l_using         },
         { "range",      l_range         },
-        { "system",     l_system        },
         { "eval",       l_eval          }
     };
 }
