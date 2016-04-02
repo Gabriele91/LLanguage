@@ -54,12 +54,14 @@ namespace l_language
         "GET_LOCAL",
         "GET_GLOBAL",
         "GET_AT_VAL",
-        
+        "GET_THIS",
         //Set
         "SET_UP_VALUE",
         "SET_LOCAL",
         "SET_GLOBAL",
         "SET_AT_VAL",
+        "SET_THIS",
+        "SET_THIS_NPOP",
         
         //for
         

@@ -36,6 +36,10 @@ namespace l_language
         {
             return m_commands[i];
         }
+        l_command& last_command()
+        {
+            return m_commands.back();
+        }
         //push costant
         size_t push_costant(const l_variable& costants)
         {

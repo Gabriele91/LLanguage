@@ -24,7 +24,9 @@ namespace l_language
         }
         else
         {
-            if(is_upper_value(fun,node))
+            if(node->m_name == "this")
+                fun->push({ L_SET_THIS, 0, node->m_line });
+            else if(is_upper_value(fun,node))
                 fun->push({ L_SET_UP_VALUE, get_var_id(fun, node), node->m_line });
             else if(is_global_value(fun,node))
                 fun->push({ L_SET_GLOBAL, get_var_id(fun, node), node->m_line });
@@ -43,7 +45,9 @@ namespace l_language
         }
         else
         {
-            if(is_upper_value(fun,node))
+            if(node->m_name == "this")
+                fun->push({ L_GET_THIS, 0, node->m_line });
+            else if(is_upper_value(fun,node))
                 fun->push({ L_GET_UP_VALUE, get_var_id(fun, node), node->m_line });
             else if(is_global_value(fun,node))
                 fun->push({ L_GET_GLOBAL, get_var_id(fun, node), node->m_line });
@@ -273,7 +277,7 @@ namespace l_language
                 fun->push({ opcode, 0, node->m_line });
             }
             //set var
-            compile_variable_set(fun,node->m_assignable->to<l_syntactic_tree::variable_node>());
+            return compile_variable_set(fun,node->m_assignable->to<l_syntactic_tree::variable_node>());
         }
         else
         {
@@ -446,8 +450,21 @@ namespace l_language
         {
             compile_exp(fun, *it);
         }
-        //push call
-        compile_assignable_exp_get(fun,call_node->m_exp_to_call);
+        //is this call?
+        if(call_node->m_exp_to_call->m_type == l_syntactic_tree::FIELD_NODE)
+        {
+            //get call name
+            compile_assignable_exp_set(fun,call_node->m_exp_to_call);
+            //set this
+            fun->push({ L_SET_THIS_NPOP, 1 /* jmp key */, call_node->m_exp_to_call->m_line });
+            //push call
+            fun->push({ L_GET_AT_VAL,    0 /* from key */, call_node->m_exp_to_call->m_line });
+        }
+        else
+        {
+            //push call
+            compile_assignable_exp_get(fun,call_node->m_exp_to_call);
+        }
         //push call
         fun->push({ L_CALL, n_args, call_node->m_line });
         //success
@@ -461,7 +478,10 @@ namespace l_language
         //get function id
         size_t id_function = ((size_t)function_def_node->m_data);
         //compile staments
-        compile_statements(&m_vm->function((unsigned int)id_function),function_def_node->m_staments);
+        if(!compile_statements(&m_vm->function((unsigned int)id_function),function_def_node->m_staments))
+        {
+            return false;
+        }
         //get fun id
         fun->push({ L_CLOSER, get_function_id(fun, function_def_node), function_def_node->m_line });
         //push call
@@ -487,7 +507,10 @@ namespace l_language
     bool l_compiler_tree_to_vm::compile_return(l_function* fun,l_syntactic_tree::return_node* return_node)
     {
         //compile exp
-        if(return_node->m_exp) compile_exp(fun, return_node->m_exp);
+        if(return_node->m_exp)
+        {
+            if(!compile_exp(fun, return_node->m_exp)) return false;
+        }
         //get fun id
         fun->push({ L_RETURN, return_node->m_exp ? 1:0, return_node->m_line });
         //success

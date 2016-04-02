@@ -49,11 +49,14 @@ namespace l_language
         L_GET_LOCAL,
         L_GET_GLOBAL,
         L_GET_AT_VAL,
+        L_GET_THIS,
         //Set
         L_SET_UP_VALUE,
         L_SET_LOCAL,
         L_SET_GLOBAL,
         L_SET_AT_VAL,
+        L_SET_THIS,
+        L_SET_THIS_NPOP,
         //for
         L_IT,
         L_FOR_IN,

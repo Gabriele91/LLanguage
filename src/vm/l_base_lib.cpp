@@ -175,6 +175,14 @@ int l_eval(l_language::l_thread* th, int args)
     return 1;
 }
 
+int l_get_this(l_language::l_thread* th, int args)
+{
+    //return this
+    th->push_return(th->get_this());
+    //number of ret values
+    return 1;
+}
+
 namespace l_language
 {
     l_language::l_vm::l_extern_libary l_base_lib=
@@ -186,6 +194,7 @@ namespace l_language
         { "type_of",    l_type_of       },
         { "using",      l_using         },
         { "range",      l_range         },
-        { "eval",       l_eval          }
+        { "eval",       l_eval          },
+        { "get_this",   l_get_this      }
     };
 }

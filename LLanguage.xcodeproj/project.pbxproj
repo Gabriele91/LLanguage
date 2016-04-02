@@ -35,6 +35,7 @@
 		E078AA341C88CCC000131C43 /* l_call_context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0F605F81C72299D00D5B90B /* l_call_context.cpp */; };
 		E07F58591C9DDCC000C5BF71 /* l_variable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E07F58581C9DDCC000C5BF71 /* l_variable.cpp */; };
 		E07F585A1C9DDCC400C5BF71 /* l_variable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E07F58581C9DDCC000C5BF71 /* l_variable.cpp */; };
+		E08194B91CAFD8C900B87B27 /* this.ll in Sources */ = {isa = PBXBuildFile; fileRef = E08194B81CAFD8C900B87B27 /* this.ll */; };
 		E0950C7E1C4AC50400845FEE /* l_gc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0950C7D1C4AC50400845FEE /* l_gc.cpp */; };
 		E09599381C676A8900BF39F8 /* l_opcode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E09599371C676A8900BF39F8 /* l_opcode.cpp */; };
 		E0DBF2E41C678A4E00F9DA98 /* l_function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0DBF2E31C678A4E00F9DA98 /* l_function.cpp */; };
@@ -84,6 +85,7 @@
 		E078AA251C88CCB400131C43 /* LLanguageLibPriv.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LLanguageLibPriv.hpp; sourceTree = "<group>"; };
 		E078AA271C88CCB400131C43 /* LLanguageLib.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LLanguageLib.cpp; sourceTree = "<group>"; };
 		E07F58581C9DDCC000C5BF71 /* l_variable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_variable.cpp; sourceTree = "<group>"; };
+		E08194B81CAFD8C900B87B27 /* this.ll */ = {isa = PBXFileReference; explicitFileType = sourcecode.javascript; fileEncoding = 4; path = this.ll; sourceTree = "<group>"; };
 		E0891CC71C5A62AD00FB37F6 /* l_variable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = l_variable.h; path = vm/l_variable.h; sourceTree = "<group>"; };
 		E0950C761C4A871700845FEE /* l_vm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = l_vm.h; path = vm/l_vm.h; sourceTree = "<group>"; };
 		E0950C771C4A877800845FEE /* l_array.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_array.h; path = vm/l_array.h; sourceTree = "<group>"; };
@@ -251,6 +253,7 @@
 				E078A9FF1C88CB3300131C43 /* fields.ll */,
 				E09539911C8AC8CB00241553 /* for2.ll */,
 				E0A887061C9172770099CDC0 /* def3.ll */,
+				E08194B81CAFD8C900B87B27 /* this.ll */,
 			);
 			path = samples;
 			sourceTree = SOURCE_ROOT;
@@ -354,6 +357,7 @@
 				E0109F5E1CA28826005EBF1A /* l_io_lib.cpp in Sources */,
 				E05F4B4E1C58985500F7EB6A /* l_base_lib.cpp in Sources */,
 				E0F164311CA164E40009A4EF /* l_compiler_tree_to_vm.cpp in Sources */,
+				E08194B91CAFD8C900B87B27 /* this.ll in Sources */,
 				E0DBF2E61C679C0F00F9DA98 /* l_table.cpp in Sources */,
 				E0DBF2E41C678A4E00F9DA98 /* l_function.cpp in Sources */,
 				E058073F1CA17CC600F69658 /* l_variables_context.cpp in Sources */,
@@ -459,6 +463,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;

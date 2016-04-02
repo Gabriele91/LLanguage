@@ -112,7 +112,14 @@ namespace l_language
             //set thread
             m_compiler.set_thread(&m_default_thread);
             //set thread
-            m_compiler.compile(&it_tree);
+            if(!m_compiler.compile(&it_tree))
+            {
+                output.m_errors += "fail to compile tree\n";
+                //fail
+                output.m_type = ERRORS;
+                //return
+                return output;
+            }
             //main bytecode
             if(flags & DUMP)
             {

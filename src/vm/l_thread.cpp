@@ -229,7 +229,7 @@ namespace l_language
                 case L_UNM:
                     if(!stack(0).unm(stack(0))) raise("not valid operation");
                 break;
-                    ////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////
                 case L_EQ:
                     if(!stack(1).equal(stack(0),stack(1))) raise("not valid operation");
                     pop();
@@ -259,7 +259,7 @@ namespace l_language
                     if(!stack(1).le(stack(0),stack(1))) raise("not valid operation");
                     pop();
                 break;
-                    ////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////
                 case L_NOT:
                     if(!stack(0).not_value(stack(0))) raise("not valid operation");
                 break;
@@ -273,7 +273,7 @@ namespace l_language
                     if(!stack(1).and_value(stack(0),stack(1))) raise("not valid operation");
                     pop();
                 break;
-                    ////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////
                 case L_GET_GLOBAL:
                     push( global(context,cmp.m_arg) );
                 break;
@@ -281,7 +281,7 @@ namespace l_language
                 case L_SET_GLOBAL:
                     global(context,cmp.m_arg) = pop();
                 break;
-                    ////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////
                 case L_GET_LOCAL:
                     push( strick_local(context,cmp.m_arg) );
                 break;
@@ -289,7 +289,7 @@ namespace l_language
                 case L_SET_LOCAL:
                     strick_local(context,cmp.m_arg) = pop();
                 break;
-                    ////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////
                 case L_SET_UP_VALUE:
                     local(context,cmp.m_arg) = pop();
                 break;
@@ -297,7 +297,17 @@ namespace l_language
                 case L_GET_UP_VALUE:
                     push( local(context,cmp.m_arg) );
                 break;
-                    ////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////
+                case L_GET_THIS:
+                    push(get_this());
+                break;
+                case L_SET_THIS:
+                    get_this() = pop();
+                break;
+                case L_SET_THIS_NPOP:
+                    get_this() = stack(cmp.m_arg);
+                break;
+                ////////////////////////////////////////////////////////////
                 case L_NEW_ARRAY:
                 {
                     register3(0) = l_array::gc_new(get_gc());
@@ -318,7 +328,7 @@ namespace l_language
                     push( register3(0) );
                 }
                 break;
-                    //alloc tablet
+                //alloc tablet
                 case L_NEW_TABLE:
                 {
                     register3(0) = l_table::gc_new(get_gc());
@@ -442,7 +452,7 @@ namespace l_language
                     pop();
                 }
                 break;
-                    //for in
+                //for in
                 case L_IT:
                 {
                     //get index
@@ -486,7 +496,7 @@ namespace l_language
                     }
                 }
                 break;
-                    //for of
+                //for of
                 case L_FOR_IN:
                 case L_FOR_OF:
                 {
@@ -575,7 +585,7 @@ namespace l_language
                     }
                 }
                 break;
-                    
+                
                 case L_CALL:
                 {
                     //get index
