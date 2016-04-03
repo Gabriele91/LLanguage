@@ -450,23 +450,19 @@ namespace l_language
         {
             compile_exp(fun, *it);
         }
+        //push function
+        compile_assignable_exp_get(fun,call_node->m_exp_to_call);
         //is this call?
         if(call_node->m_exp_to_call->m_type == l_syntactic_tree::FIELD_NODE)
         {
-            //get call name
-            compile_assignable_exp_set(fun,call_node->m_exp_to_call);
-            //set this
-            fun->push({ L_SET_THIS_NPOP, 1 /* jmp key */, call_node->m_exp_to_call->m_line });
-            //push call
-            fun->push({ L_GET_AT_VAL,    0 /* from key */, call_node->m_exp_to_call->m_line });
+            //push call this
+            fun->push({ L_THIS_CALL, n_args, call_node->m_line });
         }
         else
         {
             //push call
-            compile_assignable_exp_get(fun,call_node->m_exp_to_call);
+            fun->push({ L_CALL, n_args, call_node->m_line });
         }
-        //push call
-        fun->push({ L_CALL, n_args, call_node->m_line });
         //success
         return true;
     }

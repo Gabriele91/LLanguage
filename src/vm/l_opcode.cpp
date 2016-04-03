@@ -64,7 +64,6 @@ namespace l_language
         "SET_THIS_NPOP",
         
         //for
-        
         "IT",
         "FOR_IN",
         "FOR_OF",    //for R(A) of R(B) { commands len C }  //R(B) must to be a table or array
@@ -75,6 +74,7 @@ namespace l_language
         //Function
         "CLOSER",    //make function/closer
         "CALL",
+        "THIS_CALL",
         "RETURN"
     };
 

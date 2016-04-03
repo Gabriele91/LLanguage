@@ -101,6 +101,12 @@ namespace l_language
             return (m_local_variables[key] = value);
         }
         
+        //this
+        l_variable& this_field()
+        {
+            return m_this;
+        }
+        
         //info
         size_t get_size_vars() const
         {
@@ -167,6 +173,7 @@ namespace l_language
         }
         //context
         l_table m_local_variables;
+        l_variable m_this;
         //firends
         friend class l_closer;
         friend class l_thread;

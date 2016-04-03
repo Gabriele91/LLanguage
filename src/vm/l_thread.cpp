@@ -299,13 +299,13 @@ namespace l_language
                 break;
                 ////////////////////////////////////////////////////////////
                 case L_GET_THIS:
-                    push(get_this());
+                    push(context.this_field());
                 break;
                 case L_SET_THIS:
-                    get_this() = pop();
+                    context.this_field() = pop();
                 break;
                 case L_SET_THIS_NPOP:
-                    get_this() = stack(cmp.m_arg);
+                    context.this_field() = stack(cmp.m_arg);
                 break;
                 ////////////////////////////////////////////////////////////
                 case L_NEW_ARRAY:
@@ -356,7 +356,6 @@ namespace l_language
                     push( register3(0) );
                 }
                 break;
-                    
                 case L_GET_AT_VAL:
                 {
                     const l_variable& r_b = stack(1);
@@ -377,8 +376,10 @@ namespace l_language
                             if( r_c.is_int() )  index= (size_t)r_c.m_value.m_i;
                             else if( r_c.is_float() )index= (size_t)r_c.m_value.m_f;
                             else raise( "value isn't a valid key" );
+                            //save last
+                            get_this() = stack(1);
                             //get
-                            stack(1) = vector->operator[](index) ;
+                            stack(1)   = vector->operator[](index) ;
                         }
                         else if(r_b.is_table())
                         {
@@ -386,6 +387,8 @@ namespace l_language
                             l_table* table = dynamic_cast< l_table* > ( this_obj );
                             //is a string?
                             if(!r_c.is_string()) raise( "value isn't a valid key" );
+                            //save last
+                            get_this() = stack(1);
                             //get and pop value
                             stack(1) = table->operator[](r_c);
                         }
@@ -585,7 +588,7 @@ namespace l_language
                     }
                 }
                 break;
-                
+                case L_THIS_CALL:
                 case L_CALL:
                 {
                     //get index
@@ -612,7 +615,7 @@ namespace l_language
                             pop();
                         }
                         //if return
-                        if(n_return) push(register3(2));
+                        if(n_return) push(get_return());
                     }
                     else if( register3(0).is_closer() )
                     {
@@ -627,6 +630,11 @@ namespace l_language
                         //new context
                         register3(1)            = l_call_context::gc_new(get_gc());
                         l_call_context* new_ctx = register3(1).to<l_call_context>();
+                        //this?
+                        if(cmp.m_op_code == L_THIS_CALL)
+                        {
+                            new_ctx->this_field() = get_this();
+                        }
                         //init
                         new_ctx->init(*closer);
                         //lock context
@@ -666,6 +674,11 @@ namespace l_language
                     else
                     {
                         raise( "value isn't an function" );
+                    }
+                    //dealloc
+                    if(cmp.m_op_code == L_THIS_CALL)
+                    {
+                        get_this() = l_variable();
                     }
                 }
                 break;

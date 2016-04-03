@@ -135,6 +135,8 @@ namespace l_language
         l_obj::mark();
         //unmark
         m_local_variables.mark();
+        //mark this
+        m_this.mark();
         //mark next
         if(next()) next()->mark();
     }
@@ -148,6 +150,8 @@ namespace l_language
         l_obj::unmark();
         //unmark
         m_local_variables.unmark();
+        //unmark this
+        m_this.unmark();
         //unmark next
         if(next()) next()->unmark();
     }
