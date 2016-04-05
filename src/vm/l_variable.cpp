@@ -10,6 +10,10 @@
 #include <l_parser.h>
 #include <l_variable.h>
 
+#include <l_vm.h>
+#include <l_table.h>
+#include <l_array.h>
+#include <l_iterator.h>
 
 namespace l_language
 {
@@ -28,6 +32,46 @@ namespace l_language
         else if(is_string())return string()->str();
         //bad cast
         return "";
+    }
+    
+    l_table* l_variable::table()
+    {
+        return static_cast< l_table* >( m_value.m_pobj );
+    }
+    
+    l_array* l_variable::array()
+    {
+        return static_cast< l_array* >( m_value.m_pobj );
+    }
+    
+    l_iterator* l_variable::iterator()
+    {
+        return static_cast< l_iterator* >( m_value.m_pobj );
+    }
+    
+    l_string* l_variable::string()
+    {
+        return static_cast< l_string* >( m_value.m_pobj );
+    }
+    
+    const l_table* l_variable::table() const
+    {
+        return static_cast< l_table* >( m_value.m_pobj );
+    }
+    
+    const l_array* l_variable::array() const
+    {
+        return static_cast< l_array* >( m_value.m_pobj );
+    }
+    
+    const l_iterator* l_variable::iterator() const
+    {
+        return static_cast< l_iterator* >( m_value.m_pobj );
+    }
+    
+    const l_string* l_variable::string() const
+    {
+        return static_cast< l_string* >( m_value.m_pobj );
     }
     
     bool l_variable::add(l_variable& var,l_variable& output)

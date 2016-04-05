@@ -7,6 +7,7 @@
 //
 #include <l_base_lib.h>
 #include <l_array.h>
+#include <l_base_lib_xrange.h>
 #include <cmath>
 
 
@@ -84,6 +85,33 @@ int l_range(l_language::l_thread* th,int args)
     }
     //return
     th->push_return(array);
+    //return
+    return 1;
+}
+
+int l_xrange_gen(l_language::l_thread* th,int args)
+{
+    int start = 0;
+    int stop  = 0;
+    int step  = 1;
+    //..
+    switch (args)
+    {
+        case 1: stop = th->value(0).to_int(); break;
+        
+        case 2: start = th->value(0).to_int();
+        stop  = th->value(1).to_int(); break;
+        
+        case 3: start = th->value(0).to_int();
+                stop  = th->value(1).to_int();
+                step  = th->value(2).to_int(); break;
+        
+        default: return -1; break;
+    }
+    //alloc
+    l_language::l_variable xrange = l_language::l_xrange::gc_new(th->get_gc(),start,stop,step);
+    //return
+    th->push_return(xrange);
     //return
     return 1;
 }
@@ -194,6 +222,7 @@ namespace l_language
         { "type_of",    l_type_of       },
         { "using",      l_using         },
         { "range",      l_range         },
+        { "xrange",     l_xrange_gen    },
         { "eval",       l_eval          },
         { "get_this",   l_get_this      }
     };

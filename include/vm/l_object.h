@@ -44,7 +44,7 @@ namespace l_language
             return m_gc;
         }
         
-        const l_gc* get_gc() const
+        l_gc* get_gc() const
         {
             return m_gc;
         }

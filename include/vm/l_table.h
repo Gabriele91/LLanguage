@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <l_object.h>
 #include <l_variable.h>
+#include <l_iterator.h>
 
 namespace l_language
 {
@@ -36,16 +37,64 @@ namespace l_language
         {
 			size_t operator()(const l_variable& left) const
 			{
-				assert(left.is_string());
-				std::hash<std::string> f_hash;
-				return f_hash(left.string()->str());
+                #if 0
+                    //assert(left.is_string());
+                    std::hash<std::string> f_hash;
+                    return f_hash(left.string()->str());
+                #elif 0
+                    //input
+                    const char* cptr = left.string()->str().c_str();
+                    //output
+                    size_t output { 0 };
+                    char* const optr = (char* const)&output;
+                    //hash
+                    for( size_t i = 0; cptr[i] && i < sizeof(size_t); ++i )
+                    {
+                        optr[i] = cptr[i];
+                    }
+                    //return
+                    return output;
+                #elif 1
+                    //input
+                    const size_t* cptr = (const size_t*)left.string()->str().c_str();
+                    //return
+                    return *cptr;
+                #else
+                    //input
+                    const auto& cstr = left.string()->str();
+                    const char* cptr = cstr.c_str();
+                    //output
+                    size_t output { 0 };
+                    char*  optr = (char*)&output;
+                    //mem
+                    std::memcpy(optr, cptr, std::min(cstr.size(),sizeof(size_t)));
+                    //return
+                    return output;
+                #endif
 			}
 
-            bool operator()(const l_variable& left,const l_variable& right) const 
+            bool operator()(const l_variable& left,const l_variable& right) const
             {
-                assert(left.is_string());
-                assert(right.is_string());
-                return left.string()->str() == right.string()->str();
+                #if 1
+                    //assert(left.is_string());
+                    //assert(right.is_string());
+                    return left.string()->str() == right.string()->str();
+                #else
+                    //pointers
+                    const auto& lstr = left.string()->str();
+                    const auto& rstr = right.string()->str();
+                    //compare size
+                    if( lstr.size() != rstr.size() ) return false;
+                    //c compare
+                    const char* lptr = lstr.c_str();
+                    const char* rptr = rstr.c_str();
+                    //compare
+                    for(; *lptr && *rptr ;++lptr, ++rptr)
+                        if(*lptr != *rptr)
+                            return false;
+                    //return...
+                    return *lptr == *rptr;
+                #endif
             }
         };
         //type
@@ -174,7 +223,7 @@ namespace l_language
         
     };
     
-    class l_table_it : public l_obj
+    class l_table_it : public l_iterator
     {
         l_table*                  m_table;
         l_table::l_map_object_it  m_iterator;
@@ -243,32 +292,32 @@ namespace l_language
         static l_variable gc_new(l_vm* vm,l_table::l_map_object_it c_it);
         static l_variable gc_new(l_vm& vm,l_table::l_map_object_it c_it);
         
-        l_variable get() const
+        virtual l_variable get() const
         {
             return m_iterator->second;
         }
         
-        l_variable get_id()
+        virtual l_variable get_id() const
         {
             return m_iterator->first;
         }
         
-        bool valid() const
+        virtual bool valid() const
         {
             return m_table && m_table->m_map.end() != m_iterator;
         }
         
-        l_variable next()
+        virtual l_variable next() const
         {
             //auto copy it
             l_table::l_map_object_it next_it = m_iterator;
             //next
             ++next_it;
             //next
-            return gc_new(get_gc(),m_iterator);
+            return gc_new(l_obj::get_gc(),m_iterator);
         }
         
-        void self_next()
+        virtual void self_next()
         {
             ++m_iterator;
         }

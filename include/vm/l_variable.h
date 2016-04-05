@@ -20,6 +20,7 @@ namespace l_language
     class l_thread;
     class l_array;
     class l_closer;
+    class l_iterator;
     class l_gc;
     class l_table;
     typedef int (*l_cfunction) (l_thread*,int args);
@@ -42,6 +43,7 @@ namespace l_language
             STRING,
             ARRAY,
             TABLE,
+            ITERATOR,
             OBJECT,
             COBJECT
         };
@@ -99,6 +101,12 @@ namespace l_language
         l_variable(l_table* obj)
         {
             m_type         = TABLE;
+            m_value.m_pobj = (l_obj*)obj;
+        }
+        
+        l_variable(l_iterator* obj)
+        {
+            m_type         = ITERATOR;
             m_value.m_pobj = (l_obj*)obj;
         }
         
@@ -188,14 +196,20 @@ namespace l_language
             return m_type == TABLE;
         }
         
+        bool is_iterator() const
+        {
+            return m_type == ITERATOR;
+        }
+        
         bool is_object(bool strict=false) const
         {
             return m_type == OBJECT ||
             (!strict &&
             (
-                   m_type == STRING ||
-                   m_type == TABLE  ||
-                   m_type == ARRAY  ||
+                   m_type == STRING  ||
+                   m_type == TABLE   ||
+                   m_type == ARRAY   ||
+                   m_type == ITERATOR||
                    m_type == COBJECT
             ));
         }
@@ -249,15 +263,21 @@ namespace l_language
             return dynamic_cast< const T* >( m_value.m_pobj );
         }
         
-        l_string* string()
-        {
-            return dynamic_cast< l_string* >( m_value.m_pobj );
-        }
+        l_table* table();
         
-        const l_string* string() const
-        {
-            return dynamic_cast< const l_string* >( m_value.m_pobj );
-        }
+        l_array* array();
+        
+        l_iterator* iterator();
+        
+        l_string* string();
+        
+        const l_table* table() const;
+        
+        const l_array* array() const;
+        
+        const l_iterator* iterator() const;
+        
+        const l_string* string() const;
         
         bool is_false()
         {

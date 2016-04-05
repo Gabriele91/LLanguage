@@ -9,6 +9,7 @@
 
 #include <l_gc.h>
 #include <l_variable.h>
+#include <l_iterator.h>
 
 namespace l_language
 {
@@ -147,7 +148,7 @@ namespace l_language
         
     };
     
-    class l_array_it : public l_obj
+    class l_array_it : public l_iterator
     {
         l_array*                       m_vector;
         l_array::l_pool_object_list_it m_iterator;
@@ -247,30 +248,30 @@ namespace l_language
             return  vm.get_gc().new_obj< l_array_it >(c_it);
         }
         
-        l_variable get() const
+        virtual l_variable get() const
         {
             return m_iterator->m_variable;
         }
         
-        l_variable get_id()
+        virtual l_variable get_id() const
         {
             l_array::l_pool_object_list_it begin = m_vector->m_pool.begin();
             auto difference = std::distance(begin,m_iterator);
             return l_variable((int)difference);
         }
         
-        bool valid() const
+        virtual bool valid() const
         {
             return m_vector && m_vector->m_pool.end() != m_iterator;
         }
         
-        l_variable next()
+        virtual l_variable next() const
         {
             //next
             return l_array_it::gc_new(get_gc(),m_iterator+1);
         }
         
-        void self_next()
+        virtual void self_next()
         {
             ++m_iterator;
         }
