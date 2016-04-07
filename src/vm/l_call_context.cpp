@@ -181,7 +181,8 @@ namespace l_language
     {
         return  gc_new(vm.get_gc());
     }
-    
+
+#if 1
     l_variable l_call_context::const_new(l_gc* gc)
     {
         l_call_context*  l_call_ctx  = new l_call_context();
@@ -225,4 +226,5 @@ namespace l_language
         
         return  variable;
     }
+#endif
 }

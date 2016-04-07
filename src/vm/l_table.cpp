@@ -96,7 +96,7 @@ namespace l_language
     {
         return  vm.get_gc().new_obj< l_table_it >(vector);
     }
-    
+#if 0
     l_variable l_table_it::gc_new(l_gc* gc,l_table::l_map_object_it c_it)
     {
         return  gc->new_obj< l_table_it >(c_it);
@@ -116,4 +116,26 @@ namespace l_language
     {
         return  vm.get_gc().new_obj< l_table_it >(c_it);
     }
+#else
+    
+    l_variable l_table_it::gc_new(l_gc* gc,l_table::l_table_raw_it c_it)
+    {
+        return  gc->new_obj< l_table_it >(c_it);
+    }
+    
+    l_variable l_table_it::gc_new(l_gc& gc,l_table::l_table_raw_it c_it)
+    {
+        return  gc.new_obj< l_table_it >(c_it);
+    }
+    
+    l_variable l_table_it::gc_new(l_vm* vm,l_table::l_table_raw_it c_it)
+    {
+        return  vm->get_gc().new_obj< l_table_it >(c_it);
+    }
+    
+    l_variable l_table_it::gc_new(l_vm& vm,l_table::l_table_raw_it c_it)
+    {
+        return  vm.get_gc().new_obj< l_table_it >(c_it);
+    }
+#endif
 }

@@ -182,10 +182,17 @@ int l_using(l_language::l_thread* th, int args)
 	//table obj
 	auto& table = *var_table.to<l_language::l_table>();
 	//for each
-	for (auto it : table.raw())
+#if 0
+    for (auto it : table.raw())
 	{
 		th->main_context()->variable(it.first) = it.second;
 	}
+#else
+    for(auto it : table)
+    {
+        th->main_context()->variable(it.m_key) = it.m_value;
+    }
+#endif
 	//number of ret values
 	return 0;
 }
