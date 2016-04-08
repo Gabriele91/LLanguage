@@ -33,6 +33,7 @@ namespace l_language
         {
             R_TEMP1,
             R_TEMP2,
+            R_TEMP3,
             R_RETURN,
             R_CONTEXT,
             R_THIS,

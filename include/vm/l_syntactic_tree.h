@@ -770,6 +770,8 @@ namespace l_language
             list_nodes     m_staments;
             //vars
             list_vars      m_args;
+            //args list name
+            variable_node* m_name_args_list{ nullptr };
             //root
             function_def_node()
             {
@@ -786,10 +788,16 @@ namespace l_language
                 m_args.push_back(node);
                 return this;
             }
+            virtual function_def_node* set_name_args_list(variable_node* node)
+            {
+                m_name_args_list = node;
+                return this;
+            }
             
             virtual ~function_def_node()
             {
                 if(m_variable)               delete m_variable;
+                if(m_name_args_list)         delete m_name_args_list;
                 for(auto& node : m_staments) delete node;
                 for(auto& node : m_args)     delete node;
             }

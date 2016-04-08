@@ -106,7 +106,7 @@
 		E09599361C676A5800BF39F8 /* l_opcode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_opcode.h; path = vm/l_opcode.h; sourceTree = "<group>"; };
 		E09599371C676A8900BF39F8 /* l_opcode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_opcode.cpp; sourceTree = "<group>"; };
 		E09A53601CB13CB600D5FE77 /* slow_test.ll */ = {isa = PBXFileReference; explicitFileType = sourcecode.javascript; fileEncoding = 4; path = slow_test.ll; sourceTree = "<group>"; };
-		E0A41F451CB26AEF00B723A8 /* l_base_lib_xrange.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = l_base_lib_xrange.h; sourceTree = "<group>"; };
+		E0A41F451CB26AEF00B723A8 /* l_xrange.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = l_xrange.h; sourceTree = "<group>"; };
 		E0A41F461CB2729300B723A8 /* l_iterator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_iterator.h; path = vm/l_iterator.h; sourceTree = "<group>"; };
 		E0A4DAA81C692D15007D5089 /* l_call_context.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_call_context.h; path = vm/l_call_context.h; sourceTree = "<group>"; };
 		E0A887061C9172770099CDC0 /* def3.ll */ = {isa = PBXFileReference; explicitFileType = sourcecode.javascript; fileEncoding = 4; path = def3.ll; sourceTree = "<group>"; };
@@ -215,7 +215,7 @@
 				E0DBF2E11C67893700F9DA98 /* l_commands.h */,
 				E0DBF2E21C6789BB00F9DA98 /* l_function.h */,
 				E0F1642B1CA162E20009A4EF /* l_thread.h */,
-				E0A41F451CB26AEF00B723A8 /* l_base_lib_xrange.h */,
+				E0A41F451CB26AEF00B723A8 /* l_xrange.h */,
 				E09599351C67508A00BF39F8 /* l_base_lib.h */,
 				E09529A61CA1BDB200F9D24B /* l_io_lib.h */,
 				E09529A71CA1BDF100F9D24B /* l_os_lib.h */,
@@ -226,8 +226,9 @@
 		E0950C7A1C4AC4C600845FEE /* vm */ = {
 			isa = PBXGroup;
 			children = (
-				E0950C7D1C4AC50400845FEE /* l_gc.cpp */,
+				E01317AC1C92C28E00477C6A /* l_parser.cpp */,
 				E071D70B1C4AC9D1008840D3 /* l_vm.cpp */,
+				E0950C7D1C4AC50400845FEE /* l_gc.cpp */,
 				E05F4B4B1C57FB8D00F7EB6A /* l_string.cpp */,
 				E05F4B501C589BB600F7EB6A /* l_compiler_utilities.cpp */,
 				E09599371C676A8900BF39F8 /* l_opcode.cpp */,
@@ -235,7 +236,6 @@
 				E0DBF2E31C678A4E00F9DA98 /* l_function.cpp */,
 				E0DBF2E51C679C0F00F9DA98 /* l_table.cpp */,
 				E0F605F81C72299D00D5B90B /* l_call_context.cpp */,
-				E01317AC1C92C28E00477C6A /* l_parser.cpp */,
 				E07F58581C9DDCC000C5BF71 /* l_variable.cpp */,
 				E0F1642F1CA164E40009A4EF /* l_compiler_tree_to_vm.cpp */,
 				E058073E1CA17CC600F69658 /* l_variables_context.cpp */,

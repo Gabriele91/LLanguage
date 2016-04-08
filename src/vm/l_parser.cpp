@@ -30,7 +30,7 @@ namespace l_language
             "null",
             "true",
             "false",
-            
+            "...",
             NULL,
         };
         return str_keywords;
@@ -57,7 +57,8 @@ namespace l_language
     {
         return KEYWORDCMP(ptr, NULL) ||
                KEYWORDCMP(ptr, TRUE) ||
-               KEYWORDCMP(ptr, FALSE) ;
+               KEYWORDCMP(ptr, FALSE)||
+               KEYWORDCMP(ptr, ARGS) ;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //put variable

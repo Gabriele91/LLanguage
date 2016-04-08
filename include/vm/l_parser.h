@@ -75,7 +75,7 @@ namespace l_language
     for_c_args   := operation {[','] operation} ';' exp ';' operation {[','] operation}
     for_each_args:= variable ('in'|'of') exp
     for          := 'for' (for_each_args | for_c_args | '(' (for_each_args | for_c_args ) ')') '{' staments '}'
-    def          := ('def'|'function') [variable] '(' [ variable {[',' variable]} ] ')' '{' staments '}'
+    def          := ('def'|'function') [variable] '(' ([ variable {[',' variable]} [',' '...' variable] ] | ['...'variable]) ')' '{' staments '}'
     return       := 'return' [exp]
     type context := ('global' | 'super') [ variable {[ ',' variable ]} ]
 	*/
@@ -167,7 +167,8 @@ namespace l_language
             
             K_NULL,
             K_TRUE,
-            K_FALSE
+            K_FALSE,
+            K_ARGS
         };
         static const char** get_keywords();
         static const char* get_keyword(keyword key);
@@ -1554,6 +1555,8 @@ namespace l_language
                 //args...
                 if(!CSTRCMP_SKIP(ptr, ")"))
                 {
+                    //
+                    bool b_not_have_args_list = true;
                     //values...
                     do
                     {
@@ -1561,6 +1564,13 @@ namespace l_language
                         skip_space_end_comment(ptr);
                         //variable node
                         l_syntactic_tree::node* l_variable = nullptr;
+                        //args list?
+                        if(KEYWORDCMP_SKIP(ptr, ARGS))
+                        {
+                            b_not_have_args_list = false;
+                            //skip
+                            skip_space_end_comment(ptr);
+                        }
                         //parse variable
                         if(!parse_variable(ptr, l_variable))
                         {
@@ -1569,11 +1579,14 @@ namespace l_language
                             return false;
                         }
                         //push var
-                        l_def_node->append_arg((l_syntactic_tree::variable_node*)l_variable);
+                        if(b_not_have_args_list)
+                            l_def_node->append_arg((l_syntactic_tree::variable_node*)l_variable);
+                        else
+                            l_def_node->set_name_args_list((l_syntactic_tree::variable_node*)l_variable);
                         //skip
                         skip_space_end_comment(ptr);
                     }
-                    while (CSTRCMP_SKIP(ptr, ","));
+                    while (b_not_have_args_list && CSTRCMP_SKIP(ptr, ","));
                     //end?
                     if(!CSTRCMP_SKIP(ptr, ")"))
                     {

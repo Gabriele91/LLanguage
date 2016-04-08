@@ -63,6 +63,15 @@ namespace l_language
             add_variable_into_table(new_fun, variable);
             is_not_upper_value(new_fun, variable);
         }
+        //args list
+        if(node->m_name_args_list)
+        {
+            //add last variable
+            add_variable_into_table(new_fun, node->m_name_args_list);
+            is_not_upper_value(new_fun, node->m_name_args_list);
+            //have args list
+            new_fun->m_have_args_list = true;
+        }
         //staments
         for(l_syntactic_tree::node* st : node->m_staments)
         {

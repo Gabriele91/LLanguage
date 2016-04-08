@@ -12,7 +12,7 @@
 #include <l_gc.h>
 #include <l_array.h>
 #include <l_table.h>
-#include <l_base_lib_xrange.h>
+#include <l_xrange.h>
 #include <iostream>
 
 namespace l_language
@@ -481,7 +481,7 @@ namespace l_language
                         else if (r_a.to<l_xrange>())
                         {
                             //types
-                            l_xrange* xrange = dynamic_cast< l_xrange* > ( this_obj );
+                            l_xrange* xrange = static_cast< l_xrange* > ( this_obj );
                             //pop value
                             pop();
                             //push it
@@ -608,16 +608,40 @@ namespace l_language
                         new_ctx->init(*closer);
                         //lock context
                         new_ctx->lock();
+                        //n args
+                        unsigned int n_fun_args = call_fun.m_args_size;
+                        //alloc array args..?
+                        if (call_fun.m_have_args_list)
+                        {
+                            //alloc array
+                            register3(3) = l_array::gc_new(get_gc());
+                        }
                         //put arguments
                         for(unsigned int
                             arg  = 0;
                             arg != cmp.m_arg;
                           ++arg)
                         {
-                            if (arg < call_fun.m_args_size)
+                            if (arg < n_fun_args)
+                            {
                                 new_ctx->variable( call_fun.constant(arg) ) = pop();
+                            }
+                            else if (call_fun.m_have_args_list)
+                            {
+                                register3(3).array()->push(pop());
+                            }
                             else
+                            {
                                 pop();
+                            }
+                        }
+                        //add var list
+                        if (call_fun.m_have_args_list)
+                        {
+                            //push array
+                            new_ctx->variable( call_fun.constant(n_fun_args) ) = register3(3);
+                            //to null
+                            register3(3) = l_variable();
                         }
                         //save stack
                         long stack_top_bf_call = m_top;

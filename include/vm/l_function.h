@@ -21,6 +21,8 @@ namespace l_language
         unsigned int m_up_val_size { 0 };
         unsigned int m_values_size { 0 };
         unsigned int m_args_size   { 0 };
+        //args list?
+        bool m_have_args_list{ false };
         //costant list
         l_list_variables m_costants;
         //commands
