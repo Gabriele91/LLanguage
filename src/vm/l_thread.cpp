@@ -389,12 +389,12 @@ namespace l_language
                         }
                         else
                         {
-                            raise( "value isn't a vector/table" );
+                            raise( "value isn't a vector/table, field not available" );
                         }
                     }
                     else
                     {
-                        raise( "value isn't a vector/table/object" );
+                        raise( "value isn't a vector/table/object, field not avaliable" );
                     }
                     //pop index
                     pop();
@@ -434,7 +434,7 @@ namespace l_language
                         }
                         else
                         {
-                            raise( "value isn't a vector/table" );
+                            raise( "value isn't a vector/table, field not available" );
                         }
                     }
                     else
@@ -497,7 +497,7 @@ namespace l_language
                         //pop value
                         pop();
                         //..
-                        raise( "value isn't a table/array/object" );
+                        raise( "value isn't a table/array/object, iterator not supported" );
                     }
                 }
                 break;

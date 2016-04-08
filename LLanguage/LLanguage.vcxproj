@@ -123,38 +123,61 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\vm\l_base_lib.cpp" />
     <ClCompile Include="..\src\vm\l_call_context.cpp" />
+    <ClCompile Include="..\src\vm\l_compiler_tree_to_vm.cpp" />
     <ClCompile Include="..\src\vm\l_compiler_utilities.cpp" />
     <ClCompile Include="..\src\vm\l_function.cpp" />
     <ClCompile Include="..\src\vm\l_gc.cpp" />
-    <ClCompile Include="..\src\vm\l_lib_base.cpp" />
+    <ClCompile Include="..\src\vm\l_io_lib.cpp" />
     <ClCompile Include="..\src\vm\l_opcode.cpp" />
+    <ClCompile Include="..\src\vm\l_os_lib.cpp" />
+    <ClCompile Include="..\src\vm\l_parser.cpp" />
     <ClCompile Include="..\src\vm\l_string.cpp" />
     <ClCompile Include="..\src\vm\l_table.cpp" />
+    <ClCompile Include="..\src\vm\l_thread.cpp" />
+    <ClCompile Include="..\src\vm\l_variable.cpp" />
+    <ClCompile Include="..\src\vm\l_variables_context.cpp" />
     <ClCompile Include="..\src\vm\l_vm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\l_config.h" />
-    <ClInclude Include="..\include\l_program_language.h" />
+    <ClInclude Include="..\include\l_io_lib.h" />
+    <ClInclude Include="..\include\vm\l_array.h" />
+    <ClInclude Include="..\include\vm\l_base_lib.h" />
     <ClInclude Include="..\include\vm\l_call_context.h" />
     <ClInclude Include="..\include\vm\l_commands.h" />
     <ClInclude Include="..\include\vm\l_compiler_tree_to_vm.h" />
     <ClInclude Include="..\include\vm\l_compiler_utilities.h" />
     <ClInclude Include="..\include\vm\l_function.h" />
     <ClInclude Include="..\include\vm\l_gc.h" />
-    <ClInclude Include="..\include\vm\l_lib_base.h" />
+    <ClInclude Include="..\include\vm\l_iterator.h" />
     <ClInclude Include="..\include\vm\l_object.h" />
     <ClInclude Include="..\include\vm\l_opcode.h" />
+    <ClInclude Include="..\include\vm\l_os_lib.h" />
     <ClInclude Include="..\include\vm\l_parser.h" />
     <ClInclude Include="..\include\vm\l_string.h" />
     <ClInclude Include="..\include\vm\l_syntactic_tree.h" />
     <ClInclude Include="..\include\vm\l_table.h" />
+    <ClInclude Include="..\include\vm\l_thread.h" />
     <ClInclude Include="..\include\vm\l_variable.h" />
     <ClInclude Include="..\include\vm\l_variables_context.h" />
-    <ClInclude Include="..\include\vm\l_vector.h" />
     <ClInclude Include="..\include\vm\l_vm.h" />
+    <ClInclude Include="..\include\vm\l_xrange.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\samples\def.ll" />
+    <None Include="..\samples\def2.ll" />
+    <None Include="..\samples\def3.ll" />
+    <None Include="..\samples\fields.ll" />
+    <None Include="..\samples\for.ll" />
+    <None Include="..\samples\for2.ll" />
+    <None Include="..\samples\lambda_function.ll" />
+    <None Include="..\samples\logic_ops.ll" />
+    <None Include="..\samples\runtimeerrors.ll" />
+    <None Include="..\samples\slow_test.ll" />
+    <None Include="..\samples\this.ll" />
+    <None Include="..\samples\while.ll" />
     <None Include="..\tests\def.ll" />
     <None Include="..\tests\def2.ll" />
     <None Include="..\tests\fields.ll" />

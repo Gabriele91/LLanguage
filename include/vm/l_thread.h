@@ -98,7 +98,7 @@ namespace l_language
         //push return
         void push_return(const l_variable& var)
         {
-            m_register[2] = var;
+            m_register[R_RETURN] = var;
         }
         //get top
         l_variable& value(size_t x)

@@ -24,51 +24,60 @@
     <ClCompile Include="..\src\main.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\vm\l_compiler_utilities.cpp">
-      <Filter>File di origine\vm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\vm\l_gc.cpp">
-      <Filter>File di origine\vm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\vm\l_lib_base.cpp">
-      <Filter>File di origine\vm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\vm\l_string.cpp">
-      <Filter>File di origine\vm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\vm\l_vm.cpp">
-      <Filter>File di origine\vm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\vm\l_function.cpp">
-      <Filter>File di origine\vm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\vm\l_opcode.cpp">
-      <Filter>File di origine\vm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\vm\l_table.cpp">
+    <ClCompile Include="..\src\vm\l_base_lib.cpp">
       <Filter>File di origine\vm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\vm\l_call_context.cpp">
       <Filter>File di origine\vm</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\vm\l_compiler_tree_to_vm.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_compiler_utilities.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_function.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_gc.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_io_lib.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_opcode.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_os_lib.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_parser.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_string.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_table.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_thread.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_variable.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_variables_context.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_vm.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\vm\l_gc.h">
+    <ClInclude Include="..\include\vm\l_array.h">
       <Filter>File di intestazione\vm</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\vm\l_object.h">
-      <Filter>File di intestazione\vm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\vm\l_string.h">
-      <Filter>File di intestazione\vm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\vm\l_variable.h">
-      <Filter>File di intestazione\vm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\vm\l_vector.h">
-      <Filter>File di intestazione\vm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\vm\l_vm.h">
+    <ClInclude Include="..\include\vm\l_base_lib.h">
       <Filter>File di intestazione\vm</Filter>
     </ClInclude>
     <ClInclude Include="..\include\vm\l_call_context.h">
@@ -86,13 +95,25 @@
     <ClInclude Include="..\include\vm\l_function.h">
       <Filter>File di intestazione\vm</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\vm\l_lib_base.h">
+    <ClInclude Include="..\include\vm\l_gc.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vm\l_iterator.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vm\l_object.h">
       <Filter>File di intestazione\vm</Filter>
     </ClInclude>
     <ClInclude Include="..\include\vm\l_opcode.h">
       <Filter>File di intestazione\vm</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\vm\l_os_lib.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\vm\l_parser.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vm\l_string.h">
       <Filter>File di intestazione\vm</Filter>
     </ClInclude>
     <ClInclude Include="..\include\vm\l_syntactic_tree.h">
@@ -101,14 +122,26 @@
     <ClInclude Include="..\include\vm\l_table.h">
       <Filter>File di intestazione\vm</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\vm\l_thread.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vm\l_variable.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\vm\l_variables_context.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vm\l_vm.h">
       <Filter>File di intestazione\vm</Filter>
     </ClInclude>
     <ClInclude Include="..\include\l_config.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\l_program_language.h">
+    <ClInclude Include="..\include\l_io_lib.h">
       <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vm\l_xrange.h">
+      <Filter>File di intestazione\vm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +164,42 @@
       <Filter>File di risorse</Filter>
     </None>
     <None Include="..\tests\runtimeerrors.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\samples\def.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\samples\def2.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\samples\def3.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\samples\fields.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\samples\for.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\samples\for2.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\samples\lambda_function.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\samples\logic_ops.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\samples\runtimeerrors.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\samples\slow_test.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\samples\this.ll">
+      <Filter>File di risorse</Filter>
+    </None>
+    <None Include="..\samples\while.ll">
       <Filter>File di risorse</Filter>
     </None>
   </ItemGroup>
