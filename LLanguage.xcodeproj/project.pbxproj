@@ -64,6 +64,7 @@
 		E0109F5C1CA287AB005EBF1A /* l_os_lib.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = l_os_lib.cpp; sourceTree = "<group>"; };
 		E0109F5D1CA28826005EBF1A /* l_io_lib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_io_lib.cpp; sourceTree = "<group>"; };
 		E01317AC1C92C28E00477C6A /* l_parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_parser.cpp; sourceTree = "<group>"; };
+		E04284CF1CB82FE20055ADC6 /* l_xrange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = l_xrange.h; path = vm/l_xrange.h; sourceTree = "<group>"; };
 		E058073E1CA17CC600F69658 /* l_variables_context.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_variables_context.cpp; sourceTree = "<group>"; };
 		E05F4B4A1C57F52400F7EB6A /* l_string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_string.h; path = vm/l_string.h; sourceTree = "<group>"; };
 		E05F4B4B1C57FB8D00F7EB6A /* l_string.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_string.cpp; sourceTree = "<group>"; };
@@ -106,7 +107,6 @@
 		E09599361C676A5800BF39F8 /* l_opcode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_opcode.h; path = vm/l_opcode.h; sourceTree = "<group>"; };
 		E09599371C676A8900BF39F8 /* l_opcode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_opcode.cpp; sourceTree = "<group>"; };
 		E09A53601CB13CB600D5FE77 /* slow_test.ll */ = {isa = PBXFileReference; explicitFileType = sourcecode.javascript; fileEncoding = 4; path = slow_test.ll; sourceTree = "<group>"; };
-		E0A41F451CB26AEF00B723A8 /* l_xrange.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = l_xrange.h; sourceTree = "<group>"; };
 		E0A41F461CB2729300B723A8 /* l_iterator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_iterator.h; path = vm/l_iterator.h; sourceTree = "<group>"; };
 		E0A4DAA81C692D15007D5089 /* l_call_context.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_call_context.h; path = vm/l_call_context.h; sourceTree = "<group>"; };
 		E0A887061C9172770099CDC0 /* def3.ll */ = {isa = PBXFileReference; explicitFileType = sourcecode.javascript; fileEncoding = 4; path = def3.ll; sourceTree = "<group>"; };
@@ -197,6 +197,7 @@
 		E0950C751C4A870D00845FEE /* vm */ = {
 			isa = PBXGroup;
 			children = (
+				E04284CF1CB82FE20055ADC6 /* l_xrange.h */,
 				E095992F1C67508A00BF39F8 /* l_parser.h */,
 				E09599311C67508A00BF39F8 /* l_syntactic_tree.h */,
 				E09599331C67508A00BF39F8 /* l_variables_context.h */,
@@ -215,7 +216,6 @@
 				E0DBF2E11C67893700F9DA98 /* l_commands.h */,
 				E0DBF2E21C6789BB00F9DA98 /* l_function.h */,
 				E0F1642B1CA162E20009A4EF /* l_thread.h */,
-				E0A41F451CB26AEF00B723A8 /* l_xrange.h */,
 				E09599351C67508A00BF39F8 /* l_base_lib.h */,
 				E09529A61CA1BDB200F9D24B /* l_io_lib.h */,
 				E09529A71CA1BDF100F9D24B /* l_os_lib.h */,
