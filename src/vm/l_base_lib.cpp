@@ -43,7 +43,7 @@ int l_to_float(l_language::l_thread* th,int args)
     switch (var.m_type)
     {
         case l_language::l_variable::LNULL: f = 0.0f; break;
-        case l_language::l_variable::LBOOL: f = var.m_value.m_b ? 1.0 : 0.0; break;
+        case l_language::l_variable::LBOOL: f = var.m_value.m_b ? 1.0f : 0.0f; break;
         case l_language::l_variable::INT: f = (float)var.m_value.m_i; break;
         case l_language::l_variable::FLOAT: f = var.m_value.m_f; break;
         case l_language::l_variable::STRING: f = (float)std::atof(var.string()->c_str()); break;

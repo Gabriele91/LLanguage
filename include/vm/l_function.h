@@ -15,8 +15,9 @@
 namespace l_language
 {
     //function
-    struct l_function
+    class l_function
     {
+	public:
         //allocs
         unsigned int m_up_val_size { 0 };
         unsigned int m_values_size { 0 };

@@ -845,7 +845,7 @@ namespace l_language
             //is op node
             bool is_op() const
             {
-                return m_op;
+                return m_op ? true : false;
             }
             //appen a variable node
             virtual context_type_node* append(variable_node* node)
