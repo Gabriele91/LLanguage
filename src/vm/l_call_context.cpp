@@ -129,8 +129,8 @@ namespace l_language
     //unmark event
     void l_call_context::mark()
     {
-        //..
-        if(is_marked()) return;
+        //mark in any cases
+        if(l_obj::is_marked()) return;
         //mark
         l_obj::mark();
         //unmark
