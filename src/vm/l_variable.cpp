@@ -216,7 +216,7 @@ namespace l_language
                 break;
                 
                 case STRING:
-                output = var.string()->gc_merge(var.string());
+                output = var.string()->gc_merge(string());
                 break;
                 
                 default:

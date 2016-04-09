@@ -12,6 +12,6 @@ namespace l_language
 {
     namespace compiler_utilities
     {
-        extern std::string compile_string(const std::string& value);
+        extern std::string compile_string(const std::string& value,bool quotation_marks = true);
     };
 };

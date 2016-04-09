@@ -12,10 +12,14 @@ namespace l_language
 {
     namespace compiler_utilities
     {
-        std::string  compile_string(const std::string& value)
+        std::string  compile_string(const std::string& value,bool quotation_marks)
         {
+            //vars
             const char *tmp = value.c_str();
-            std::string out = "\"";// add ".....
+            std::string out;
+            //start
+            if(quotation_marks) out = "\"";// add ".....
+            //compile..
             while ((*tmp) != '\0')
             {
                 switch (*tmp)
@@ -34,7 +38,8 @@ namespace l_language
                 }
                 ++tmp;//next char
             }
-            out += '\"';// add ...."
+            //end
+            if(quotation_marks) out += '\"';// add ...."
             //return..
             return out;
         }
