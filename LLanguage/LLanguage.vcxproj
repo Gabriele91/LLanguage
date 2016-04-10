@@ -184,13 +184,6 @@
     <None Include="..\samples\slow_test.ll" />
     <None Include="..\samples\this.ll" />
     <None Include="..\samples\while.ll" />
-    <None Include="..\tests\def.ll" />
-    <None Include="..\tests\def2.ll" />
-    <None Include="..\tests\fields.ll" />
-    <None Include="..\tests\for.ll" />
-    <None Include="..\tests\lambda_function.ll" />
-    <None Include="..\tests\runtimeerrors.ll" />
-    <None Include="..\tests\while.ll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

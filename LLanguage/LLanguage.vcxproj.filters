@@ -19,6 +19,9 @@
     <Filter Include="File di intestazione\vm">
       <UniqueIdentifier>{defaede5-34e0-48b8-817f-70bee97c4abe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="File di risorse\samples">
+      <UniqueIdentifier>{64291d7f-5abb-404d-af86-cd0bbc04fea3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -145,62 +148,41 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\tests\fields.ll">
-      <Filter>File di risorse</Filter>
-    </None>
-    <None Include="..\tests\for.ll">
-      <Filter>File di risorse</Filter>
-    </None>
-    <None Include="..\tests\while.ll">
-      <Filter>File di risorse</Filter>
-    </None>
-    <None Include="..\tests\def.ll">
-      <Filter>File di risorse</Filter>
-    </None>
-    <None Include="..\tests\def2.ll">
-      <Filter>File di risorse</Filter>
-    </None>
-    <None Include="..\tests\lambda_function.ll">
-      <Filter>File di risorse</Filter>
-    </None>
-    <None Include="..\tests\runtimeerrors.ll">
-      <Filter>File di risorse</Filter>
-    </None>
     <None Include="..\samples\def.ll">
-      <Filter>File di risorse</Filter>
+      <Filter>File di risorse\samples</Filter>
     </None>
     <None Include="..\samples\def2.ll">
-      <Filter>File di risorse</Filter>
+      <Filter>File di risorse\samples</Filter>
     </None>
     <None Include="..\samples\def3.ll">
-      <Filter>File di risorse</Filter>
+      <Filter>File di risorse\samples</Filter>
     </None>
     <None Include="..\samples\fields.ll">
-      <Filter>File di risorse</Filter>
+      <Filter>File di risorse\samples</Filter>
     </None>
     <None Include="..\samples\for.ll">
-      <Filter>File di risorse</Filter>
+      <Filter>File di risorse\samples</Filter>
     </None>
     <None Include="..\samples\for2.ll">
-      <Filter>File di risorse</Filter>
+      <Filter>File di risorse\samples</Filter>
     </None>
     <None Include="..\samples\lambda_function.ll">
-      <Filter>File di risorse</Filter>
+      <Filter>File di risorse\samples</Filter>
     </None>
     <None Include="..\samples\logic_ops.ll">
-      <Filter>File di risorse</Filter>
+      <Filter>File di risorse\samples</Filter>
     </None>
     <None Include="..\samples\runtimeerrors.ll">
-      <Filter>File di risorse</Filter>
+      <Filter>File di risorse\samples</Filter>
     </None>
     <None Include="..\samples\slow_test.ll">
-      <Filter>File di risorse</Filter>
+      <Filter>File di risorse\samples</Filter>
     </None>
     <None Include="..\samples\this.ll">
-      <Filter>File di risorse</Filter>
+      <Filter>File di risorse\samples</Filter>
     </None>
     <None Include="..\samples\while.ll">
-      <Filter>File di risorse</Filter>
+      <Filter>File di risorse\samples</Filter>
     </None>
   </ItemGroup>
 </Project>

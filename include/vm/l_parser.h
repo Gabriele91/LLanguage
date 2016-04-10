@@ -63,19 +63,20 @@ namespace l_language
 	//statments
 	italanguage  := staments
 	staments     := { stament }
+	stamentsblock:= '{' staments '}' | stament
     stament		 := if | call | cicle | operation | def
     assignment   := '=' | '<-' | "+=" | "-=" | "*=" | "/="
     operation    := assignable assignament exp | call
-    if			 := 'if' exp '{' staments '}' {[ else_if ]} [ else ]
-    else_if      := else if exp '{' staments '}'
-    else         := else '{' staments '}'
+    if			 := 'if' exp stamentsblock {[ else_if ]} [ else ]
+    else_if      := else if exp stamentsblock
+    else         := else stamentsblock
     call         := assignable '(' [exp] {[ ',' exp ]} ')'
 	cicle        := while | for
-	while        := 'while' <exp> '{' staments '}'
+	while        := 'while' exp stamentsblock
     for_c_args   := operation {[','] operation} ';' exp ';' operation {[','] operation}
     for_each_args:= variable ('in'|'of') exp
-    for          := 'for' (for_each_args | for_c_args | '(' (for_each_args | for_c_args ) ')') '{' staments '}'
-    def          := ('def'|'function') [variable] '(' ([ variable {[',' variable]} [',' '...' variable] ] | ['...'variable]) ')' '{' staments '}'
+    for          := 'for' ( (for_each_args | for_c_args) [';'] | '(' (for_each_args | for_c_args ) ')') stamentsblock
+    def          := ('def'|'function') [variable] '(' ([ variable {[',' variable]} [',' '...' variable] ] | ['...'variable]) ')' stamentsblock
     return       := 'return' [exp]
     type context := ('global' | 'super') [ variable {[ ',' variable ]} ]
 	*/
@@ -651,14 +652,36 @@ namespace l_language
 		}
         ///////////////////////////////////////////////////////////////////////////////////////////////
         //statments
-        
-        //parse staments
+
+		//parse stament
+		bool parse_stament(const char*& ptr, l_syntactic_tree::list_nodes& nodes)
+		{
+			//////////////////
+			//stament
+			//////////////////
+			//skip
+			skip_space_end_comment(ptr);
+			//parse
+			l_syntactic_tree::node* stament;
+			if (!parse_stament(ptr, stament)) return false;
+			//push stament
+			nodes.push_back(stament);
+			//skip
+			skip_space_end_comment(ptr);
+			//jump commond
+			CSTRCMP_SKIP(ptr, ";");
+			//skip
+			skip_space_end_comment(ptr);
+			//////////////////
+			return true;
+		}
+		//parse staments
 		bool parse_staments(const char*& ptr, l_syntactic_tree::list_nodes& nodes)
 		{
 			//skip
 			skip_space_end_comment(ptr);
 			//staments
-			while (*ptr && *ptr != EOF && !CSTRCMP(ptr,"}"))
+			while (*ptr && *ptr != EOF && !CSTRCMP(ptr, "}"))
 			{
 				//parse
 				l_syntactic_tree::node* stament;
@@ -667,12 +690,40 @@ namespace l_language
 				nodes.push_back(stament);
 				//skip
 				skip_space_end_comment(ptr);
-                //jump commond
-                CSTRCMP_SKIP(ptr,";");
-                //skip
-                skip_space_end_comment(ptr);
+				//jump commond
+				CSTRCMP_SKIP(ptr, ";");
+				//skip
+				skip_space_end_comment(ptr);
 			}
 			return true;
+		}
+		//parse staments/stament block
+		bool parse_stament_s_block(const char*& ptr, l_syntactic_tree::list_nodes& nodes)
+		{
+			//skip
+			skip_space_end_comment(ptr);
+			//try
+			if (CSTRCMP_SKIP(ptr, "{"))
+			{
+				//try
+				if (!parse_staments(ptr, nodes)) return false;
+				//then
+				if (!CSTRCMP_SKIP(ptr, "}"))
+				{
+					push_error("not found \'}\' keyword");
+					return false;
+				}
+				//skip spaces
+				skip_space_end_comment(ptr);
+				//return
+				return true;
+			}
+			else
+			{
+				return parse_stament(ptr, nodes);
+			}
+			//skip
+			skip_space_end_comment(ptr);
 		}
 		//parse stament
 		bool parse_stament(const char*& ptr, l_syntactic_tree::node*& node)
@@ -1186,28 +1237,8 @@ namespace l_language
                     default:
                         break;
                 }
-                //skip
-                skip_space_end_comment(ptr);
-                // 'then'
-                if (!CSTRCMP_SKIP(ptr, "{"))
-                {
-                    push_error("not found \'{\' keyword");
-                    return false;
-                }
-                //skip
-                skip_space_end_comment(ptr);
-                //add sub nodes
-                if (!parse_staments(ptr, *staments)) return false;
-                //skip
-                skip_space_end_comment(ptr);
-                //close
-                if (!CSTRCMP_SKIP(ptr, "}"))
-                {
-                    push_error("not found \'}\' keyword");
-                    return false;
-                }
-                //skip
-                skip_space_end_comment(ptr);
+				// parse '{' staments '}' | stament
+				if (!parse_stament_s_block(ptr, *staments)) return false;
                 //change state
                 if( state != ELSE_STATE )
                 {
@@ -1259,28 +1290,11 @@ namespace l_language
             // exp
             l_syntactic_tree::exp_node *exp = nullptr;
             if (!parse_exp(ptr, exp)) return false;
-            //skip
-            skip_space_end_comment(ptr);
-            // '{'
-            if (!CSTRCMP_SKIP(ptr, "{"))
-            {
-                push_error("not found \"{\" keyword");
-                return false;
-            }
-            //skip
-            skip_space_end_comment(ptr);
-            //build node
+			//alloc
 			            node = l_syntactic_tree::while_do(exp, m_line);
             auto* while_node = (l_syntactic_tree::while_node*) (node);
-            //add sub nodes
-            if (!parse_staments(ptr, while_node->m_staments)) return false;
-            //skip
-            skip_space_end_comment(ptr);
-            // '}'
-            if (!CSTRCMP_SKIP(ptr, "}"))
-            {
-                push_error("not found \"}\" keyword");
-            }
+			// parse '{' staments '}' | stament
+			if (!parse_stament_s_block(ptr, while_node->m_staments)) return false;
             //success
             return true;
         }
@@ -1345,7 +1359,7 @@ namespace l_language
                     return false;
                 }
                 //..
-                while (!CSTRCMP(ptr, "{") && !CSTRCMP(ptr, ")"))
+                while (!CSTRCMP(ptr, "{") && !CSTRCMP(ptr, ")") && !CSTRCMP_SKIP(ptr, ";"))
                 {
                     //parse op
                     l_syntactic_tree::node* op_node = nullptr;
@@ -1413,34 +1427,19 @@ namespace l_language
                 return false;
                 
             }
-            //skip
-            skip_space_end_comment(ptr);
-            // '{'
-            if (!CSTRCMP_SKIP(ptr, "{"))
-            {
-                push_error("not found \"{\" character");
-                if(node)  delete node;
-                return false;
-            }
-            //skip
-            skip_space_end_comment(ptr);
-            //add statements
+			//cast
             auto* for_node = (l_syntactic_tree::for_node*) (node);
-            //add sub nodes
-            if (!parse_staments(ptr, for_node->m_staments))
-            {
-                if(node)  delete node;
-                return false;
-            }
-            //skip
-            skip_space_end_comment(ptr);
-            // '}'
-            if (!CSTRCMP_SKIP(ptr, "}"))
-            {
-                push_error("not found \"}\" character");
-                if(node)  delete node;
-                return false;
-            }
+			// parse { staments } | stament
+			if (!parse_stament_s_block(ptr, for_node->m_staments))
+			{
+				//free
+				if (node)  delete node;
+				//to null
+				node = nullptr;
+				//fail
+				return false;
+			}
+			//success
 			return true;
         }
 		//parse cicle
@@ -1598,27 +1597,8 @@ namespace l_language
                     }
                 }
             }
-            //...
-            //skip
-            skip_space_end_comment(ptr);
-            // '{'
-            if (!CSTRCMP_SKIP(ptr, "{"))
-            {
-                push_error("not found \"{\" keyword");
-                return false;
-            }
-            //skip
-            skip_space_end_comment(ptr);
-            //add sub nodes
-            if (!parse_staments(ptr, l_def_node->m_staments)) return false;
-            //skip
-            skip_space_end_comment(ptr);
-            // '}'
-            if (!CSTRCMP_SKIP(ptr, "}"))
-            {
-                push_error("not found \"}\" keyword");
-                return false;
-            }
+			// parse '{' staments '}' | stament
+			if (!parse_stament_s_block(ptr, l_def_node->m_staments)) return false;
             //success
             return true;
         }
