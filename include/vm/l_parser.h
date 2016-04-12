@@ -59,12 +59,16 @@ namespace l_language
      array_dec   := '[' [exp] {[ ',' exp ]} ']'
      table_dec   := '{' [table_field] {[ ',' table_field ]} '}'
      table_field := (constant | variable) ':' exp
-
+     
+     class_dec   := 'class' variable [ ':' variable {[',' variable]}] class_body
+     class_field := ('public'|'private'|'protected') ( variable [assignament exp] | def )
+     class_body  := '{' {[ class_field ]} '}'
+     
 	//statments
 	italanguage  := staments
 	staments     := { stament }
 	stamentsblock:= '{' staments '}' | stament
-    stament		 := if | call | cicle | operation | def
+    stament		 := if | call | cicle | operation | def | class_dec
     assignment   := '=' | '<-' | "+=" | "-=" | "*=" | "/="
     operation    := assignable assignament exp | call
     if			 := 'if' exp stamentsblock {[ else_if ]} [ else ]

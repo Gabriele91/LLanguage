@@ -36,7 +36,8 @@ namespace l_language
             TABLE_NODE,
             FUNCTION_DEF_NODE,
             RETURN_NODE,
-            CONTEXT_TYPE_NODE
+            CONTEXT_TYPE_NODE,
+            CLASS_NODE
 		};
 
 		//class declaretion
@@ -57,12 +58,14 @@ namespace l_language
         class function_def_node;
         class return_node;
         class context_type_node;
+        class class_node;
 		//node list
         using list_nodes  = std::vector< node* >;
         using list_ops    = std::vector< op_node* >;
         using list_vars   = std::vector< variable_node* >;
         using list_exps   = std::vector< exp_node* >;
         using list_exps2  = std::vector< std::array< exp_node*, 2 > >;
+        using list_defs   = std::vector< function_def_node* >;
 
 		//besic node
 		class node
@@ -865,6 +868,106 @@ namespace l_language
                 for(auto& node : m_vars) delete node;
             }
         };
+        //class
+        class class_node : public node
+        {
+        public:
+            //politicy
+            enum attribute_def_type
+            {
+                T_PUBLIC,
+                T_PRIVATE,
+                T_PROTECTED
+            };
+            //attribute struct
+            struct attribute
+            {
+                variable_node*     m_var{ nullptr };
+                exp_node*          m_exp{ nullptr };
+                attribute_def_type m_type;
+                
+                attribute()
+                {
+                }
+                
+                attribute(variable_node* var, attribute_def_type type)
+                {
+                    m_var  = var;
+                    m_exp  = nullptr;
+                    m_type = type;
+                }
+    
+                attribute(variable_node* var, exp_node* exp, attribute_def_type type)
+                {
+                    m_var  = var;
+                    m_exp  = exp;
+                    m_type = type;
+                }
+                
+                virtual ~attribute()
+                {
+                    if(m_var) delete m_var;
+                    if(m_exp) delete m_exp;
+                }
+            };
+            //method struct
+            struct method_def
+            {
+                function_def_node* m_method{ nullptr };
+                attribute_def_type m_type;
+                
+                method_def()
+                {
+                }
+                
+                method_def(function_def_node* method, attribute_def_type type)
+                {
+                    m_method  = method;
+                    m_type = type;
+                }
+                
+                virtual ~method_def()
+                {
+                    if(m_method) delete m_method;
+                }
+            };
+            //parent types
+            list_vars  m_parent;
+            //attribute types
+            std::vector < attribute >  m_attrs;
+            //def types
+            std::vector < method_def > m_defs;
+            //init
+            class_node()
+            {
+                m_type = CLASS_NODE;
+            };
+            //add parent class
+            void add_parent(variable_node* var)
+            {
+                m_parent.push_back(var);
+            }
+            //utilities
+            void add_attr(variable_node* var,attribute_def_type type= T_PUBLIC)
+            {
+                m_attrs.push_back({ var, type });
+            }
+            void add_attr(variable_node* var,exp_node* exp,attribute_def_type type= T_PUBLIC)
+            {
+                m_attrs.push_back({ var, exp, type });
+            }
+            //utilities
+            void add_def(function_def_node* def,attribute_def_type type= T_PUBLIC)
+            {
+                m_defs.push_back({ def, type });
+            }
+            //dealloc
+            virtual ~class_node()
+            {
+                for(auto& node : m_parent) delete node;
+            }
+        };
+        
 		//utilities
 
 		//variable
@@ -1159,8 +1262,17 @@ namespace l_language
             node->m_char = ichar;
             return node;
         }
-
-		//tree root
+        //class stament
+        static class_node* clazz(size_t line = 0, size_t ichar = 0)
+        {
+            auto* node = new class_node;
+            node->m_line = line;
+            node->m_char = ichar;
+            return node;
+        }
+        
+        
+        //tree root
 		root_node* m_root = { new root_node };
 		//append stament
 		root_node* append(node* node)
