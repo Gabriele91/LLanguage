@@ -175,18 +175,25 @@ int l_get_global(l_language::l_thread* th,int args)
 
 int l_using(l_language::l_thread* th, int args)
 {
-	//get variable
-	auto& name = th->value(0);
-	//gettable
-	auto& var_table = th->main_context()->variable(name);
-	//table obj
-	auto& table = *var_table.to<l_language::l_table>();
-	//for each
-	for (auto it : table.raw())
-	{
-		th->main_context()->variable(it.first) = it.second;
-	}
-	//number of ret values
+    for(int arg =0; arg!=args; ++arg)
+    {
+        //get variable
+        auto& name = th->value(arg);
+        //is a string or a table?
+        if(!name.is_table() && !name.is_string()) return -1;
+        //gettable
+        auto& var_table = name.is_table() ? name : th->main_context()->variable(name);
+        //is a table?
+        if(!var_table.is_table()) return -1;
+        //table obj
+        auto& table = *var_table.to<l_language::l_table>();
+        //for each
+        for (auto it : table.raw())
+        {
+            th->main_context()->variable(it.first) = it.second;
+        }
+    }
+    //number of ret values
 	return 0;
 }
 

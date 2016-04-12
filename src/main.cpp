@@ -6,6 +6,7 @@
 #include <l_base_lib.h>
 #include <l_io_lib.h>
 #include <l_os_lib.h>
+#include <l_math_lib.h>
 #define STR_VERSION_MAJOR "0"
 #define STR_VERSION_MINOR "4"
 #define STR_VERSION_MAINTENANCE "6"
@@ -105,6 +106,7 @@ int main(int argc,const char* args[])
         it_compiler.add_lib(l_language::l_base_lib);
         it_compiler.add_lib("io",l_language::l_io_lib);
         it_compiler.add_lib("os",l_language::l_os_lib);
+        it_compiler.add_lib("math",l_language::l_math_lib);
         //read code // "source.it"
         std::ifstream source_file(i_source);
         std::string source((std::istreambuf_iterator<char>(source_file)),

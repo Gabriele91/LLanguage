@@ -249,6 +249,24 @@ namespace l_language
             return m_value.m_f;
         }
         
+        bool can_to_int() const
+        {
+            return
+               is_float()
+            || is_int()
+            || is_bool()
+            || is_null();
+        }
+        
+        bool can_to_float() const
+        {
+            return
+               is_float()
+            || is_int()
+            || is_bool()
+            || is_null();
+        }
+        
         std::string to_string() const;
         
         template< class T >
