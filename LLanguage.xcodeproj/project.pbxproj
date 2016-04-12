@@ -19,6 +19,7 @@
 		E05F4B4C1C57FB8D00F7EB6A /* l_string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E05F4B4B1C57FB8D00F7EB6A /* l_string.cpp */; };
 		E05F4B4E1C58985500F7EB6A /* l_base_lib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E05F4B4D1C58985500F7EB6A /* l_base_lib.cpp */; };
 		E05F4B511C589BB600F7EB6A /* l_compiler_utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E05F4B501C589BB600F7EB6A /* l_compiler_utilities.cpp */; };
+		E071630A1CBA6D2C00B0064F /* staments.ll in Sources */ = {isa = PBXBuildFile; fileRef = E07163091CBA6D2C00B0064F /* staments.ll */; };
 		E071D70C1C4AC9D1008840D3 /* l_vm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E071D70B1C4AC9D1008840D3 /* l_vm.cpp */; };
 		E078AA1C1C88CC3700131C43 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E072DDDB1C35357A00B197A1 /* main.cpp */; };
 		E078AA241C88CCB400131C43 /* LLanguageLib.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E078AA231C88CCB400131C43 /* LLanguageLib.hpp */; };
@@ -70,6 +71,7 @@
 		E05F4B4B1C57FB8D00F7EB6A /* l_string.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_string.cpp; sourceTree = "<group>"; };
 		E05F4B4D1C58985500F7EB6A /* l_base_lib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_base_lib.cpp; sourceTree = "<group>"; };
 		E05F4B501C589BB600F7EB6A /* l_compiler_utilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_compiler_utilities.cpp; sourceTree = "<group>"; };
+		E07163091CBA6D2C00B0064F /* staments.ll */ = {isa = PBXFileReference; explicitFileType = sourcecode.javascript; fileEncoding = 4; path = staments.ll; sourceTree = "<group>"; };
 		E071D70B1C4AC9D1008840D3 /* l_vm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_vm.cpp; sourceTree = "<group>"; };
 		E072DDC71C35353200B197A1 /* LLanguage */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LLanguage; sourceTree = BUILT_PRODUCTS_DIR; };
 		E072DDD61C35357A00B197A1 /* l_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = l_config.h; sourceTree = "<group>"; };
@@ -249,6 +251,7 @@
 		E09524D91C69FB2F00F523AB /* samples */ = {
 			isa = PBXGroup;
 			children = (
+				E07163091CBA6D2C00B0064F /* staments.ll */,
 				E078A9F81C88CB3300131C43 /* logic_ops.ll */,
 				E078A9F91C88CB3300131C43 /* lambda_function.ll */,
 				E078A9FA1C88CB3300131C43 /* runtimeerrors.ll */,
@@ -363,6 +366,7 @@
 				E09A53611CB13CB600D5FE77 /* slow_test.ll in Sources */,
 				E05F4B4C1C57FB8D00F7EB6A /* l_string.cpp in Sources */,
 				E0109F5E1CA28826005EBF1A /* l_io_lib.cpp in Sources */,
+				E071630A1CBA6D2C00B0064F /* staments.ll in Sources */,
 				E05F4B4E1C58985500F7EB6A /* l_base_lib.cpp in Sources */,
 				E0F164311CA164E40009A4EF /* l_compiler_tree_to_vm.cpp in Sources */,
 				E08194B91CAFD8C900B87B27 /* this.ll in Sources */,
