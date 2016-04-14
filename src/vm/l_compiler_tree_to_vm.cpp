@@ -515,11 +515,12 @@ namespace l_language
     //compile context type
     bool l_compiler_tree_to_vm::compile_context_type(l_function* fun,l_syntactic_tree::context_type_node* context_type_node)
     {
-        if(context_type_node->is_op())
+        //if(context_type_node->is_op())
+        for (auto& op_node :  context_type_node->m_ops)
         {
-            if(context_type_node->m_op->is(l_syntactic_tree::OP_NODE))
+            if(op_node->is(l_syntactic_tree::OP_NODE))
             {
-                return compile_op(fun, context_type_node->m_op);
+                if(!compile_op(fun, op_node)) return false;
             }
             else return false;
         }

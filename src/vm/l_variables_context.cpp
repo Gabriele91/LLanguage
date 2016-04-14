@@ -20,14 +20,15 @@ namespace l_language
         
         switch (node->m_type)
         {
-            case l_syntactic_tree::OP_NODE:              visit(fun,node->to<l_syntactic_tree::op_node>());            break;
-            case l_syntactic_tree::CALL_NODE:            visit(fun,node->to<l_syntactic_tree::call_node>());          break;
-            case l_syntactic_tree::IF_NODE:              visit(fun,node->to<l_syntactic_tree::if_node>());            break;
-            case l_syntactic_tree::WHILE_NODE:           visit(fun,node->to<l_syntactic_tree::while_node>());         break;
-            case l_syntactic_tree::FOR_NODE:             visit(fun,node->to<l_syntactic_tree::for_node>());           break;
-            case l_syntactic_tree::FUNCTION_DEF_NODE:    visit(fun,node->to<l_syntactic_tree::function_def_node>());  break;
-            case l_syntactic_tree::RETURN_NODE:          visit(fun,node->to<l_syntactic_tree::return_node>());        break;
-            case l_syntactic_tree::CONTEXT_TYPE_NODE:    visit(fun,node->to<l_syntactic_tree::context_type_node>());  break;
+            case l_syntactic_tree::OP_NODE:              visit(fun,node->to<l_syntactic_tree::op_node>());              break;
+            case l_syntactic_tree::CALL_NODE:            visit(fun,node->to<l_syntactic_tree::call_node>());            break;
+            case l_syntactic_tree::IF_NODE:              visit(fun,node->to<l_syntactic_tree::if_node>());              break;
+            case l_syntactic_tree::WHILE_NODE:           visit(fun,node->to<l_syntactic_tree::while_node>());           break;
+            case l_syntactic_tree::FOR_NODE:             visit(fun,node->to<l_syntactic_tree::for_node>());             break;
+            case l_syntactic_tree::FUNCTION_DEF_NODE:    visit(fun,node->to<l_syntactic_tree::function_def_node>());    break;
+            case l_syntactic_tree::RETURN_NODE:          visit(fun,node->to<l_syntactic_tree::return_node>());          break;
+            case l_syntactic_tree::CONTEXT_TYPE_NODE:    visit(fun,node->to<l_syntactic_tree::context_type_node>());    break;
+            case l_syntactic_tree::CLASS_NODE:         /*visit(fun,node->to<l_syntactic_tree::context_type_node>());*/  break;
             default: assert(0); break;
         }
     }
@@ -236,12 +237,13 @@ namespace l_language
     //type context
     void l_variables_context::visit(l_function*  fun, l_syntactic_tree::context_type_node* ctx_node)
     {
-        if(ctx_node->is_op())
+        //operations
+        for (auto& op_node : ctx_node->m_ops)
         {
             l_syntactic_tree::exp_node* exp_to_call_node = nullptr;
             //visit op
-            visit(fun, ctx_node->m_op);
-            exp_to_call_node = ctx_node->m_op->m_assignable;
+            visit(fun, op_node);
+            exp_to_call_node = op_node->m_assignable;
             //assignable node
             //get variable
             while (exp_to_call_node)
@@ -266,29 +268,18 @@ namespace l_language
                 must_to_be_global_value(fun,exp_to_call_node->to_variable_node());
             }
             else
-                if(ctx_node->m_context_type == l_syntactic_tree::context_type_node::T_SUPER)
-                {
-                    must_to_be_upper_value(fun,exp_to_call_node->to_variable_node());
-                }
-        }
-        else
-        {
-            //args
-            if(ctx_node->m_context_type == l_syntactic_tree::context_type_node::T_GLOBAL)
+            if(ctx_node->m_context_type == l_syntactic_tree::context_type_node::T_SUPER)
             {
-                for (auto& variable : ctx_node->m_vars)
-                {
-                    must_to_be_global_value(fun,variable);
-                }
+                must_to_be_upper_value(fun,exp_to_call_node->to_variable_node());
             }
-            else
-                if(ctx_node->m_context_type == l_syntactic_tree::context_type_node::T_SUPER)
-                {
-                    for (auto& variable : ctx_node->m_vars)
-                    {
-                        must_to_be_upper_value(fun,variable);
-                    }
-                }
+        }
+        //vars
+        for (auto& variable : ctx_node->m_vars)
+        {
+            if(ctx_node->m_context_type == l_syntactic_tree::context_type_node::T_GLOBAL)
+                must_to_be_global_value(fun,variable);
+            else if(ctx_node->m_context_type == l_syntactic_tree::context_type_node::T_SUPER)
+                must_to_be_upper_value(fun,variable);
         }
     }
     

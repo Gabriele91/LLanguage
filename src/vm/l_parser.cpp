@@ -19,6 +19,12 @@ namespace l_language
             "super",
             "global",
             
+            "class",
+            "var",
+            "public",
+            "private",
+            "protected",
+            
             "of",
             "in",
             

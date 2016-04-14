@@ -61,8 +61,8 @@ namespace l_language
      table_field := (constant | variable) ':' exp
      
      class_dec   := 'class' variable [ ':' variable {[',' variable]}] class_body
-     class_field := ('public'|'private'|'protected') ( variable [assignament exp] | def )
-     class_body  := '{' {[ class_field ]} '}'
+     class_field := ( 'var' variable [assignament exp] {[',' variable [assignament exp]]} | def )
+     class_body  := '{'  {[  ('public'|'private'|'protected') | class_field ]} '}'
      
 	//statments
 	italanguage  := staments
@@ -82,7 +82,7 @@ namespace l_language
     for          := 'for' ( (for_each_args | for_c_args) [';'] | '(' (for_each_args | for_c_args ) ')') stamentsblock
     def          := ('def'|'function') [variable] '(' ([ variable {[',' variable]} [',' '...' variable] ] | ['...'variable]) ')' stamentsblock
     return       := 'return' [exp]
-    type context := ('global' | 'super') [ variable {[ ',' variable ]} ]
+    type context := ('global' | 'super') [ variable [assignament exp] {[ ',' variable [assignament exp] ]} ]
 	*/
 	class l_parser
 	{
@@ -162,6 +162,12 @@ namespace l_language
             K_SUPER,
             K_GLOBAL,
             
+            K_CLASS,
+            K_VAR,
+            K_PUBLIC,
+            K_PRIVATE,
+            K_PROTECTED,
+            
             K_OF,
             K_IN,
             
@@ -173,7 +179,7 @@ namespace l_language
             K_NULL,
             K_TRUE,
             K_FALSE,
-            K_ARGS
+            K_ARGS,
         };
         static const char** get_keywords();
         static const char* get_keyword(keyword key);
@@ -736,6 +742,7 @@ namespace l_language
 			skip_space_end_comment(ptr);
             //staments
             if (KEYWORDCMP(ptr, IF))					           return parse_if(ptr, node);
+            if (KEYWORDCMP(ptr, CLASS))					           return parse_class(ptr, node);
             if (KEYWORDCMP(ptr, DEF) || KEYWORDCMP(ptr, FUNCTION)) return parse_def(ptr, node);
             if (KEYWORDCMP(ptr, FOR) || KEYWORDCMP(ptr, WHILE))    return parse_cicle(ptr, node);
             if (KEYWORDCMP(ptr, GLOBAL)||KEYWORDCMP(ptr, SUPER))   return parse_type(ptr, node);
@@ -790,6 +797,7 @@ namespace l_language
             //index start char?
             return is_start_index(*ptr) || is_point(*ptr);
         }
+
 		//parse field
         bool parse_field_or_def_and_call(const char*& ptr,
                                          l_syntactic_tree::node*& node,
@@ -1473,26 +1481,25 @@ namespace l_language
                 push_error("not found \"global/super\" keyword");
                 return false;
             }
-            //is op?
-            if(is_operation_slow(ptr,true))
+            //skip
+            skip_space_end_comment(ptr);
+            //parse
+            do
             {
-                //op node
-                l_syntactic_tree::node* op_node = nullptr;
-                //parse
-                if(!parse_operation(ptr,op_node,true))
+                if(is_operation_slow(ptr,true))
                 {
-                    return false;
+                    //op node
+                    l_syntactic_tree::node* op_node = nullptr;
+                    //parse
+                    if(!parse_operation(ptr,op_node,true))
+                    {
+                        return false;
+                    }
+                    //save
+                    l_context_type->append( (l_syntactic_tree::op_node*)op_node );
                 }
-                //save
-                l_context_type->m_op = (l_syntactic_tree::op_node*)op_node;
-            }
-            //values...
-            else
-            {
-                do
+                else
                 {
-                    //skip
-                    skip_space_end_comment(ptr);
                     //variable node
                     l_syntactic_tree::node* l_variable = nullptr;
                     //parse variable
@@ -1504,13 +1511,16 @@ namespace l_language
                         //false
                         return false;
                     }
-                    //push var
-                    l_context_type->append((l_syntactic_tree::variable_node*)l_variable);
                     //skip
                     skip_space_end_comment(ptr);
+                    //push var
+                    l_context_type->append((l_syntactic_tree::variable_node*)l_variable);
                 }
-                while (CSTRCMP_SKIP(ptr, ","));
+                //skip
+                skip_space_end_comment(ptr);
             }
+            while (CSTRCMP_SKIP(ptr, ","));
+
             //skip
             skip_space_end_comment(ptr);
             //cast
@@ -1644,7 +1654,179 @@ namespace l_language
             //go back
             return true;
         }
-		//parse itlanguage
+        //parse class
+        bool parse_class(const char*& ptr, l_syntactic_tree::node*& node)
+        {
+            //ptrs
+            l_syntactic_tree::class_node* class_node = nullptr;
+            //skip
+            skip_space_end_comment(ptr);
+            //class
+            if(!KEYWORDCMP_SKIP(ptr, CLASS))
+            {
+                push_error("Not found class keyword");
+                return false;
+            }
+            //alloc
+            class_node = l_syntactic_tree::clazz();
+            //skip
+            skip_space_end_comment(ptr);
+            //variable
+            if(!parse_variable(ptr, *((l_syntactic_tree::node**)&(class_node->m_class_name))))
+            {
+                delete class_node;
+                return false;
+            }
+            //parse ':'
+            //TODO
+            //skip
+            skip_space_end_comment(ptr);
+            //parse class body
+            if(!parse_class_body(ptr,class_node))
+            {
+                delete class_node;
+                return false;
+            }
+            //pass class node
+            node = class_node;
+            //var name
+            return true;
+        }
+        //parse class body
+        bool parse_class_body(const char*& ptr,l_syntactic_tree::class_node* class_node)
+        {
+            //fast access
+            using attribute_def_type = l_syntactic_tree::class_node::attribute_def_type;
+            //skip
+            skip_space_end_comment(ptr);
+            //{
+            if (!CSTRCMP_SKIP(ptr, "{"))
+            {
+                push_error("not found \'{\' keyword");
+                return false;
+            }
+            //skip
+            skip_space_end_comment(ptr);
+            //status
+            attribute_def_type l_current_state = attribute_def_type::T_PUBLIC;
+            //parse attribute and defs
+            while(!CSTRCMP(ptr, "}"))
+            {
+                if(KEYWORDCMP(ptr, DEF) || KEYWORDCMP(ptr, FUNCTION))
+                {
+                    //ptr
+                    l_syntactic_tree::node* def_node = nullptr;
+                    //parse
+                    if(!parse_def(ptr, def_node)) return false;
+                    //push
+                    class_node->add_def((l_syntactic_tree::function_def_node*)def_node,l_current_state);
+                    //..
+                }
+                else if(KEYWORDCMP_SKIP(ptr, VAR))
+                {
+                    do
+                    {
+                        //.. name
+                        l_syntactic_tree::node* variable_node;
+                        //..
+                        if(!parse_variable(ptr, variable_node))
+                        {
+                            push_error("not valid attribute name");
+                            return false;
+                        }
+                        //skip
+                        skip_space_end_comment(ptr);
+                        //..
+                        if (is_assignment(ptr))
+                        {
+                            //node exp
+                            l_syntactic_tree::exp_node *exp_node = nullptr;
+                            //op name
+                            std::string op_name;
+                            //parse exp
+                            if (!parse_assignment(ptr,op_name) || !parse_exp(ptr, exp_node))
+                            {
+                                if (exp_node) delete exp_node;
+                                return false;
+                            }
+                            //append
+                            class_node->add_attr((l_syntactic_tree::variable_node*)variable_node,
+                                                 exp_node,
+                                                 l_current_state);
+                        }
+                        else
+                        {
+                            //append
+                            class_node->add_attr((l_syntactic_tree::variable_node*)variable_node,
+                                                 l_current_state);
+                        }
+                        //jmp
+                        skip_space_end_comment(ptr);
+                    }
+                    while (CSTRCMP_SKIP(ptr, ","));
+                    
+                }
+                else if(KEYWORDCMP_SKIP(ptr, PUBLIC))
+                {
+                    //change state
+                    l_current_state = attribute_def_type::T_PUBLIC;
+                    //jmp
+                    skip_space_end_comment(ptr);
+                    //jmp :
+                    if (!CSTRCMP_SKIP(ptr, ":"))
+                    {
+                        push_error("not found \':\' keyword");
+                        return false;
+                    }
+                }
+                else if(KEYWORDCMP_SKIP(ptr, PRIVATE))
+                {
+                    //change state
+                    l_current_state = attribute_def_type::T_PRIVATE;
+                    //jmp
+                    skip_space_end_comment(ptr);
+                    //jmp :
+                    if (!CSTRCMP_SKIP(ptr, ":"))
+                    {
+                        push_error("not found \':\' keyword");
+                        return false;
+                    }
+                    
+                }
+                else if(KEYWORDCMP_SKIP(ptr, PROTECTED))
+                {
+                    //change state
+                    l_current_state = attribute_def_type::T_PROTECTED;
+                    //jmp
+                    skip_space_end_comment(ptr);
+                    //jmp :
+                    if (!CSTRCMP_SKIP(ptr, ":"))
+                    {
+                        push_error("not found \':\' keyword");
+                        return false;
+                    }
+                }
+                else
+                {
+                    push_error("invalid class declaretion");
+                    return false;
+                }
+                //..
+                //skip
+                skip_space_end_comment(ptr);
+            }
+            //then
+            if (!CSTRCMP_SKIP(ptr, "}"))
+            {
+                push_error("not found \'}\' keyword");
+                return false;
+            }
+            //skip spaces
+            skip_space_end_comment(ptr);
+            //return success
+            return true;
+        }
+        //parse itlanguage
 		bool parse_italanguage(const char*& ptr, l_syntactic_tree::root_node*& node)
 		{
 			//skip

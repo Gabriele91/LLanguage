@@ -828,9 +828,8 @@ namespace l_language
         class context_type_node : public node
         {
         public:
-            //is a operation
-            op_node* m_op{  nullptr };
             //is a lit of variables
+            list_ops  m_ops;
             list_vars m_vars;
             //type
             enum context_type
@@ -845,18 +844,17 @@ namespace l_language
             {
                 m_type = CONTEXT_TYPE_NODE;
             };
-            //is op node
-            bool is_op() const
-            {
-                return m_op ? true : false;
-            }
             //appen a variable node
             virtual context_type_node* append(variable_node* node)
             {
                 m_vars.push_back(node);
                 return this;
             }
-            //..
+            virtual context_type_node* append(op_node* node)
+            {
+                m_ops.push_back(node);
+                return this;
+            }         //..
             size_t size() const
             {
                 return m_vars.size();
@@ -864,7 +862,7 @@ namespace l_language
             //dealloc
             virtual ~context_type_node()
             {
-                if(m_op)                 delete m_op;
+                for(auto& node : m_ops)  delete node;
                 for(auto& node : m_vars) delete node;
             }
         };
@@ -903,12 +901,6 @@ namespace l_language
                     m_exp  = exp;
                     m_type = type;
                 }
-                
-                virtual ~attribute()
-                {
-                    if(m_var) delete m_var;
-                    if(m_exp) delete m_exp;
-                }
             };
             //method struct
             struct method_def
@@ -925,12 +917,9 @@ namespace l_language
                     m_method  = method;
                     m_type = type;
                 }
-                
-                virtual ~method_def()
-                {
-                    if(m_method) delete m_method;
-                }
             };
+            //name class
+            variable_node* m_class_name;
             //parent types
             list_vars  m_parent;
             //attribute types
@@ -964,7 +953,11 @@ namespace l_language
             //dealloc
             virtual ~class_node()
             {
-                for(auto& node : m_parent) delete node;
+                if (m_class_name)                         delete m_class_name;
+                for(auto& node : m_parent)                delete node;
+                for(auto& node : m_defs)                  delete node.m_method;
+                for(auto& node : m_attrs)                 delete node.m_var;
+                for(auto& node : m_attrs)  if(node.m_exp) delete node.m_exp;
             }
         };
         
