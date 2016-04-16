@@ -124,6 +124,7 @@
 		E0F1642C1CA164200009A4EF /* l_thread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_thread.cpp; sourceTree = "<group>"; };
 		E0F1642F1CA164E40009A4EF /* l_compiler_tree_to_vm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_compiler_tree_to_vm.cpp; sourceTree = "<group>"; };
 		E0F605F81C72299D00D5B90B /* l_call_context.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_call_context.cpp; sourceTree = "<group>"; };
+		E0FA3E2A1CBFD3C20095B0C9 /* l_class.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_class.h; path = vm/l_class.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,13 +210,14 @@
 				E09599331C67508A00BF39F8 /* l_variables_context.h */,
 				E09599301C67508A00BF39F8 /* l_compiler_tree_to_vm.h */,
 				E09599341C67508A00BF39F8 /* l_compiler_utilities.h */,
-				E0891CC71C5A62AD00FB37F6 /* l_variable.h */,
 				E0A4DAA81C692D15007D5089 /* l_call_context.h */,
 				E09599361C676A5800BF39F8 /* l_opcode.h */,
 				E0950C761C4A871700845FEE /* l_vm.h */,
 				E0950C781C4A87E800845FEE /* l_gc.h */,
+				E0891CC71C5A62AD00FB37F6 /* l_variable.h */,
 				E0950C7F1C4AC58800845FEE /* l_object.h */,
 				E0A41F461CB2729300B723A8 /* l_iterator.h */,
+				E0FA3E2A1CBFD3C20095B0C9 /* l_class.h */,
 				E09599321C67508A00BF39F8 /* l_table.h */,
 				E0950C771C4A877800845FEE /* l_array.h */,
 				E05F4B4A1C57F52400F7EB6A /* l_string.h */,
@@ -234,16 +236,16 @@
 			isa = PBXGroup;
 			children = (
 				E01317AC1C92C28E00477C6A /* l_parser.cpp */,
+				E07F58581C9DDCC000C5BF71 /* l_variable.cpp */,
+				E05F4B4B1C57FB8D00F7EB6A /* l_string.cpp */,
+				E0DBF2E51C679C0F00F9DA98 /* l_table.cpp */,
+				E0DBF2E31C678A4E00F9DA98 /* l_function.cpp */,
+				E0F605F81C72299D00D5B90B /* l_call_context.cpp */,
 				E071D70B1C4AC9D1008840D3 /* l_vm.cpp */,
 				E0950C7D1C4AC50400845FEE /* l_gc.cpp */,
-				E05F4B4B1C57FB8D00F7EB6A /* l_string.cpp */,
 				E05F4B501C589BB600F7EB6A /* l_compiler_utilities.cpp */,
 				E09599371C676A8900BF39F8 /* l_opcode.cpp */,
 				E0F1642C1CA164200009A4EF /* l_thread.cpp */,
-				E0DBF2E31C678A4E00F9DA98 /* l_function.cpp */,
-				E0DBF2E51C679C0F00F9DA98 /* l_table.cpp */,
-				E0F605F81C72299D00D5B90B /* l_call_context.cpp */,
-				E07F58581C9DDCC000C5BF71 /* l_variable.cpp */,
 				E0F1642F1CA164E40009A4EF /* l_compiler_tree_to_vm.cpp */,
 				E058073E1CA17CC600F69658 /* l_variables_context.cpp */,
 				E05F4B4D1C58985500F7EB6A /* l_base_lib.cpp */,

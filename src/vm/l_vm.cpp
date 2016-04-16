@@ -250,16 +250,37 @@ namespace l_language
         new_ctx->lock();
         //..
         unsigned int id_arg = 0;
-        //put arguments
-        for(auto arg : args)
-        {
-            if (id_arg < call_fun.m_args_size)
-                new_ctx->variable( call_fun.constant(id_arg++) ) = arg;
-            else
-                break;
-        }
         //..
         l_thread* thread = new l_thread(this);
+        //n args
+        unsigned int n_fun_args = call_fun.m_args_size;
+        //alloc array args..?
+        if (call_fun.m_have_args_list)
+        {
+            //alloc array
+            thread->register3(3) = l_array::gc_new(get_gc());
+        }
+        //put arguments
+        for(auto& arg : args)
+        {
+            if (id_arg < call_fun.m_args_size)
+            {
+                new_ctx->variable( call_fun.constant(id_arg++) ) = arg;
+            }
+            else if (call_fun.m_have_args_list)
+            {
+                thread->register3(3).array()->push(arg);
+            }
+            else break;
+        }
+        //add var list
+        if (call_fun.m_have_args_list)
+        {
+            //push array
+            new_ctx->variable( call_fun.constant(n_fun_args) ) = thread->register3(3);
+            //to null
+            thread->register3(3) = l_variable();
+        }
         //execute call
         l_thread::type_return n_return = thread->execute(*new_ctx);
         //error?
@@ -269,7 +290,7 @@ namespace l_language
         //return?
         if(n_return == l_thread::T_RETURN_VALUE)
         {
-            v_return = (thread->register3(2));
+            v_return = (thread->get_return());
         }
         //dealloc
         delete thread;

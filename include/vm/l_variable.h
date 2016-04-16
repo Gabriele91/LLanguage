@@ -23,6 +23,8 @@ namespace l_language
     class l_iterator;
     class l_gc;
     class l_table;
+    class l_class;
+    class l_class_object;
     typedef int (*l_cfunction) (l_thread*,int args);
     typedef unsigned int l_function_id;
     //variable
@@ -44,6 +46,8 @@ namespace l_language
             ARRAY,
             TABLE,
             ITERATOR,
+            CLASS,
+            CLASS_OBJECT,
             OBJECT,
             COBJECT
         };
@@ -134,6 +138,17 @@ namespace l_language
             m_value.m_pobj = (l_obj*)obj;
         }
         
+        l_variable(l_class* obj)
+        {
+            m_type         = CLASS;
+            m_value.m_pobj = (l_obj*)obj;
+        }
+        l_variable(l_class_object* obj)
+        {
+            m_type         = CLASS_OBJECT;
+            m_value.m_pobj = (l_obj*)obj;
+        }
+        
         l_variable(const l_variable& value)
         {
             (*this) = value;
@@ -201,17 +216,36 @@ namespace l_language
             return m_type == ITERATOR;
         }
         
-        bool is_object(bool strict=false) const
+        bool is_ref_obj() const
         {
-            return m_type == OBJECT ||
-            (!strict &&
-            (
-                   m_type == STRING  ||
-                   m_type == TABLE   ||
-                   m_type == ARRAY   ||
-                   m_type == ITERATOR||
-                   m_type == COBJECT
-            ));
+            return m_type == OBJECT      ||
+                   m_type == STRING      ||
+                   m_type == TABLE       ||
+                   m_type == ARRAY       ||
+                   m_type == ITERATOR    ||
+                   m_type == CLASS       ||
+                   m_type == CLASS_OBJECT||
+                   m_type == COBJECT;
+        }
+        
+        bool is_object() const
+        {
+            return m_type == OBJECT;
+        }
+        
+        bool is_cobject() const
+        {
+            return m_type == COBJECT;
+        }
+        
+        bool is_class() const
+        {
+            return m_type == CLASS;
+        }
+        
+        bool is_class_object() const
+        {
+            return m_type == CLASS_OBJECT;
         }
         
         bool is_function() const
@@ -289,6 +323,10 @@ namespace l_language
         
         l_string* string();
         
+        l_class* clazz();
+        
+        l_class_object* class_object();
+        
         const l_table* table() const;
         
         const l_array* array() const;
@@ -296,6 +334,10 @@ namespace l_language
         const l_iterator* iterator() const;
         
         const l_string* string() const;
+        
+        const l_class* clazz() const;
+        
+        const l_class_object* class_object() const;
         
         bool is_false()
         {

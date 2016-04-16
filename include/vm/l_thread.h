@@ -37,6 +37,7 @@ namespace l_language
             R_RETURN,
             R_CONTEXT,
             R_THIS,
+            R_TEMP_CLASS,
             R_N_REGS
         };
         //temp variable
@@ -61,6 +62,10 @@ namespace l_language
         l_variable& get_this()
         {
             return m_register[R_THIS];
+        }
+        l_variable& get_class_temp()
+        {
+            return m_register[R_TEMP_CLASS];
         }
         //access
         l_variable& global(int value_id);

@@ -136,7 +136,7 @@ namespace  l_language
             //temporal register
             for(l_variable& var : thread->m_register)
             {
-                if(var.is_object() && var.is_unmarked())
+                if(var.is_ref_obj() && var.is_unmarked())
                 {
                     var.mark();
                 }
@@ -148,7 +148,7 @@ namespace  l_language
             {
                 l_variable& var  = thread->value(i);
                 
-                if(var.is_object() && var.is_unmarked())
+                if(var.is_ref_obj() && var.is_unmarked())
                 {
                     var.mark();
                 }

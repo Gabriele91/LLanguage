@@ -1677,8 +1677,31 @@ namespace l_language
                 delete class_node;
                 return false;
             }
+            //skip
+            skip_space_end_comment(ptr);
             //parse ':'
-            //TODO
+            if(CSTRCMP_SKIP(ptr, ":"))
+            {
+                //skip
+                skip_space_end_comment(ptr);
+                //parse list
+                do
+                {
+                    //temp var node
+                    l_syntactic_tree::node*  variable_node = nullptr;
+                    //parse..
+                    if(!parse_variable(ptr, variable_node))
+                    {
+                        delete class_node;
+                        return false;
+                    }
+                    //add parent
+                    class_node->add_parent((l_syntactic_tree::variable_node*)variable_node);
+                    //skip
+                    skip_space_end_comment(ptr);
+                }
+                while (CSTRCMP_SKIP(ptr, ","));
+            }
             //skip
             skip_space_end_comment(ptr);
             //parse class body
@@ -1709,17 +1732,25 @@ namespace l_language
             skip_space_end_comment(ptr);
             //status
             attribute_def_type l_current_state = attribute_def_type::T_PUBLIC;
+            //get class name
+            //std::string def_class_name = "$"+class_node->get_class_name();
             //parse attribute and defs
             while(!CSTRCMP(ptr, "}"))
             {
                 if(KEYWORDCMP(ptr, DEF) || KEYWORDCMP(ptr, FUNCTION))
                 {
                     //ptr
-                    l_syntactic_tree::node* def_node = nullptr;
+                    l_syntactic_tree::node* node = nullptr;
                     //parse
-                    if(!parse_def(ptr, def_node)) return false;
+                    if(!parse_def(ptr, node)) return false;
+                    //cast type
+                    auto* def_node = (l_syntactic_tree::function_def_node*)node;
+                    //def name
+                    //auto& def_name = def_node->m_variable->m_name;
+                    //rename def
+                    //def_name = def_class_name+"|"+def_name;
                     //push
-                    class_node->add_def((l_syntactic_tree::function_def_node*)def_node,l_current_state);
+                    class_node->add_def(def_node,l_current_state);
                     //..
                 }
                 else if(KEYWORDCMP_SKIP(ptr, VAR))

@@ -80,7 +80,7 @@ namespace l_language
             //mark childs
             for(auto& var : m_pool)
             {
-                if(var.variable().is_object())
+                if(var.variable().is_ref_obj())
                 if(var.variable().is_unmarked())
                 {
                     var.variable().mark();
@@ -98,7 +98,7 @@ namespace l_language
             //mark childs
             for(auto& var : m_pool)
             {
-                if(var.variable().is_object())
+                if(var.variable().is_ref_obj())
                 if(var.variable().is_marked())
                 {
                     var.variable().unmark();

@@ -36,6 +36,12 @@ namespace l_language
         L_DIV,     // /
         L_MOD,     // %
         L_UNM,     // -
+        //Class
+        L_START_CLASS_DEC,
+        L_CLASS_ATTR,
+        L_CLASS_METHOD,
+        L_CLASS_PARENT,
+        L_END_CLASS_DEC,
         //Loads
         L_PUSH_NULL,
         L_PUSH_TRUE,

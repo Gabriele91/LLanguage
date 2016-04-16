@@ -55,6 +55,10 @@ namespace l_language
         bool compile_function_def(l_function* fun,
                                   l_syntactic_tree::function_def_node* function_def_node,
                                   bool is_exp = false);
+        //compile class
+        bool compile_class_def(l_function* fun,
+                               l_syntactic_tree::class_node* class_node,
+                               bool is_exp = false);
         //compile return
         bool compile_return(l_function* fun,l_syntactic_tree::return_node* return_node);
         //compile context type

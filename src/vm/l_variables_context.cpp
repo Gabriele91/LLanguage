@@ -28,10 +28,12 @@ namespace l_language
             case l_syntactic_tree::FUNCTION_DEF_NODE:    visit(fun,node->to<l_syntactic_tree::function_def_node>());    break;
             case l_syntactic_tree::RETURN_NODE:          visit(fun,node->to<l_syntactic_tree::return_node>());          break;
             case l_syntactic_tree::CONTEXT_TYPE_NODE:    visit(fun,node->to<l_syntactic_tree::context_type_node>());    break;
-            case l_syntactic_tree::CLASS_NODE:         /*visit(fun,node->to<l_syntactic_tree::context_type_node>());*/  break;
+            case l_syntactic_tree::CLASS_NODE:           visit(fun,node->to<l_syntactic_tree::class_node>());    break;
             default: assert(0); break;
         }
     }
+    
+    
     
     //function def
     void l_variables_context::visit(l_function* fun,l_syntactic_tree::function_def_node* node)
@@ -77,6 +79,29 @@ namespace l_language
         for(l_syntactic_tree::node* st : node->m_staments)
         {
             visit(new_fun,st);
+        }
+    }
+    
+    //class
+    void l_variables_context::visit(l_function*  fun, l_syntactic_tree::class_node* node)
+    {
+        //class name
+        visit(fun, node->m_class_name);
+        //..
+        for(auto& parent : node->m_parents)
+        {
+            visit(fun,parent);
+        }
+        //staments
+        for(auto& attrs : node->m_attrs)
+        {
+            if(attrs.m_var) visit(fun,attrs.m_var);
+            if(attrs.m_exp) visit(fun,attrs.m_exp);
+        }
+        //sub def
+        for(auto& defs : node->m_defs)
+        {
+            visit(fun,defs.m_method);
         }
     }
     
@@ -282,6 +307,7 @@ namespace l_language
                 must_to_be_upper_value(fun,variable);
         }
     }
+
     
     //for
     void l_variables_context::visit(l_function* fun, l_syntactic_tree::for_node* for_node)
@@ -430,6 +456,11 @@ namespace l_language
     int l_variables_context::get_function_id(l_function* f_context,l_syntactic_tree::function_def_node* c_node)
     {
         return get_table_id(f_context,function_index(c_node));
+    }
+    
+    int l_variables_context::get_class_id(l_function* f_context,l_syntactic_tree::class_node* c_node)
+    {
+        return get_table_id(f_context,class_index(c_node));
     }
     
     bool l_variables_context::is_upper_value(l_function* f_context,l_syntactic_tree::variable_node* node)

@@ -921,7 +921,7 @@ namespace l_language
             //name class
             variable_node* m_class_name;
             //parent types
-            list_vars  m_parent;
+            list_vars  m_parents;
             //attribute types
             std::vector < attribute >  m_attrs;
             //def types
@@ -934,7 +934,7 @@ namespace l_language
             //add parent class
             void add_parent(variable_node* var)
             {
-                m_parent.push_back(var);
+                m_parents.push_back(var);
             }
             //utilities
             void add_attr(variable_node* var,attribute_def_type type= T_PUBLIC)
@@ -950,11 +950,18 @@ namespace l_language
             {
                 m_defs.push_back({ def, type });
             }
+            //get class name
+            std::string get_class_name() const
+            {
+                std::string out = m_class_name->m_name;
+                for(auto& node : m_parents) out+=":"+node->m_name;
+                return out;
+            }
             //dealloc
             virtual ~class_node()
             {
                 if (m_class_name)                         delete m_class_name;
-                for(auto& node : m_parent)                delete node;
+                for(auto& node : m_parents)               delete node;
                 for(auto& node : m_defs)                  delete node.m_method;
                 for(auto& node : m_attrs)                 delete node.m_var;
                 for(auto& node : m_attrs)  if(node.m_exp) delete node.m_exp;

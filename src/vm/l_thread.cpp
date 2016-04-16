@@ -12,6 +12,7 @@
 #include <l_gc.h>
 #include <l_array.h>
 #include <l_table.h>
+#include <l_class.h>
 #include <l_xrange.h>
 #include <iostream>
 
@@ -358,7 +359,7 @@ namespace l_language
                           l_variable& r_b = stack(1);
                     const l_variable& r_c = stack(0);
                     //try
-                    if ( r_b.is_object() )
+                    if ( r_b.is_ref_obj() )
                     {
                         //is a vector
                         if(r_b.is_array())
@@ -387,9 +388,20 @@ namespace l_language
                             //get and pop value
                             stack(1) = table->operator[](r_c);
                         }
+                        else if(r_b.is_class_object())
+                        {
+                            //types
+                            l_class_object* object =  r_b.class_object();
+                            //is a string?
+                            if(!r_c.is_string()) raise( "value isn't a valid key" );
+                            //save last
+                            get_this() = stack(1);
+                            //get and pop value
+                            stack(1) = object->get_value(r_c);
+                        }
                         else
                         {
-                            raise( "value isn't a vector/table, field not available" );
+                            raise( "value isn't a vector/table/object, field not available" );
                         }
                     }
                     else
@@ -407,7 +419,7 @@ namespace l_language
                     //get index
                     const l_variable& r_b = stack(1);
                     //try
-                    if ( r_a.is_object() )
+                    if ( r_a.is_ref_obj() )
                     {
                         //is a vector
                         if(r_a.is_array())
@@ -432,9 +444,18 @@ namespace l_language
                             //get and pop value
                             table->operator[](r_b) = pop();
                         }
+                        else if(r_a.is_class_object())
+                        {
+                            //types
+                            l_class_object* object =  r_a.class_object();
+                            //is a string?
+                            if(!r_b.is_string()) raise( "value isn't a valid key" );
+                            //get and pop value
+                            if(!object->set_value(r_b, pop())) raise( "value is't an attribute" );
+                        }
                         else
                         {
-                            raise( "value isn't a vector/table, field not available" );
+                            raise( "value isn't a vector/table/object, field not available" );
                         }
                     }
                     else
@@ -455,7 +476,7 @@ namespace l_language
                     l_variable& r_a = top();
                     //..
                     //try
-                    if ( r_a.is_object() )
+                    if ( r_a.is_ref_obj() )
                     {
                         //get object
                         l_obj* this_obj = (l_obj*)r_a.m_value.m_pobj;
@@ -562,6 +583,8 @@ namespace l_language
                 {
                     //get index
                     register3(0) = pop();
+                    //return this?
+                    bool b_ret_this = false;
                     //get args
                     if( register3(0).is_cfunction() )
                     {
@@ -586,8 +609,38 @@ namespace l_language
                         //if return
                         if(n_return) push(get_return());
                     }
-                    else if( register3(0).is_closer() )
+                    else if( register3(0).is_closer() || register3(0).is_class() )
                     {
+                        if(register3(0).is_class())
+                        {
+                            l_class* this_class = register3(0).clazz();
+                            //this
+                            get_this() = this_class->new_object(this);
+                            //is a this call
+                            cmp.m_op_code = L_THIS_CALL;
+                            //return this
+                            b_ret_this = true;
+                            //get costructor
+                            register3(0) = this_class->get_constructor();
+                            //is null?
+                            if(register3(0).is_null())
+                            {
+                                //pop args
+                                for(unsigned int
+                                    arg  = 0;
+                                    arg != cmp.m_arg;
+                                    ++arg)
+                                {
+                                    pop();
+                                }
+                                //push this
+                                push(get_this());
+                                //remove this ref
+                                get_this() = l_variable();
+                                //..
+                                break;
+                            }
+                        }
                         //get context
                         l_closer* closer = register3(0).to<l_closer>();
                         //else assert
@@ -663,6 +716,10 @@ namespace l_language
                         {
                             push(register3(2));
                         }
+                        else if(b_ret_this)
+                        {
+                            push(get_this());
+                        }
                     }
                     else
                     {
@@ -674,8 +731,35 @@ namespace l_language
                         get_this() = l_variable();
                     }
                 }
-                break;
-                    
+                    break;
+                case L_START_CLASS_DEC:
+                    //alloc
+                    get_class_temp() = l_variable(get_gc()->new_obj<l_class>());
+                    //end
+                    break;
+                case L_CLASS_ATTR:
+                    //add
+                    get_class_temp().clazz()->add_variable(pop(),pop());
+                    //end
+                    break;
+                case L_CLASS_METHOD:
+                    //add
+                    get_class_temp().clazz()->add_def(pop(),pop());
+                    //end
+                    break;
+                case L_CLASS_PARENT:
+                    /*
+                     todo
+                     */
+                    //end
+                    break;
+                case L_END_CLASS_DEC:
+                    //set class name
+                    get_class_temp().clazz()->set_class_name( vconst(cmp.m_arg) );
+                    //push
+                    push(get_class_temp());
+                    //end
+                    break;
                 default:  break;
             }
         }

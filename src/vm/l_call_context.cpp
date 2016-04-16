@@ -136,7 +136,7 @@ namespace l_language
         //unmark
         m_local_variables.mark();
         //mark this
-        if(m_this.is_object())
+        if(m_this.is_ref_obj())
         {
             m_this.unmark();
         }
@@ -154,7 +154,7 @@ namespace l_language
         //unmark
         m_local_variables.unmark();
         //unmark this
-        if(m_this.is_object())
+        if(m_this.is_ref_obj())
         {
             m_this.unmark();
         }

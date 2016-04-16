@@ -14,6 +14,7 @@
 #include <l_table.h>
 #include <l_array.h>
 #include <l_iterator.h>
+#include <l_class.h>
 
 namespace l_language
 {
@@ -54,24 +55,44 @@ namespace l_language
         return static_cast< l_string* >( m_value.m_pobj );
     }
     
+    l_class* l_variable::clazz()
+    {
+        return static_cast< l_class* >( m_value.m_pobj );
+    }
+    
+    l_class_object* l_variable::class_object()
+    {
+        return static_cast< l_class_object* >( m_value.m_pobj );
+    }
+    
     const l_table* l_variable::table() const
     {
-        return static_cast< l_table* >( m_value.m_pobj );
+        return static_cast<  const l_table* >( m_value.m_pobj );
     }
     
     const l_array* l_variable::array() const
     {
-        return static_cast< l_array* >( m_value.m_pobj );
+        return static_cast< const l_array* >( m_value.m_pobj );
     }
     
     const l_iterator* l_variable::iterator() const
     {
-        return static_cast< l_iterator* >( m_value.m_pobj );
+        return static_cast< const l_iterator* >( m_value.m_pobj );
     }
     
     const l_string* l_variable::string() const
     {
-        return static_cast< l_string* >( m_value.m_pobj );
+        return static_cast< const l_string* >( m_value.m_pobj );
+    }
+    
+    const l_class* l_variable::clazz() const
+    {
+        return static_cast< const l_class* >( m_value.m_pobj );
+    }
+    
+    const l_class_object* l_variable::class_object() const
+    {
+        return static_cast< const l_class_object* >( m_value.m_pobj );
     }
     
     bool l_variable::add(l_variable& var,l_variable& output)

@@ -39,6 +39,13 @@ namespace l_language
         "MOD",     // %
         "UNM",     // -
         
+        //Class
+        "START_CLASS_DEC",
+        "CLASS_ATTR",
+        "CLASS_METHOD",
+        "CLASS_PARENT",
+        "END_CLASS_DEC",
+        
         //Loads
         "PUSH_NULL",
         "PUSH_TRUE",

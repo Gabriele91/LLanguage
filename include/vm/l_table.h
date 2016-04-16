@@ -24,6 +24,30 @@ namespace l_language
     class l_vm;
     class l_thread;
     
+    //value compare
+    struct l_value_compare
+    {
+        size_t operator()(const l_variable& left) const
+        {
+            //input
+            const size_t* cptr = (const size_t*)left.string()->str().c_str();
+            //return
+            return *cptr;
+        }
+        
+        bool operator()(const l_variable& left,const l_variable& right) const
+        {
+            return left.string()->str() == right.string()->str();
+        }
+    };
+    //type
+    using l_map_object           = std::unordered_map< l_variable,
+                                                       l_variable,
+                                                       l_value_compare,
+                                                       l_value_compare >;
+    using l_map_object_it        = l_map_object::iterator;
+    using l_map_object_const_it  = l_map_object::const_iterator;
+    
     //implementation
     class l_table : public l_obj
     {
@@ -32,78 +56,6 @@ namespace l_language
         friend class l_call_context;
         friend class l_vm;
         friend class l_thread;
-        //value compare
-        struct l_value_compare
-        {
-			size_t operator()(const l_variable& left) const
-			{
-                #if 0
-                    //assert(left.is_string());
-                    std::hash<std::string> f_hash;
-                    return f_hash(left.string()->str());
-                #elif 0
-                    //input
-                    const char* cptr = left.string()->str().c_str();
-                    //output
-                    size_t output { 0 };
-                    char* const optr = (char* const)&output;
-                    //hash
-                    for( size_t i = 0; cptr[i] && i < sizeof(size_t); ++i )
-                    {
-                        optr[i] = cptr[i];
-                    }
-                    //return
-                    return output;
-                #elif 1
-                    //input
-                    const size_t* cptr = (const size_t*)left.string()->str().c_str();
-                    //return
-                    return *cptr;
-                #else
-                    //input
-                    const auto& cstr = left.string()->str();
-                    const char* cptr = cstr.c_str();
-                    //output
-                    size_t output { 0 };
-                    char*  optr = (char*)&output;
-                    //mem
-                    std::memcpy(optr, cptr, std::min(cstr.size(),sizeof(size_t)));
-                    //return
-                    return output;
-                #endif
-			}
-
-            bool operator()(const l_variable& left,const l_variable& right) const
-            {
-                #if 1
-                    //assert(left.is_string());
-                    //assert(right.is_string());
-                    return left.string()->str() == right.string()->str();
-                #else
-                    //pointers
-                    const auto& lstr = left.string()->str();
-                    const auto& rstr = right.string()->str();
-                    //compare size
-                    if( lstr.size() != rstr.size() ) return false;
-                    //c compare
-                    const char* lptr = lstr.c_str();
-                    const char* rptr = rstr.c_str();
-                    //compare
-                    for(; *lptr && *rptr ;++lptr, ++rptr)
-                        if(*lptr != *rptr)
-                            return false;
-                    //return...
-                    return *lptr == *rptr;
-                #endif
-            }
-        };
-        //type
-        using l_map_object           = std::unordered_map< l_variable,
-														   l_variable,
-														   l_value_compare,
-													       l_value_compare >;
-        using l_map_object_it        = l_map_object::iterator;
-        using l_map_object_const_it  = l_map_object::const_iterator;
         //table
         l_map_object m_map;
         //mark event
@@ -118,7 +70,7 @@ namespace l_language
             {
                 l_variable& var = it.second;
                 
-                if(var.is_object())
+                if(var.is_ref_obj())
                 if(var.is_unmarked())
                 {
                     var.mark();
@@ -127,7 +79,7 @@ namespace l_language
                 //key is static
                 const l_variable& key = it.first;
                 //is a object?
-                if(key.is_object())
+                if(key.is_ref_obj())
                 if(key.is_unmarked())
                 {
                     //object
@@ -149,7 +101,7 @@ namespace l_language
             {
                 l_variable& var = it.second;
                 
-                if(var.is_object())
+                if(var.is_ref_obj())
                 if(var.is_marked())
                 {
                     var.unmark();
@@ -157,7 +109,7 @@ namespace l_language
                 //key is static
                 const l_variable& key = it.first;
                 //is a object?
-                if(key.is_object())
+                if(key.is_ref_obj())
                 if(key.is_marked())
                 {
                     //object
@@ -225,8 +177,8 @@ namespace l_language
     
     class l_table_it : public l_iterator
     {
-        l_table*                  m_table;
-        l_table::l_map_object_it  m_iterator;
+        l_table*         m_table;
+        l_map_object_it  m_iterator;
         
         //mark event
         virtual void mark()
@@ -276,7 +228,7 @@ namespace l_language
             m_iterator = m_table->m_map.begin();
         }
         
-        l_table_it(const l_table::l_map_object_it& c_it)
+        l_table_it(const l_map_object_it& c_it)
         {
             //get iterator
             m_iterator = c_it;
@@ -287,10 +239,10 @@ namespace l_language
         static l_variable gc_new(l_gc& gc,l_table* vector);
         static l_variable gc_new(l_vm* vm,l_table* vector);
         static l_variable gc_new(l_vm& vm,l_table* vector);
-        static l_variable gc_new(l_gc* gc,l_table::l_map_object_it c_it);
-        static l_variable gc_new(l_gc& gc,l_table::l_map_object_it c_it);
-        static l_variable gc_new(l_vm* vm,l_table::l_map_object_it c_it);
-        static l_variable gc_new(l_vm& vm,l_table::l_map_object_it c_it);
+        static l_variable gc_new(l_gc* gc,l_map_object_it c_it);
+        static l_variable gc_new(l_gc& gc,l_map_object_it c_it);
+        static l_variable gc_new(l_vm* vm,l_map_object_it c_it);
+        static l_variable gc_new(l_vm& vm,l_map_object_it c_it);
         
         virtual l_variable get() const
         {
@@ -310,7 +262,7 @@ namespace l_language
         virtual l_variable next() const
         {
             //auto copy it
-            l_table::l_map_object_it next_it = m_iterator;
+            l_map_object_it next_it = m_iterator;
             //next
             ++next_it;
             //next

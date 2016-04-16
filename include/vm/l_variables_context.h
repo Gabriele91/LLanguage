@@ -183,9 +183,15 @@ namespace l_language
         {
             return "function:"+name;
         }
+        
         std::string function_index(l_syntactic_tree::function_def_node* fdef_node)
         {
             return "function:"+fdef_node->m_variable->m_name;
+        }
+        
+        std::string class_index(l_syntactic_tree::class_node* fclass_node)
+        {
+            return "class:"+fclass_node->m_class_name->m_name;
         }
         
         std::string variable_index(const std::string& name)
@@ -203,6 +209,7 @@ namespace l_language
         
         //function def
         void visit(l_function* fun,l_syntactic_tree::function_def_node* node);
+        
         
         //assignable
         void visit(l_function* fun,l_syntactic_tree::variable_node* node);
@@ -223,8 +230,12 @@ namespace l_language
         
         //op
         void visit(l_function* fun, l_syntactic_tree::op_node* op_node);
+        
         //type context
         void visit(l_function*  fun, l_syntactic_tree::context_type_node* ctx_node);
+        
+        //class
+        void visit(l_function*  fun, l_syntactic_tree::class_node* class_node);
         
         //for
         void visit(l_function* fun, l_syntactic_tree::for_node* for_node);
@@ -271,6 +282,8 @@ namespace l_language
         int get_const_id(l_function* f_context,l_syntactic_tree::constant_node* c_node);
         
         int get_function_id(l_function* f_context,l_syntactic_tree::function_def_node* c_node);
+        
+        int get_class_id(l_function* f_context,l_syntactic_tree::class_node* c_node);
         
         bool is_upper_value(l_function* f_context,l_syntactic_tree::variable_node* node);
         bool is_global_value(l_function* f_context,l_syntactic_tree::variable_node* node);

@@ -8,8 +8,8 @@
 #include <l_os_lib.h>
 #include <l_math_lib.h>
 #define STR_VERSION_MAJOR "0"
-#define STR_VERSION_MINOR "4"
-#define STR_VERSION_MAINTENANCE "9"
+#define STR_VERSION_MINOR "5"
+#define STR_VERSION_MAINTENANCE "0"
 
 
 

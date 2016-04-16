@@ -97,22 +97,22 @@ namespace l_language
         return  vm.get_gc().new_obj< l_table_it >(vector);
     }
     
-    l_variable l_table_it::gc_new(l_gc* gc,l_table::l_map_object_it c_it)
+    l_variable l_table_it::gc_new(l_gc* gc,l_map_object_it c_it)
     {
         return  gc->new_obj< l_table_it >(c_it);
     }
     
-    l_variable l_table_it::gc_new(l_gc& gc,l_table::l_map_object_it c_it)
+    l_variable l_table_it::gc_new(l_gc& gc,l_map_object_it c_it)
     {
         return  gc.new_obj< l_table_it >(c_it);
     }
     
-    l_variable l_table_it::gc_new(l_vm* vm,l_table::l_map_object_it c_it)
+    l_variable l_table_it::gc_new(l_vm* vm,l_map_object_it c_it)
     {
         return  vm->get_gc().new_obj< l_table_it >(c_it);
     }
     
-    l_variable l_table_it::gc_new(l_vm& vm,l_table::l_map_object_it c_it)
+    l_variable l_table_it::gc_new(l_vm& vm,l_map_object_it c_it)
     {
         return  vm.get_gc().new_obj< l_table_it >(c_it);
     }

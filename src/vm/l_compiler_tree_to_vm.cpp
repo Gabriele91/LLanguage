@@ -499,6 +499,56 @@ namespace l_language
         //success
         return true;
     }
+    
+    
+    //compile class
+    bool l_compiler_tree_to_vm::compile_class_def(l_function* fun,
+                                                  l_syntactic_tree::class_node* class_node,
+                                                  bool is_exp)
+    {
+        //create class
+        fun->push({ L_START_CLASS_DEC,  0, class_node->m_line });
+        //add variables
+        for(auto& attr : class_node->m_attrs)
+        {
+            //add exp
+            if(attr.m_exp) compile_exp(fun, attr.m_exp);
+            else           fun->push({ L_PUSH_NULL,  0, attr.m_var->m_line });
+            //add var
+            fun->push({ L_PUSHK, get_var_id(fun,attr.m_var), attr.m_var->m_line });
+            //type
+            fun->push({ L_CLASS_ATTR,  (int)attr.m_type, attr.m_var->m_line });
+        }
+        //add super class
+        for(auto& parent: class_node->m_parents)
+        {
+            compile_variable_get(fun, parent);
+        }
+        if(class_node->m_parents.size())
+        {
+            fun->push({ L_CLASS_PARENT,  (int)class_node->m_parents.size(), class_node->m_parents[0]->m_line });
+        }
+        //add methods
+        for(auto& defs : class_node->m_defs)
+        {
+            //..
+            l_syntactic_tree::function_def_node* method = defs.m_method;
+            //compile
+            compile_function_def(fun,method);
+            //gen closer
+            fun->push({ L_CLOSER, get_function_id(fun, method), method->m_line });
+            //add var
+            fun->push({ L_PUSHK, get_var_id(fun,method->m_variable), method->m_variable->m_line });
+            //method
+            fun->push({ L_CLASS_METHOD,  defs.m_type, defs.m_method->m_line });
+        }
+        //create class object
+        fun->push({ L_END_CLASS_DEC,   get_var_id(fun,class_node->m_class_name), class_node->m_line });
+        //push value into variable def
+        compile_variable_set(fun,class_node->m_class_name);
+        //..true
+        return true;
+    }
     //compile return
     bool l_compiler_tree_to_vm::compile_return(l_function* fun,l_syntactic_tree::return_node* return_node)
     {
@@ -558,6 +608,9 @@ namespace l_language
                     break;
                 case l_syntactic_tree::CONTEXT_TYPE_NODE:
                     if(! compile_context_type(fun,node->to<l_syntactic_tree::context_type_node>()) ) return false;
+                    break;
+                case l_syntactic_tree::CLASS_NODE:
+                    if(! compile_class_def(fun,node->to<l_syntactic_tree::class_node>()) ) return false;
                     break;
                 default:  break;
             }
