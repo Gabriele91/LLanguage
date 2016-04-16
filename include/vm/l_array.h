@@ -13,8 +13,10 @@
 
 namespace l_language
 {
-    //vector
-    class l_array;
+	//vector
+	class l_array;
+	//class
+	class l_class;
     //vector iterator
     class l_array_it;
     
@@ -23,6 +25,7 @@ namespace l_language
     {
         
         //friend class
+		friend class l_class;
         friend class l_array_it;
         
         //implement  object

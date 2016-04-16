@@ -188,11 +188,17 @@ namespace l_language
         {
             return "function:"+fdef_node->m_variable->m_name;
         }
-        
-        std::string class_index(l_syntactic_tree::class_node* fclass_node)
-        {
-            return "class:"+fclass_node->m_class_name->m_name;
-        }
+
+		std::string method_index(l_syntactic_tree::class_node* name,
+								 l_syntactic_tree::function_def_node* fdef_node)
+		{
+			return "method:" + name->get_class_name() +":"+ fdef_node->m_variable->m_name;
+		}
+
+		std::string class_index(l_syntactic_tree::class_node* fclass_node)
+		{
+			return "class:" + fclass_node->m_class_name->m_name;
+		}
         
         std::string variable_index(const std::string& name)
         {
@@ -206,11 +212,14 @@ namespace l_language
         
         
         void visit(l_function* fun, l_syntactic_tree::node* node);
-        
-        //function def
-        void visit(l_function* fun,l_syntactic_tree::function_def_node* node);
-        
-        
+
+		//function def
+		void visit(l_function* fun, l_syntactic_tree::function_def_node* node);
+
+		//method def
+		void visit(l_function* fun, l_syntactic_tree::class_node*		 c_node,
+									l_syntactic_tree::function_def_node* m_node);
+                
         //assignable
         void visit(l_function* fun,l_syntactic_tree::variable_node* node);
         
@@ -280,9 +289,11 @@ namespace l_language
         int get_var_id(l_function* f_context,l_syntactic_tree::variable_node* node);
         
         int get_const_id(l_function* f_context,l_syntactic_tree::constant_node* c_node);
-        
-        int get_function_id(l_function* f_context,l_syntactic_tree::function_def_node* c_node);
-        
+
+		int get_function_id(l_function* f_context, l_syntactic_tree::function_def_node* c_node);
+
+		int get_method_id(l_function* f_context, l_syntactic_tree::class_node* c_node, l_syntactic_tree::function_def_node* m_node);
+
         int get_class_id(l_function* f_context,l_syntactic_tree::class_node* c_node);
         
         bool is_upper_value(l_function* f_context,l_syntactic_tree::variable_node* node);

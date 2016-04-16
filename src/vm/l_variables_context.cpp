@@ -82,6 +82,44 @@ namespace l_language
         }
     }
     
+
+	//method def
+	void l_variables_context::visit(l_function* fun, l_syntactic_tree::class_node* c_node,
+												     l_syntactic_tree::function_def_node* m_node)
+	{
+		//alloc new function
+		l_function* new_fun = &m_vm->get_new_function();
+		//add data
+		m_node->m_data = (void*)(m_vm->get_count_of_functions() - 1);
+		//add variable node
+		//...
+		visit(fun, m_node->m_variable);
+		//alloc variable
+		add_into_table(fun, l_variable((l_function_id)(m_vm->get_count_of_functions() - 1)), method_index(c_node,m_node));
+		//n args
+		new_fun->m_args_size = (unsigned int)m_node->m_args.size();
+		//args...
+		for (l_syntactic_tree::variable_node* variable : m_node->m_args)
+		{
+			add_variable_into_table(new_fun, variable);
+			is_not_upper_value(new_fun, variable);
+		}
+		//args list
+		if (m_node->m_name_args_list)
+		{
+			//add last variable
+			add_variable_into_table(new_fun, m_node->m_name_args_list);
+			is_not_upper_value(new_fun, m_node->m_name_args_list);
+			//have args list
+			new_fun->m_have_args_list = true;
+		}
+		//staments
+		for (l_syntactic_tree::node* st : m_node->m_staments)
+		{
+			visit(new_fun, st);
+		}
+	}
+
     //class
     void l_variables_context::visit(l_function*  fun, l_syntactic_tree::class_node* node)
     {
@@ -101,7 +139,7 @@ namespace l_language
         //sub def
         for(auto& defs : node->m_defs)
         {
-            visit(fun,defs.m_method);
+            visit(fun, node, defs.m_method);
         }
     }
     
@@ -457,7 +495,14 @@ namespace l_language
     {
         return get_table_id(f_context,function_index(c_node));
     }
-    
+
+	int l_variables_context::get_method_id(l_function* f_context, 
+									       l_syntactic_tree::class_node* c_node,
+										   l_syntactic_tree::function_def_node* m_node)
+	{
+		return get_table_id(f_context, method_index(c_node, m_node));
+	}
+
     int l_variables_context::get_class_id(l_function* f_context,l_syntactic_tree::class_node* c_node)
     {
         return get_table_id(f_context,class_index(c_node));

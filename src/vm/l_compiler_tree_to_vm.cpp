@@ -534,9 +534,15 @@ namespace l_language
             //..
             l_syntactic_tree::function_def_node* method = defs.m_method;
             //compile
-            compile_function_def(fun,method);
-            //gen closer
-            fun->push({ L_CLOSER, get_function_id(fun, method), method->m_line });
+			//get function id
+			size_t id_function = ((size_t)method->m_data);
+			//compile staments
+			if (!compile_statements(&m_vm->function((unsigned int)id_function), method->m_staments))
+			{
+				return false;
+			}
+			//get closer
+			fun->push({ L_CLOSER, get_method_id(fun, class_node, method), method->m_line });
             //add var
             fun->push({ L_PUSHK, get_var_id(fun,method->m_variable), method->m_variable->m_line });
             //method

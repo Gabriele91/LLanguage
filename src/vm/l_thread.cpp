@@ -705,6 +705,10 @@ namespace l_language
                         {
                             raise( "call exception" );
                         }
+						else if (b_ret_this)
+						{
+							register3(2) = new_ctx->this_field();
+						}
                         //unlock context
                         new_ctx->unlock();
                         //reset last context
@@ -712,13 +716,9 @@ namespace l_language
                         //restore stack
                         m_top = stack_top_bf_call;
                         //return?
-                        if(n_return == T_RETURN_VALUE)
+                        if(n_return == T_RETURN_VALUE || b_ret_this)
                         {
                             push(register3(2));
-                        }
-                        else if(b_ret_this)
-                        {
-                            push(get_this());
                         }
                     }
                     else
@@ -764,9 +764,11 @@ namespace l_language
 				}
                 break;
                 case L_CLASS_PARENT:
-                    /*
-                     todo
-                     */
+                    //push class
+					for (unsigned int i = 0; i != cmp.m_arg; ++i)
+					{
+						get_class_temp().clazz()->add_parent(pop());
+					}
                     //end
                     break;
                 case L_END_CLASS_DEC:

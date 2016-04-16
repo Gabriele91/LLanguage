@@ -126,6 +126,7 @@ namespace l_language
         };
         //maps
         l_variable   m_class_name;
+		l_array		 m_parents;
         l_map_object m_maps[M_NMAP];
         
         //mark event
@@ -135,6 +136,8 @@ namespace l_language
             if(is_marked()) return;
             //mark
             m_class_name.mark();
+			//mark parents
+			m_parents.mark();
             //mark
             l_obj::mark();
             //mark childs
@@ -162,6 +165,7 @@ namespace l_language
                 }
             }
         }
+
         //unmark event
         virtual void unmark()
         {
@@ -169,6 +173,8 @@ namespace l_language
             if(is_unmarked()) return;
             //unmark
             m_class_name.unmark();
+			//unmark parents
+			m_parents.unmark();
             //unmark
             l_obj::unmark();
             //mark childs
@@ -195,7 +201,8 @@ namespace l_language
                 }
             }
         }
-        
+
+		//exists def?
         bool exists_def(const l_variable& key,l_map_object_const_it& it) const
         {
             return (it=m_maps[M_DEFS].find(key))!=m_maps[M_DEFS].end();
@@ -230,6 +237,20 @@ namespace l_language
         {
             m_maps[M_OPERS][key] = value;
         }
+		void add_parent(const l_variable& value)
+		{
+			//append
+			m_parents.push(value);
+			//get class
+			const l_class* p_class = value.clazz();
+			//get attributes
+			const l_map_object& p_attrs = p_class->m_maps[M_ATTRS];
+			//add attributes
+			for (auto it : p_attrs)
+			{
+				m_maps[M_ATTRS][it.first] = it.second;
+			}
+		}
         
         l_variable get_value(const l_variable&  key)
         {
@@ -253,11 +274,19 @@ namespace l_language
             //first
             l_map_object_it val_it = m_maps[M_DEFS].find(key);
             //find?
-            if(val_it != m_maps[M_DEFS].end())
-            {
-                //return
-                return val_it->second;
-            }
+            if(val_it != m_maps[M_DEFS].end()) return val_it->second;
+			//search from parens
+			for (auto rit = m_parents.m_pool.rbegin();
+					  rit != m_parents.m_pool.rend(); 
+				    ++rit)
+			{
+				//..
+				l_variable& it_class = *rit;
+				//pointer 
+				l_variable& def = it_class.clazz()->get_def(key);
+				//find?
+				if (!def.is_null()) return def;
+			}
             
             return l_variable();
         }
