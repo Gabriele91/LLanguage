@@ -176,7 +176,7 @@ namespace l_language
             //compile
             l_function_id call_fun_id = m_compiler.compile_function(&it_tree);
             //register
-            l_variable&   regT1 = m_default_thread.register3(l_thread::R_TEMP1);
+            l_variable&   regT1 = m_default_thread.get_temp1();
             //new context
             regT1 = l_closer::gc_new(get_gc());
             //init context
@@ -258,7 +258,7 @@ namespace l_language
         if (call_fun.m_have_args_list)
         {
             //alloc array
-            thread->register3(3) = l_array::gc_new(get_gc());
+            thread->get_temp3() = l_array::gc_new(get_gc());
         }
         //put arguments
         for(auto& arg : args)
@@ -269,7 +269,7 @@ namespace l_language
             }
             else if (call_fun.m_have_args_list)
             {
-                thread->register3(3).array()->push(arg);
+                thread->get_temp3().array()->push(arg);
             }
             else break;
         }
@@ -277,9 +277,9 @@ namespace l_language
         if (call_fun.m_have_args_list)
         {
             //push array
-            new_ctx->variable( call_fun.constant(n_fun_args) ) = thread->register3(3);
+            new_ctx->variable( call_fun.constant(n_fun_args) ) = thread->get_temp3();
             //to null
-            thread->register3(3) = l_variable();
+            thread->get_temp3() = l_variable();
         }
         //execute call
         l_thread::type_return n_return = thread->execute(*new_ctx);

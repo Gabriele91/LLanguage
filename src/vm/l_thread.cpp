@@ -103,7 +103,7 @@ namespace l_language
         //lock context
         context.lock();
         //save context
-        register3(R_CONTEXT)      = l_variable( &context );
+        get_last_context()        = l_variable( &context );
         //pc...
         unsigned int     pc       = 0;
         l_function&      function = m_vm->function(context.get_fun_id());
@@ -130,7 +130,7 @@ namespace l_language
                     if(cmp.m_arg)
                     {
                         //get value
-                        register3(2) = pop();
+                        get_return() = pop();
                         //return...
                         return T_RETURN_VALUE;
                     }
@@ -194,11 +194,11 @@ namespace l_language
                     {
                         
                         //new context
-                        register3(0) = l_closer::gc_new(get_gc());
+                        get_temp1() = l_closer::gc_new(get_gc());
                         //init context
-                        register3(0).to<l_closer>()->init(call_fun.m_value.m_fid, this, l_variable(&context));
+                        get_temp1().to<l_closer>()->init(call_fun.m_value.m_fid, this, l_variable(&context));
                         //push context
-                        push(register3(0));
+                        push(get_temp1());
                     }
                 }
                 break;
@@ -312,12 +312,12 @@ namespace l_language
                 ////////////////////////////////////////////////////////////
                 case L_NEW_ARRAY:
                 {
-                    register3(0) = l_array::gc_new(get_gc());
+                    get_temp1() = l_array::gc_new(get_gc());
                     //init ?
                     if( cmp.m_arg > 0 )
                     {
                         //types
-                        l_array* vector = register3(0).array();
+                        l_array* vector = get_temp1().array();
                         //put stack into vector
                         for(int i = cmp.m_arg-1; i >= 0; --i)
                         {
@@ -325,18 +325,18 @@ namespace l_language
                         }
                     }
                     //push array (n.b. gc run...)
-                    push( register3(0) );
+                    push( get_temp1() );
                 }
                 break;
                 //alloc tablet
                 case L_NEW_TABLE:
                 {
-                    register3(0) = l_table::gc_new(get_gc());
+                    get_temp1() = l_table::gc_new(get_gc());
                     //init ?
                     if( cmp.m_arg > 0 )
                     {
                         //types
-                        l_table* table = register3(0).table();
+                        l_table* table = get_temp1().table();
                         //assert
                         assert(!(cmp.m_arg % 2));
                         //put stack into vector
@@ -351,7 +351,7 @@ namespace l_language
                         }
                     }
                     //push table (n.b. gc run...)
-                    push( register3(0) );
+                    push( get_temp1() );
                 }
                 break;
                 case L_GET_AT_VAL:
@@ -582,14 +582,14 @@ namespace l_language
                 case L_CALL:
                 {
                     //get index
-                    register3(0) = pop();
+                    get_temp1() = pop();
                     //return this?
                     bool b_ret_this = false;
                     //get args
-                    if( register3(0).is_cfunction() )
+                    if( get_temp1().is_cfunction() )
                     {
                         //return size
-                        int n_return = register3(0).m_value.m_pcfun(this,cmp.m_arg);
+                        int n_return = get_temp1().m_value.m_pcfun(this,cmp.m_arg);
                         //assert (1 return)
                         assert(n_return <= 1);
                         //error
@@ -609,11 +609,11 @@ namespace l_language
                         //if return
                         if(n_return) push(get_return());
                     }
-                    else if( register3(0).is_closer() || register3(0).is_class() )
+                    else if( get_temp1().is_closer() || get_temp1().is_class() )
                     {
-                        if(register3(0).is_class())
+                        if(get_temp1().is_class())
                         {
-                            l_class* this_class = register3(0).clazz();
+                            l_class* this_class = get_temp1().clazz();
                             //this
                             get_this() = this_class->new_object(this);
                             //is a this call
@@ -621,9 +621,9 @@ namespace l_language
                             //return this
                             b_ret_this = true;
                             //get costructor
-                            register3(0) = this_class->get_constructor();
+                            get_temp1() = this_class->get_constructor();
                             //is null?
-                            if(register3(0).is_null())
+                            if(get_temp1().is_null())
                             {
                                 //pop args
                                 for(unsigned int
@@ -642,16 +642,16 @@ namespace l_language
                             }
                         }
                         //get context
-                        l_closer* closer = register3(0).to<l_closer>();
+                        l_closer* closer = get_temp1().to<l_closer>();
                         //else assert
                         if(!closer){ assert(0); };
                         //new function
                         l_function& call_fun    = m_vm->function(closer->get_fun_id());
                         //save last context
-                        l_variable last_ctx     = register3(R_CONTEXT);
+                        l_variable last_ctx     = get_last_context();
                         //new context
-                        register3(1)            = l_call_context::gc_new(get_gc());
-                        l_call_context* new_ctx = register3(1).to<l_call_context>();
+                        get_temp2()            = l_call_context::gc_new(get_gc());
+                        l_call_context* new_ctx = get_temp2().to<l_call_context>();
                         //this?
                         if(cmp.m_op_code == L_THIS_CALL)
                         {
@@ -667,7 +667,7 @@ namespace l_language
                         if (call_fun.m_have_args_list)
                         {
                             //alloc array
-                            register3(3) = l_array::gc_new(get_gc());
+                            get_temp3() = l_array::gc_new(get_gc());
                         }
                         //put arguments
                         for(unsigned int
@@ -681,7 +681,7 @@ namespace l_language
                             }
                             else if (call_fun.m_have_args_list)
                             {
-                                register3(3).array()->push(pop());
+                                get_temp3().array()->push(pop());
                             }
                             else
                             {
@@ -692,9 +692,9 @@ namespace l_language
                         if (call_fun.m_have_args_list)
                         {
                             //push array
-                            new_ctx->variable( call_fun.constant(n_fun_args) ) = register3(3);
+                            new_ctx->variable( call_fun.constant(n_fun_args) ) = get_temp3();
                             //to null
-                            register3(3) = l_variable();
+                            get_temp3() = l_variable();
                         }
                         //save stack
                         long stack_top_bf_call = m_top;
@@ -707,18 +707,18 @@ namespace l_language
                         }
 						else if (b_ret_this)
 						{
-							register3(2) = new_ctx->this_field();
+							get_return() = new_ctx->this_field();
 						}
                         //unlock context
                         new_ctx->unlock();
                         //reset last context
-                        register3(R_CONTEXT) = last_ctx;
+                        get_last_context() = last_ctx;
                         //restore stack
                         m_top = stack_top_bf_call;
                         //return?
                         if(n_return == T_RETURN_VALUE || b_ret_this)
                         {
-                            push(register3(2));
+                            push(get_return());
                         }
                     }
                     else

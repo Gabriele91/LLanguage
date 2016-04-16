@@ -51,6 +51,18 @@ namespace l_language
                  unsigned int main_id = 0,
                  size_t stack = 512);
         //access
+        l_variable& get_temp1()
+        {
+            return m_register[R_TEMP1];
+        }
+        l_variable& get_temp2()
+        {
+            return m_register[R_TEMP2];
+        }
+        l_variable& get_temp3()
+        {
+            return m_register[R_TEMP2];
+        }
         l_variable& get_last_context()
         {
             return m_register[R_CONTEXT];
@@ -94,11 +106,6 @@ namespace l_language
         l_variable& top()
         {
             return m_stack[m_top];
-        }
-        //get a register
-        l_variable& register3(size_t i)
-        {
-            return m_register[i];
         }
         //push return
         void push_return(const l_variable& var)
