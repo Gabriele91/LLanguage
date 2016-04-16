@@ -25,7 +25,7 @@ int l_to_int(l_language::l_thread* th,int args)
         case l_language::l_variable::INT: i = var.m_value.m_i; break;
         case l_language::l_variable::FLOAT: i = (int)var.m_value.m_f; break;
         case l_language::l_variable::STRING: i = std::atoi(var.string()->c_str()); break;
-        default: assert(0); break;
+        default: return -1; break;
     }
     //push string
     th->push_return(l_language::l_variable(i));
@@ -146,18 +146,20 @@ int l_type_of(l_language::l_thread* th,int args)
     //
     switch (type)
     {
-        case l_language::l_variable::LNULL:     str ="null";     break;
-        case l_language::l_variable::LBOOL:     str ="bool";     break;
-        case l_language::l_variable::INT:       str ="int";      break;
-        case l_language::l_variable::FLOAT:     str ="float";    break;
-        case l_language::l_variable::STRING:    str ="string";   break;
-        case l_language::l_variable::FUNCTION:  str ="function"; break;
-        case l_language::l_variable::CFUNCTION: str ="cfunction";break;
-        case l_language::l_variable::ARRAY:     str ="array";    break;
-        case l_language::l_variable::TABLE:     str ="table";    break;
-        case l_language::l_variable::OBJECT:    str ="object";   break;
-        case l_language::l_variable::COBJECT:   str ="cobject";  break;
-        default: assert(0); break;
+        case l_language::l_variable::LNULL:       str ="null";           break;
+        case l_language::l_variable::LBOOL:       str ="bool";           break;
+        case l_language::l_variable::INT:         str ="int";            break;
+        case l_language::l_variable::FLOAT:       str ="float";          break;
+        case l_language::l_variable::STRING:      str ="string";         break;
+        case l_language::l_variable::FUNCTION:    str ="function";       break;
+        case l_language::l_variable::CFUNCTION:   str ="cfunction";      break;
+        case l_language::l_variable::ARRAY:       str ="array";          break;
+        case l_language::l_variable::TABLE:       str ="table";          break;
+        case l_language::l_variable::OBJECT:      str ="object";         break;
+		case l_language::l_variable::CLASS:       str ="class";          break;
+		case l_language::l_variable::CLASS_OBJECT:str ="class_object";   break;
+		case l_language::l_variable::COBJECT:     str ="cobject";        break;
+		default: return -1; break;
     }
     //push type
     th->push_return(l_language::l_string::gc_new(th->m_vm->get_gc(), str));

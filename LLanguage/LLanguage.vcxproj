@@ -75,6 +75,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../include;../include/vm</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -86,6 +87,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../include;../include/vm</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -102,6 +104,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableEnhancedInstructionSet>
       </EnableEnhancedInstructionSet>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -120,6 +123,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableEnhancedInstructionSet>
       </EnableEnhancedInstructionSet>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -136,6 +140,7 @@
     <ClCompile Include="..\src\vm\l_function.cpp" />
     <ClCompile Include="..\src\vm\l_gc.cpp" />
     <ClCompile Include="..\src\vm\l_io_lib.cpp" />
+    <ClCompile Include="..\src\vm\l_math_lib.cpp" />
     <ClCompile Include="..\src\vm\l_opcode.cpp" />
     <ClCompile Include="..\src\vm\l_os_lib.cpp" />
     <ClCompile Include="..\src\vm\l_parser.cpp" />
@@ -152,6 +157,7 @@
     <ClInclude Include="..\include\vm\l_array.h" />
     <ClInclude Include="..\include\vm\l_base_lib.h" />
     <ClInclude Include="..\include\vm\l_call_context.h" />
+    <ClInclude Include="..\include\vm\l_class.h" />
     <ClInclude Include="..\include\vm\l_commands.h" />
     <ClInclude Include="..\include\vm\l_compiler_tree_to_vm.h" />
     <ClInclude Include="..\include\vm\l_compiler_utilities.h" />

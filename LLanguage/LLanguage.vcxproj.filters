@@ -75,6 +75,9 @@
     <ClCompile Include="..\src\vm\l_vm.cpp">
       <Filter>File di origine\vm</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\vm\l_math_lib.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\vm\l_array.h">
@@ -140,10 +143,13 @@
     <ClInclude Include="..\include\l_config.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\l_io_lib.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\vm\l_xrange.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vm\l_class.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\l_io_lib.h">
       <Filter>File di intestazione\vm</Filter>
     </ClInclude>
   </ItemGroup>

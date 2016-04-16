@@ -738,15 +738,31 @@ namespace l_language
                     //end
                     break;
                 case L_CLASS_ATTR:
-                    //add
-                    get_class_temp().clazz()->add_variable(pop(),pop());
-                    //end
-                    break;
+				{
+					//values 
+					const l_variable& key   = stack(0);
+					const l_variable& value = stack(1);
+					//add
+					get_class_temp().clazz()->add_variable(key, value);
+					//pop
+					pop();
+					pop();
+				}
+                //end
+                break;
                 case L_CLASS_METHOD:
-                    //add
-                    get_class_temp().clazz()->add_def(pop(),pop());
-                    //end
-                    break;
+				{
+					//values 
+					const l_variable& key   = stack(0);
+					const l_variable& value = stack(1);
+					//add
+					get_class_temp().clazz()->add_def(key, value);
+					//pop
+					pop();
+					pop();
+					//end
+				}
+                break;
                 case L_CLASS_PARENT:
                     /*
                      todo

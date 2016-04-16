@@ -221,23 +221,23 @@ namespace l_language
             switch (var.m_type)
             {
                 case LNULL:
-                output = var.string()->gc_merge(str_null);
+                output = string()->gc_merge(str_null);
                 break;
                 
                 case LBOOL:
-                output = var.string()->gc_merge(B2CSTR(var.m_value.m_b));
+                output = string()->gc_merge(B2CSTR(var.m_value.m_b));
                 break;
                 
                 case INT:
-                output = var.string()->gc_merge(std::to_string(m_value.m_i));
+                output = string()->gc_merge(std::to_string(var.m_value.m_i));
                 break;
                 
                 case FLOAT:
-                output = var.string()->gc_merge(std::to_string(m_value.m_f));
+                output = string()->gc_merge(std::to_string(var.m_value.m_f));
                 break;
                 
                 case STRING:
-                output = var.string()->gc_merge(string());
+                output = string()->gc_merge(var.string());
                 break;
                 
                 default:

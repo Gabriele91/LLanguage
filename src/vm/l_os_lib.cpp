@@ -9,7 +9,7 @@
 #include <l_string.h>
 #include <l_variable.h>
 #include <cmath>
-
+#include <cstdlib>
 int l_system(l_language::l_thread* th, int args)
 {
     //have an arg?
