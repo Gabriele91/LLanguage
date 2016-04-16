@@ -283,7 +283,7 @@ namespace l_language
 				//..
 				l_variable& it_class = *rit;
 				//pointer 
-				l_variable& def = it_class.clazz()->get_def(key);
+				const l_variable& def = it_class.clazz()->get_def(key);
 				//find?
 				if (!def.is_null()) return def;
 			}
