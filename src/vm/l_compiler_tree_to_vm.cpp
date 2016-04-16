@@ -508,6 +508,15 @@ namespace l_language
     {
         //create class
         fun->push({ L_START_CLASS_DEC,  0, class_node->m_line });
+        //add super class
+        for(auto& parent: class_node->m_parents)
+        {
+            compile_variable_get(fun, parent);
+        }
+        if(class_node->m_parents.size())
+        {
+            fun->push({ L_CLASS_PARENT,  (int)class_node->m_parents.size(), class_node->m_parents[0]->m_line });
+        }
         //add variables
         for(auto& attr : class_node->m_attrs)
         {
@@ -518,15 +527,6 @@ namespace l_language
             fun->push({ L_PUSHK, get_var_id(fun,attr.m_var), attr.m_var->m_line });
             //type
             fun->push({ L_CLASS_ATTR,  (int)attr.m_type, attr.m_var->m_line });
-        }
-        //add super class
-        for(auto& parent: class_node->m_parents)
-        {
-            compile_variable_get(fun, parent);
-        }
-        if(class_node->m_parents.size())
-        {
-            fun->push({ L_CLASS_PARENT,  (int)class_node->m_parents.size(), class_node->m_parents[0]->m_line });
         }
         //add methods
         for(auto& defs : class_node->m_defs)
