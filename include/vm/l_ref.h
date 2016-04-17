@@ -12,9 +12,8 @@ namespace l_language
     class l_ref;
     class l_variable;
     class l_gc;
-    class l_obj;
     
-    class l_obj
+    class l_ref
     {
         
     public:
@@ -51,7 +50,7 @@ namespace l_language
         
     protected:
         
-        virtual ~l_obj()
+        virtual ~l_ref()
         {
         }
         

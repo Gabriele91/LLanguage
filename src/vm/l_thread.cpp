@@ -388,10 +388,10 @@ namespace l_language
                             //get and pop value
                             stack(1) = table->operator[](r_c);
                         }
-                        else if(r_b.is_class_object())
+                        else if(r_b.is_object())
                         {
                             //types
-                            l_class_object* object =  r_b.class_object();
+                            l_object* object =  r_b.object();
                             //is a string?
                             if(!r_c.is_string()) raise( "value isn't a valid key" );
                             //save last
@@ -444,10 +444,10 @@ namespace l_language
                             //get and pop value
                             table->operator[](r_b) = pop();
                         }
-                        else if(r_a.is_class_object())
+                        else if(r_a.is_object())
                         {
                             //types
-                            l_class_object* object =  r_a.class_object();
+                            l_object* object =  r_a.object();
                             //is a string?
                             if(!r_b.is_string()) raise( "value isn't a valid key" );
                             //get and pop value
@@ -479,7 +479,7 @@ namespace l_language
                     if ( r_a.is_ref_obj() )
                     {
                         //get object
-                        l_obj* this_obj = (l_obj*)r_a.m_value.m_pobj;
+                        l_ref* this_obj = (l_ref*)r_a.m_value.m_pobj;
                         //is a vector
                         if(r_a.is_array())
                         {

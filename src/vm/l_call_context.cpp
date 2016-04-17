@@ -5,7 +5,7 @@
 //  Created by Gabriele on 07/02/16.
 //  Copyright © 2016 Gabriele Di Bari. All rights reserved.
 //
-#include <l_object.h>
+#include <l_ref.h>
 #include <l_call_context.h>
 #include <l_vm.h>
 
@@ -36,7 +36,7 @@ namespace l_language
         //..
         if(is_marked()) return;
         //mark
-        l_obj::mark();
+        l_ref::mark();
         //mark next
         if(next()) next()->mark();
     }
@@ -47,7 +47,7 @@ namespace l_language
         //..
         if(is_unmarked()) return;
         //unmark
-        l_obj::unmark();
+        l_ref::unmark();
         //unmark next
         if(next()) next()->unmark();
     }
@@ -77,7 +77,7 @@ namespace l_language
         l_closer*  l_this_closer  = new l_closer();
         l_this_closer->set_gc(gc);
         
-        l_variable variable = (l_obj*)l_this_closer;
+        l_variable variable = (l_ref*)l_this_closer;
         variable.m_const = true;
         
         return  variable;
@@ -88,7 +88,7 @@ namespace l_language
         l_closer*  l_this_closer  = new l_closer();
         l_this_closer->set_gc(&gc);
         
-        l_variable variable = (l_obj*)l_this_closer;
+        l_variable variable = (l_ref*)l_this_closer;
         variable.m_const = true;
         
         return  variable;
@@ -99,7 +99,7 @@ namespace l_language
         l_closer*  l_this_closer  = new l_closer();
         l_this_closer->set_gc(&vm->get_gc());
         
-        l_variable variable = (l_obj*)l_this_closer;
+        l_variable variable = (l_ref*)l_this_closer;
         variable.m_const = true;
         
         return  variable;
@@ -110,7 +110,7 @@ namespace l_language
         l_closer*  l_this_closer  = new l_closer();
         l_this_closer->set_gc(&vm.get_gc());
         
-        l_variable variable = (l_obj*)l_this_closer;
+        l_variable variable = (l_ref*)l_this_closer;
         variable.m_const = true;
         
         return  variable;
@@ -130,9 +130,9 @@ namespace l_language
     void l_call_context::mark()
     {
         //mark in any cases
-        if(l_obj::is_marked()) return;
+        if(l_ref::is_marked()) return;
         //mark
-        l_obj::mark();
+        l_ref::mark();
         //unmark
         m_local_variables.mark();
         //mark this
@@ -150,7 +150,7 @@ namespace l_language
         //..
         if(is_unmarked()) return;
         //unmark
-        l_obj::unmark();
+        l_ref::unmark();
         //unmark
         m_local_variables.unmark();
         //unmark this
@@ -187,7 +187,7 @@ namespace l_language
         l_call_context*  l_call_ctx  = new l_call_context();
         l_call_ctx->set_gc(gc);
         
-        l_variable variable = (l_obj*)l_call_ctx;
+        l_variable variable = (l_ref*)l_call_ctx;
         variable.m_const = true;
         
         return  variable;
@@ -198,7 +198,7 @@ namespace l_language
         l_call_context*  l_call_ctx  = new l_call_context();
         l_call_ctx->set_gc(&gc);
         
-        l_variable variable = (l_obj*)l_call_ctx;
+        l_variable variable = (l_ref*)l_call_ctx;
         variable.m_const = true;
         
         return  variable;
@@ -209,7 +209,7 @@ namespace l_language
         l_call_context*  l_call_ctx  = new l_call_context();
         l_call_ctx->set_gc(&vm->get_gc());
         
-        l_variable variable = (l_obj*)l_call_ctx;
+        l_variable variable = (l_ref*)l_call_ctx;
         variable.m_const = true;
         
         return  variable;
@@ -220,7 +220,7 @@ namespace l_language
         l_call_context*  l_call_ctx  = new l_call_context();
         l_call_ctx->set_gc(&vm.get_gc());
         
-        l_variable variable = (l_obj*)l_call_ctx;
+        l_variable variable = (l_ref*)l_call_ctx;
         variable.m_const = true;
         
         return  variable;

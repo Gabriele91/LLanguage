@@ -6,10 +6,10 @@
 //  Copyright © 2016 Gabriele Di Bari. All rights reserved.
 //
 #pragma once
-#include <l_object.h>
+#include <l_ref.h>
 namespace l_language
 {
-    class l_iterator : public l_obj
+    class l_iterator : public l_ref
     {
     public:
         virtual bool valid() const       = 0;

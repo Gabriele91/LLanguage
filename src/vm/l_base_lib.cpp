@@ -151,13 +151,13 @@ int l_type_of(l_language::l_thread* th,int args)
         case l_language::l_variable::INT:         str ="int";            break;
         case l_language::l_variable::FLOAT:       str ="float";          break;
         case l_language::l_variable::STRING:      str ="string";         break;
+        case l_language::l_variable::REF:         str ="ref";            break;
         case l_language::l_variable::FUNCTION:    str ="function";       break;
         case l_language::l_variable::CFUNCTION:   str ="cfunction";      break;
         case l_language::l_variable::ARRAY:       str ="array";          break;
         case l_language::l_variable::TABLE:       str ="table";          break;
         case l_language::l_variable::OBJECT:      str ="object";         break;
 		case l_language::l_variable::CLASS:       str ="class";          break;
-		case l_language::l_variable::CLASS_OBJECT:str ="class_object";   break;
 		case l_language::l_variable::COBJECT:     str ="cobject";        break;
 		default: return -1; break;
     }

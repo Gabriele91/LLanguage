@@ -11,7 +11,7 @@
 #include <memory>
 #include <assert.h>
 #include <unordered_map>
-#include <l_object.h>
+#include <l_ref.h>
 #include <l_thread.h>
 #include <l_table.h>
 #include <l_gc.h>
@@ -26,9 +26,9 @@ namespace l_language
     class l_vm;
     class l_thread;
     class l_class;
-    class l_class_object;
+    class l_object;
     
-    class l_class_object : public l_obj
+    class l_object : public l_ref
     {
         //firend
         friend class l_class;
@@ -41,7 +41,7 @@ namespace l_language
             //..
             if(is_marked()) return;
             //mark
-            l_obj::mark();
+            l_ref::mark();
             //mark class
             m_class.mark();
             //mark fields
@@ -62,7 +62,7 @@ namespace l_language
                 if(key.is_unmarked())
                 {
                     //object
-                    l_obj* key_object = key.m_value.m_pobj;
+                    l_ref* key_object = key.m_value.m_pobj;
                     //mark
                     key_object->mark();
                 }
@@ -75,7 +75,7 @@ namespace l_language
             //..
             if(is_unmarked()) return;
             //mark
-            l_obj::unmark();
+            l_ref::unmark();
             //unmark class
             m_class.unmark();
             //unmark fields
@@ -95,7 +95,7 @@ namespace l_language
                 if(key.is_marked())
                 {
                     //object
-                    l_obj* key_object = key.m_value.m_pobj;
+                    l_ref* key_object = key.m_value.m_pobj;
                     //mark
                     key_object->unmark();
                 }
@@ -104,7 +104,7 @@ namespace l_language
         
     public:
         
-        l_class_object(l_variable class_obj)
+        l_object(l_variable class_obj)
         {
             m_class = class_obj;
         }
@@ -114,7 +114,7 @@ namespace l_language
     };
     
     //implementation
-    class l_class : public l_obj
+    class l_class : public l_ref
     {
         //attributes
         enum
@@ -139,7 +139,7 @@ namespace l_language
 			//mark parents
 			m_parents.mark();
             //mark
-            l_obj::mark();
+            l_ref::mark();
             //mark childs
             for(auto& map:m_maps)
             for(auto it:map)
@@ -159,7 +159,7 @@ namespace l_language
                 if(key.is_unmarked())
                 {
                     //object
-                    l_obj* key_object = key.m_value.m_pobj;
+                    l_ref* key_object = key.m_value.m_pobj;
                     //mark
                     key_object->mark();
                 }
@@ -176,7 +176,7 @@ namespace l_language
 			//unmark parents
 			m_parents.unmark();
             //unmark
-            l_obj::unmark();
+            l_ref::unmark();
             //mark childs
             for(auto& map:m_maps)
             for(auto it:map)
@@ -195,7 +195,7 @@ namespace l_language
                 if(key.is_marked())
                 {
                     //object
-                    l_obj* key_object = key.m_value.m_pobj;
+                    l_ref* key_object = key.m_value.m_pobj;
                     //mark
                     key_object->unmark();
                 }
@@ -294,9 +294,9 @@ namespace l_language
         l_variable new_object(l_thread* th)
         {
             //alloc
-            l_variable var = th->get_gc()->new_obj<l_class_object>( l_variable(this) );
+            l_variable var = th->get_gc()->new_obj<l_object>( l_variable(this) );
             //..
-            l_class_object* object = var.to<l_class_object>();
+            l_object* object = var.to<l_object>();
             //copy attributes
             object->m_attributes = m_maps[M_ATTRS];
             //call gc
@@ -305,7 +305,7 @@ namespace l_language
         
     };
     
-    inline l_variable l_class_object::get_value(const l_variable&  key)
+    inline l_variable l_object::get_value(const l_variable&  key)
     {
         //first
         l_map_object_it val_it = m_attributes.find(key);
@@ -319,7 +319,7 @@ namespace l_language
         return m_class.clazz()->get_def(key);
     }
     
-    inline bool l_class_object::set_value(const l_variable&  key,const l_variable& value)
+    inline bool l_object::set_value(const l_variable&  key,const l_variable& value)
     {
         //first
         l_map_object_it val_it = m_attributes.find(key);

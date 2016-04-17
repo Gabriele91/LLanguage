@@ -9,7 +9,7 @@
 #include <cmath>
 #include <vector>
 #include <assert.h>
-#include <l_object.h>
+#include <l_ref.h>
 #include <l_string.h>
 
 
@@ -24,7 +24,7 @@ namespace l_language
     class l_gc;
     class l_table;
     class l_class;
-    class l_class_object;
+    class l_object;
     typedef int (*l_cfunction) (l_thread*,int args);
     typedef unsigned int l_function_id;
     //variable
@@ -47,9 +47,9 @@ namespace l_language
             TABLE,
             ITERATOR,
             CLASS,
-            CLASS_OBJECT,
             OBJECT,
-            COBJECT
+            COBJECT,
+            REF
         };
         
         union value
@@ -57,7 +57,7 @@ namespace l_language
             bool          m_b;
             int   	      m_i;
             float  	 	  m_f;
-            l_obj*        m_pobj;
+            l_ref*        m_pobj;
             l_cfunction   m_pcfun;
             l_function_id m_fid;
         };
@@ -93,30 +93,30 @@ namespace l_language
         l_variable(l_string* obj)
         {
             m_type         = STRING;
-            m_value.m_pobj = (l_obj*)obj;
+            m_value.m_pobj = (l_ref*)obj;
         }
         
         l_variable(l_array* obj)
         {
             m_type         = ARRAY;
-            m_value.m_pobj = (l_obj*)obj;
+            m_value.m_pobj = (l_ref*)obj;
         }
         
         l_variable(l_table* obj)
         {
             m_type         = TABLE;
-            m_value.m_pobj = (l_obj*)obj;
+            m_value.m_pobj = (l_ref*)obj;
         }
         
         l_variable(l_iterator* obj)
         {
             m_type         = ITERATOR;
-            m_value.m_pobj = (l_obj*)obj;
+            m_value.m_pobj = (l_ref*)obj;
         }
         
-        l_variable(l_obj* obj)
+        l_variable(l_ref* obj)
         {
-            m_type         = OBJECT;
+            m_type         = REF;
             m_value.m_pobj = obj;
         }
         
@@ -135,18 +135,19 @@ namespace l_language
         l_variable(l_closer* obj)
         {
             m_type         = CLOSER;
-            m_value.m_pobj = (l_obj*)obj;
+            m_value.m_pobj = (l_ref*)obj;
         }
         
         l_variable(l_class* obj)
         {
             m_type         = CLASS;
-            m_value.m_pobj = (l_obj*)obj;
+            m_value.m_pobj = (l_ref*)obj;
         }
-        l_variable(l_class_object* obj)
+        
+        l_variable(l_object* obj)
         {
-            m_type         = CLASS_OBJECT;
-            m_value.m_pobj = (l_obj*)obj;
+            m_type         = OBJECT;
+            m_value.m_pobj = (l_ref*)obj;
         }
         
         l_variable(const l_variable& value)
@@ -218,13 +219,13 @@ namespace l_language
         
         bool is_ref_obj() const
         {
-            return m_type == OBJECT      ||
+            return m_type == REF         ||
                    m_type == STRING      ||
                    m_type == TABLE       ||
                    m_type == ARRAY       ||
                    m_type == ITERATOR    ||
                    m_type == CLASS       ||
-                   m_type == CLASS_OBJECT||
+                   m_type == OBJECT      ||
                    m_type == COBJECT;
         }
         
@@ -241,11 +242,6 @@ namespace l_language
         bool is_class() const
         {
             return m_type == CLASS;
-        }
-        
-        bool is_class_object() const
-        {
-            return m_type == CLASS_OBJECT;
         }
         
         bool is_function() const
@@ -325,7 +321,7 @@ namespace l_language
         
         l_class* clazz();
         
-        l_class_object* class_object();
+        l_object* object();
         
         const l_table* table() const;
         
@@ -337,7 +333,7 @@ namespace l_language
         
         const l_class* clazz() const;
         
-        const l_class_object* class_object() const;
+        const l_object* object() const;
         
         bool is_false()
         {

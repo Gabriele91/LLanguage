@@ -60,9 +60,9 @@ namespace l_language
         return static_cast< l_class* >( m_value.m_pobj );
     }
     
-    l_class_object* l_variable::class_object()
+    l_object* l_variable::object()
     {
-        return static_cast< l_class_object* >( m_value.m_pobj );
+        return static_cast< l_object* >( m_value.m_pobj );
     }
     
     const l_table* l_variable::table() const
@@ -90,9 +90,9 @@ namespace l_language
         return static_cast< const l_class* >( m_value.m_pobj );
     }
     
-    const l_class_object* l_variable::class_object() const
+    const l_object* l_variable::object() const
     {
-        return static_cast< const l_class_object* >( m_value.m_pobj );
+        return static_cast< const l_object* >( m_value.m_pobj );
     }
     
     bool l_variable::add(l_variable& var,l_variable& output)

@@ -7,7 +7,7 @@
 //
 #pragma once
 #include <list>
-#include <l_object.h>
+#include <l_ref.h>
 
 namespace l_language
 {
@@ -15,7 +15,7 @@ namespace l_language
     class l_thread;
     class l_variable;
     class l_gc;
-    class l_obj;
+    class l_ref;
     
 #if defined( DEBUG ) || defined( _DEBUG )
     #define GC_DEBUG(x) x
@@ -27,12 +27,12 @@ namespace l_language
         //type object ref
         struct l_ref_obj
         {
-            l_obj* m_obj{ nullptr };
+            l_ref*  m_obj{ nullptr };
             size_t  m_size{ 0 };
             
             GC_DEBUG( size_t m_id { 0 }; )
             
-            l_ref_obj(l_obj* obj, size_t  size )
+            l_ref_obj(l_ref* obj, size_t  size )
             {
                 m_obj  = obj;
                 m_size = size;
@@ -61,7 +61,7 @@ namespace l_language
                 delete_garbage();
             }
             //alloc
-            l_obj* optr =(l_obj*)new T(args...);
+            l_ref* optr =(l_ref*)new T(args...);
             //put gc ref
             optr->m_gc = this;
             //push obj to pool
@@ -93,13 +93,13 @@ namespace l_language
         
     protected:
         
-        void push(l_obj* object,size_t size);
+        void push(l_ref* object,size_t size);
         
         void  remove(l_pool::iterator it);
         
-        void  remove(l_obj* obj);
+        void  remove(l_ref* obj);
         
-        void  free(l_obj* obj);
+        void  free(l_ref* obj);
         
         void  free(l_pool::iterator it);
         
@@ -118,7 +118,6 @@ namespace l_language
         size_t m_size_allocs{ 0     };
         
         //Object self delete
-        friend class l_obj;
         friend class l_ref;
     };
 

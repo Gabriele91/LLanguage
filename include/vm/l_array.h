@@ -21,7 +21,7 @@ namespace l_language
     class l_array_it;
     
     //implement vector
-    class l_array : public l_obj
+    class l_array : public l_ref
     {
         
         //friend class
@@ -79,7 +79,7 @@ namespace l_language
             //..
             if(is_marked()) return;
             //mark
-            l_obj::mark();
+            l_ref::mark();
             //mark childs
             for(auto& var : m_pool)
             {
@@ -97,7 +97,7 @@ namespace l_language
             //..
             if(is_unmarked()) return;
             //mark
-            l_obj::unmark();
+            l_ref::unmark();
             //mark childs
             for(auto& var : m_pool)
             {
@@ -162,7 +162,7 @@ namespace l_language
             //..
             if(is_marked()) return;
             //mark
-            l_obj::mark();
+            l_ref::mark();
             m_vector->mark();
         }
         
@@ -172,7 +172,7 @@ namespace l_language
             //..
             if(is_unmarked()) return;
             //mark
-            l_obj::unmark();
+            l_ref::unmark();
             m_vector->unmark();
         }
         

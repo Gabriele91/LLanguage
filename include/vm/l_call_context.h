@@ -7,7 +7,7 @@
 //
 #pragma once
 #include <l_config.h>
-#include <l_object.h>
+#include <l_ref.h>
 #include <l_variable.h>
 #include <l_table.h>
 
@@ -18,7 +18,7 @@ namespace l_language
     class l_thread;
     class l_vm;
     //closer
-    class l_closer : public l_obj
+    class l_closer : public l_ref
     {
     public:
         
@@ -115,7 +115,7 @@ namespace l_language
         
         l_variable get_local_variables() const
         {
-            return l_variable((l_obj*)&m_local_variables);
+            return l_variable((l_ref*)&m_local_variables);
         }
         
         static l_variable gc_new(l_gc* gc);
@@ -164,12 +164,12 @@ namespace l_language
         //get is mark
         virtual bool is_marked() const
         {
-            return l_obj::is_marked() || m_context_lock;
+            return l_ref::is_marked() || m_context_lock;
         }
         //get is unmark
         virtual bool is_unmarked() const
         {
-            return l_obj::is_unmarked() && !m_context_lock;
+            return l_ref::is_unmarked() && !m_context_lock;
         }
         //context
         l_table m_local_variables;

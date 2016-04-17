@@ -7,7 +7,7 @@
 //
 #pragma once
 #include <l_base_lib.h>
-#include <l_object.h>
+#include <l_ref.h>
 #include <l_iterator.h>
 #include <cmath>
 namespace l_language
@@ -31,7 +31,7 @@ namespace l_language
             //..
             if(is_marked()) return;
             //mark
-            l_obj::mark();
+            l_ref::mark();
         }
         
         //unmark event
@@ -40,7 +40,7 @@ namespace l_language
             //..
             if(is_unmarked()) return;
             //mark
-            l_obj::unmark();
+            l_ref::unmark();
         }
         
         static l_variable gc_new(l_gc* gc,int init,int end,int step = 1)
@@ -101,7 +101,7 @@ namespace l_language
     };
     
     //it generator
-    class l_xrange : public l_obj
+    class l_xrange : public l_ref
     {
         int m_init_index   { 0 };
         int m_end_index    { 0 };
@@ -113,7 +113,7 @@ namespace l_language
             //..
             if(is_marked()) return;
             //mark
-            l_obj::mark();
+            l_ref::mark();
         }
         
         //unmark event
@@ -122,7 +122,7 @@ namespace l_language
             //..
             if(is_unmarked()) return;
             //mark
-            l_obj::unmark();
+            l_ref::unmark();
         }
         
     public:

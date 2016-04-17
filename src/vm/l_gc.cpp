@@ -90,7 +90,7 @@ namespace  l_language
     }
 
     //gc actions
-    void  l_gc::push(l_obj* obj,size_t size)
+    void  l_gc::push(l_ref* obj,size_t size)
     {
         m_size_allocs += size;
         m_pool.push_back(l_ref_obj( obj, size ));
@@ -104,7 +104,7 @@ namespace  l_language
         m_pool.erase(it);
     }
 
-    void  l_gc::remove(l_obj* obj)
+    void  l_gc::remove(l_ref* obj)
     {
         l_pool::iterator it;
         for (it = m_pool.begin();
@@ -115,7 +115,7 @@ namespace  l_language
         }
     }
 
-    void  l_gc::free(l_obj* obj)
+    void  l_gc::free(l_ref* obj)
     {
         remove(obj);
         delete obj;
@@ -123,7 +123,7 @@ namespace  l_language
 
     void  l_gc::free(l_pool::iterator it)
     {
-        l_obj* obj = it->m_obj;
+        l_ref* obj = it->m_obj;
         remove(it);
         delete obj;
     }

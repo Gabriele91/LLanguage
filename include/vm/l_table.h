@@ -10,7 +10,7 @@
 #include <memory>
 #include <assert.h>
 #include <unordered_map>
-#include <l_object.h>
+#include <l_ref.h>
 #include <l_variable.h>
 #include <l_iterator.h>
 
@@ -49,7 +49,7 @@ namespace l_language
     using l_map_object_const_it  = l_map_object::const_iterator;
     
     //implementation
-    class l_table : public l_obj
+    class l_table : public l_ref
     {
         //friend class
         friend class l_table_it;
@@ -64,7 +64,7 @@ namespace l_language
             //..
             if(is_marked()) return;
             //mark
-            l_obj::mark();
+            l_ref::mark();
             //mark childs
             for(auto it:m_map)
             {
@@ -83,7 +83,7 @@ namespace l_language
                 if(key.is_unmarked())
                 {
                     //object
-                    l_obj* key_object = key.m_value.m_pobj;
+                    l_ref* key_object = key.m_value.m_pobj;
                     //mark
                     key_object->mark();
                 }
@@ -95,7 +95,7 @@ namespace l_language
             //..
             if(is_unmarked()) return;
             //mark
-            l_obj::unmark();
+            l_ref::unmark();
             //mark childs
             for(auto it:m_map)
             {
@@ -113,7 +113,7 @@ namespace l_language
                 if(key.is_marked())
                 {
                     //object
-                    l_obj* key_object = key.m_value.m_pobj;
+                    l_ref* key_object = key.m_value.m_pobj;
                     //mark
                     key_object->unmark();
                 }
@@ -186,7 +186,7 @@ namespace l_language
             //..
             if(is_marked()) return;
             //mark
-            l_obj::mark();
+            l_ref::mark();
             m_table->mark();
         }
         
@@ -196,7 +196,7 @@ namespace l_language
             //..
             if(is_unmarked()) return;
             //mark
-            l_obj::unmark();
+            l_ref::unmark();
             m_table->unmark();
         }
         
@@ -266,7 +266,7 @@ namespace l_language
             //next
             ++next_it;
             //next
-            return gc_new(l_obj::get_gc(),m_iterator);
+            return gc_new(l_ref::get_gc(),m_iterator);
         }
         
         virtual void self_next()

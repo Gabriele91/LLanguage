@@ -16,7 +16,7 @@ namespace l_language
 {
     class l_vm;
     class l_variable;
-    class l_string : public l_obj
+    class l_string : public l_ref
     {
         
         std::string m_cpp_str;
