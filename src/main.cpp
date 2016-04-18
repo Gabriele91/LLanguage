@@ -7,11 +7,10 @@
 #include <l_io_lib.h>
 #include <l_os_lib.h>
 #include <l_math_lib.h>
+#include <l_function_wrapper.h>
 #define STR_VERSION_MAJOR "0"
 #define STR_VERSION_MINOR "5"
-#define STR_VERSION_MAINTENANCE "0"
-
-
+#define STR_VERSION_MAINTENANCE "1"
 
 
 
@@ -113,7 +112,14 @@ int main(int argc,const char* args[])
                            (std::istreambuf_iterator<char>()));
         //compile
         l_language::l_vm::compiler_ouput compiler_ouput;
-        compiler_ouput = it_compiler.compile(source,f_compier_flags);
+        try
+        {
+            compiler_ouput = it_compiler.compile(source,f_compier_flags);
+        }
+        catch(const l_language::l_exception& e)
+        {
+            std::cout << "Exception[" << e.who() << "]: " << e.what() << std::endl;
+        }
         //ouput:
         if(compiler_ouput.m_type & l_language::l_vm::ERRORS)
         {

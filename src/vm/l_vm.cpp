@@ -315,5 +315,9 @@ namespace l_language
         m_compiler.add_global_variable(m_default_thread, table, name);
     }
     
+    void l_vm::add_fun(const std::string& name, l_cfunction  cfunction)
+    {
+        m_compiler.add_c_function( m_default_thread, cfunction, name );
+    }
 
 };

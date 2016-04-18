@@ -118,6 +118,9 @@
 		E0B6BE4C1CBCDD4D00EA2640 /* l_math_lib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_math_lib.cpp; sourceTree = "<group>"; };
 		E0B6BE4F1CBCDF6900EA2640 /* l_math_lib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_math_lib.h; path = vm/l_math_lib.h; sourceTree = "<group>"; };
 		E0D518581CC2BECC003EDC05 /* oop_test.ll */ = {isa = PBXFileReference; explicitFileType = sourcecode.javascript; fileEncoding = 4; path = oop_test.ll; sourceTree = "<group>"; };
+		E0D5185A1CC3FC05003EDC05 /* l_function_wrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = l_function_wrapper.h; sourceTree = "<group>"; };
+		E0D5185B1CC4DD8F003EDC05 /* l_meta_help.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = l_meta_help.h; sourceTree = "<group>"; };
+		E0D5185C1CC4EBD6003EDC05 /* l_exception.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = l_exception.h; sourceTree = "<group>"; };
 		E0DBF2E11C67893700F9DA98 /* l_commands.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_commands.h; path = vm/l_commands.h; sourceTree = "<group>"; };
 		E0DBF2E21C6789BB00F9DA98 /* l_function.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = l_function.h; path = vm/l_function.h; sourceTree = "<group>"; };
 		E0DBF2E31C678A4E00F9DA98 /* l_function.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = l_function.cpp; sourceTree = "<group>"; };
@@ -180,6 +183,9 @@
 			children = (
 				E0950C751C4A870D00845FEE /* vm */,
 				E072DDD61C35357A00B197A1 /* l_config.h */,
+				E0D5185A1CC3FC05003EDC05 /* l_function_wrapper.h */,
+				E0D5185B1CC4DD8F003EDC05 /* l_meta_help.h */,
+				E0D5185C1CC4EBD6003EDC05 /* l_exception.h */,
 			);
 			path = include;
 			sourceTree = SOURCE_ROOT;
@@ -426,7 +432,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -469,7 +475,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
