@@ -10,5 +10,5 @@
 
 namespace l_language
 {
-    extern l_vm::l_extern_libary l_os_lib;
+    extern const l_vm::l_extern_libary& l_os_lib(l_vm* vm);
 };

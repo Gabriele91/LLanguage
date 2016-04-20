@@ -71,12 +71,9 @@ namespace l_language
         l_thread* m_thread { nullptr };
         
     public:
+        
         void set_thread(l_thread* thread);
-        
-        void add_c_function(l_thread& thread,const l_cfunction function,const std::string& cfun_name);
-
         void add_global_variable(l_thread& thread,  const l_variable& g_variable, const std::string& var_name);
-        
         l_thread* compile(const l_syntactic_tree* tree);
         l_function_id compile_function(const l_syntactic_tree* tree);
     };

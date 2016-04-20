@@ -10,8 +10,7 @@
 #include <l_function_wrapper.h>
 #define STR_VERSION_MAJOR "0"
 #define STR_VERSION_MINOR "5"
-#define STR_VERSION_MAINTENANCE "1"
-
+#define STR_VERSION_MAINTENANCE "2"
 
 
 int main(int argc,const char* args[])
@@ -103,8 +102,8 @@ int main(int argc,const char* args[])
         l_vmachine it_compiler;
         //add libs
         it_compiler.add_lib(l_language::l_base_lib);
-        it_compiler.add_lib("io",l_language::l_io_lib);
-        it_compiler.add_lib("os",l_language::l_os_lib);
+        it_compiler.add_lib("io",  l_language::l_io_lib);
+        it_compiler.add_lib("os",  l_language::l_os_lib);
         it_compiler.add_lib("math",l_language::l_math_lib);
         //read code // "source.it"
         std::ifstream source_file(i_source);
@@ -112,14 +111,7 @@ int main(int argc,const char* args[])
                            (std::istreambuf_iterator<char>()));
         //compile
         l_language::l_vm::compiler_ouput compiler_ouput;
-        try
-        {
-            compiler_ouput = it_compiler.compile(source,f_compier_flags);
-        }
-        catch(const l_language::l_exception& e)
-        {
-            std::cout << "Exception[" << e.who() << "]: " << e.what() << std::endl;
-        }
+        compiler_ouput = it_compiler.compile(source,f_compier_flags);
         //ouput:
         if(compiler_ouput.m_type & l_language::l_vm::ERRORS)
         {

@@ -16,43 +16,58 @@ namespace l_language
     {
         ////////////////////////////////////////////////////////////////////////////////////
         template < typename T >
-        inline T l_arg(l_language::l_thread* th,int n)
+        inline T l_arg(l_language::l_thread* thread,int n, bool& success)
         {
             return (T)(0);
         }
         
         template < >
-        inline int l_arg< int >(l_language::l_thread* thread,int n)
+        inline l_variable l_arg(l_language::l_thread* thread,int n, bool& success)
+        {
+            return thread->value(n);
+        }
+        
+        template < >
+        inline int l_arg< int >(l_language::l_thread* thread,int n, bool& success)
         {
             if(!thread->value(n).can_to_int())
             {
-                throw l_exception_to_int(thread,"can't cast value to int");
+                thread->push_error( l_exception_to_int(thread,"can't cast value to int") );
+                success = false;
             }
             return thread->value(n).to_int();
         }
         
         template < >
-        inline float l_arg< float >(l_language::l_thread* thread,int n)
+        inline float l_arg< float >(l_language::l_thread* thread,int n, bool& success)
         {
             if(!thread->value(n).can_to_float())
             {
-                throw l_exception_to_float(thread,"can't cast value to float");
+                thread->push_error( l_exception_to_float(thread,"can't cast value to float") );
+                success = false;
             }
             return thread->value(n).to_float();
         }
         
         template < >
-        inline std::string l_arg< std::string >(l_language::l_thread* thread,int n)
+        inline std::string l_arg< std::string >(l_language::l_thread* thread,int n, bool& success)
         {
             if(!thread->value(n).is_string())
             {
-                throw l_exception_to_string(thread,"can't cast value to string");
+                thread->push_error( l_exception_to_string(thread,"can't cast value to string") );
+                success = false;
             }
             return thread->value(n).to_string();
         }
         
         template < typename T >
         inline void l_return(l_language::l_thread* thread,const T& value)
+        {
+            thread->push_return( l_variable(value) );
+        }
+        
+        template < >
+        inline void l_return(l_language::l_thread* thread,const bool& value)
         {
             thread->push_return( l_variable(value) );
         }
@@ -82,8 +97,9 @@ namespace l_language
             template<int... INDICES>
             static int do_call(l_language::l_thread* thread, t_index_int<INDICES...>)
             {
-                FUN(l_arg<ARGS>(thread, INDICES)...);
-                return 0;
+                bool success = true;
+                FUN(l_arg<ARGS>(thread, INDICES, success)...);
+                return success ? 0 : -1;
             }
         };
 
@@ -102,8 +118,9 @@ namespace l_language
             template<int... INDICES>
             static int do_call(l_language::l_thread* thread, t_index_int<INDICES...>)
             {
-                l_return(thread, FUN(l_arg<ARGS>(thread, INDICES)...));
-                return 1;
+                bool success = true;
+                l_return(thread, FUN(l_arg<ARGS>(thread, INDICES,success)...));
+                return success ? 1 : -1;
             }
         };
         

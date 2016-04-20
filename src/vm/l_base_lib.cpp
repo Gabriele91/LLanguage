@@ -199,6 +199,47 @@ int l_using(l_language::l_thread* th, int args)
 	return 0;
 }
 
+int l_length(l_language::l_thread* th,int args)
+{
+    std::string str;
+    //
+    auto type = th->value(0).m_type;
+    //length
+    int length = 0;
+    //
+    switch (type)
+    {
+        case l_language::l_variable::CLASS:
+        case l_language::l_variable::LNULL:
+        case l_language::l_variable::LBOOL:
+        case l_language::l_variable::INT:
+        case l_language::l_variable::FLOAT:
+        case l_language::l_variable::REF:
+        case l_language::l_variable::FUNCTION:
+        case l_language::l_variable::CFUNCTION:
+            return -1;
+        case l_language::l_variable::STRING:
+            length = (int)th->value(0).to_string().length();
+            break;
+        case l_language::l_variable::ARRAY:
+            //todo
+            break;
+        case l_language::l_variable::TABLE:
+            //todo
+            break;
+        case l_language::l_variable::OBJECT:
+            //todo
+            break;    
+        case l_language::l_variable::COBJECT:
+            //todo
+            break;
+        default: return -1; break;
+    }
+    //push type
+    th->push_return({ length });
+    //number of return
+    return 1;
+}
 
 int l_eval(l_language::l_thread* th, int args)
 {
@@ -233,6 +274,7 @@ namespace l_language
         { "range",      l_range         },
         { "xrange",     l_xrange_gen    },
         { "eval",       l_eval          },
-        { "get_this",   l_get_this      }
+        { "get_this",   l_get_this      },
+        { "length",     l_length        }
     };
 }

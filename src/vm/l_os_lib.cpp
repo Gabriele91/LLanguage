@@ -45,9 +45,13 @@ int l_get_env(l_language::l_thread* th, int args)
 
 namespace l_language
 {
-    l_language::l_vm::l_extern_libary l_os_lib=
+    const l_language::l_vm::l_extern_libary& l_os_lib(l_vm* vm)
     {
-        { "system" ,  l_system   },
-        { "get_env",  l_get_env  }
-    };
+        static l_language::l_vm::l_extern_libary l_lib
+        {
+            { "system" ,  l_system   },
+            { "get_env",  l_get_env  }
+        };
+        return l_lib;
+    }
 }

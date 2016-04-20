@@ -121,6 +121,9 @@ namespace l_language
         {
             //current command
             l_command& cmp = commands[pc];
+            //save info
+            m_last_code_asm  = pc;
+            m_last_code_line = (unsigned int)commands[pc].m_line;
             //opcodes
             switch (cmp.m_op_code)
             {
@@ -640,6 +643,31 @@ namespace l_language
                                 //..
                                 break;
                             }
+                            else if( get_temp1().is_cfunction() )
+                            {
+                                //return size
+                                int n_return = get_temp1().m_value.m_pcfun(this,cmp.m_arg);
+                                //assert (1 return)
+                                assert(n_return <= 1);
+                                //error
+                                if(n_return<0)
+                                {
+                                    raise( "native call exception" );
+                                }
+                                else if(n_return>1)
+                                {
+                                    raise( "native call can't return more than a value" );
+                                }
+                                //pop args
+                                for(int i=0; i < cmp.m_arg; ++i)
+                                {
+                                    pop();
+                                }
+                                //if return
+                                if(n_return) push(get_return());
+                                //break
+                                break;
+                            }
                         }
                         //get context
                         l_closer* closer = get_temp1().to<l_closer>();
@@ -734,7 +762,7 @@ namespace l_language
                     break;
                 case L_START_CLASS_DEC:
                     //alloc
-                    get_class_temp() = l_variable(get_gc()->new_obj<l_class>());
+                    get_class_temp() = l_class::gc_new(get_gc());
                     //end
                     break;
                 case L_CLASS_ATTR:

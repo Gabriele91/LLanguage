@@ -70,6 +70,24 @@ namespace l_language
             return (T*)optr;
         }
         
+        template < typename T >
+        T* add_obj(T* o_ptr_to_add)
+        {
+            //update size
+            if (m_max_size < m_size_allocs)
+            {
+                delete_garbage();
+            }
+            //alloc
+            l_ref* optr =(l_ref*)o_ptr_to_add;
+            //put gc ref
+            optr->m_gc = this;
+            //push obj to pool
+            push(optr,sizeof(T));
+            //return ptr
+            return (T*)optr;
+        }
+        
         //auto execute
         void set_max_alloc_size(size_t max_alloc);
         

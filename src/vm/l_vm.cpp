@@ -302,9 +302,15 @@ namespace l_language
     {
         for(const lib_field& field : libs)
         {
-            m_compiler.add_c_function( m_default_thread, field.m_cfunction, field.m_name );
+            m_compiler.add_global_variable( m_default_thread, field.m_cfunction, field.m_name );
         }
     }
+    
+    void l_vm::add_lib(const l_extern_libary& (*libs) (l_vm*))
+    {
+        add_lib(libs(this));
+    }
+    
     void l_vm::add_lib(const std::string& name,const l_extern_libary& libs)
     {
         l_variable table = l_table::gc_new(get_gc());
@@ -315,9 +321,19 @@ namespace l_language
         m_compiler.add_global_variable(m_default_thread, table, name);
     }
     
+    void l_vm::add_lib(const std::string& name,const l_extern_libary& (*libs) (l_vm*))
+    {
+        add_lib(name,libs(this));
+    }
+    
+    void l_vm::add_var(const std::string& name, const l_variable& variable)
+    {
+        m_compiler.add_global_variable( m_default_thread, variable, name );
+    }
+    
     void l_vm::add_fun(const std::string& name, l_cfunction  cfunction)
     {
-        m_compiler.add_c_function( m_default_thread, cfunction, name );
+        m_compiler.add_global_variable( m_default_thread, cfunction, name );
     }
 
 };

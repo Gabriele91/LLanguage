@@ -306,9 +306,21 @@ namespace l_language
         }
         
         template< class T >
+        T* static_to()
+        {
+            return static_cast< T* >( m_value.m_pobj );
+        }
+        
+        template< class T >
         const T* to() const
         {
             return dynamic_cast< const T* >( m_value.m_pobj );
+        }
+        
+        template< class T >
+        const T* static_to() const
+        {
+            return static_cast< const T* >( m_value.m_pobj );
         }
         
         l_table* table();

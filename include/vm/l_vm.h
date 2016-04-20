@@ -96,7 +96,7 @@ namespace l_language
         public:
             
             std::string m_name;
-            l_cfunction m_cfunction;
+            l_variable  m_cfunction;
             
             lib_field(const std::string& name,
                       l_cfunction  cfunction)
@@ -104,13 +104,23 @@ namespace l_language
                 m_name = name;
                 m_cfunction = cfunction;
             }
+            
+            lib_field(const std::string& name,
+                      const l_variable&  value)
+            {
+                m_name = name;
+                m_cfunction = value;
+            }
         };
         //libary vector
         using l_extern_libary = std::vector< lib_field >;
         //lib utilities
+        void add_var(const std::string& name, const l_variable& variable);
         void add_fun(const std::string& name, l_cfunction  cfunction);
         void add_lib(const l_extern_libary& libs);
+        void add_lib(const l_extern_libary& (*libs) (l_vm*));
         void add_lib(const std::string& name,const l_extern_libary& libs);
+        void add_lib(const std::string& name,const l_extern_libary& (*libs) (l_vm*));
         ////////////////////////////////////////////////////////////////////////////////////
     };
 }

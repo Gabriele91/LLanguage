@@ -16,6 +16,7 @@
 #include <l_function.h>
 #include <l_table.h>
 #include <l_call_context.h>
+#include <l_exception.h>
 
 namespace l_language
 {
@@ -26,6 +27,9 @@ namespace l_language
     public:
         //main function id
         l_function_id m_main_fun_id { 0 };
+        //last lines
+        unsigned int m_last_code_asm { 0 };
+        unsigned int m_last_code_line{ 0 };
         //current index
         long m_top{ -1 };
         //type register
@@ -173,6 +177,16 @@ namespace l_language
                 str,
                 code,
                 line
+            });
+        }
+        //..
+        void push_error(const l_exception& exception)
+        {
+            m_errors.push_back
+            ({
+                std::string(exception.what()),
+                m_last_code_asm,
+                m_last_code_line
             });
         }
         //execution return

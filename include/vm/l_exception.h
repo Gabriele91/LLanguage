@@ -64,4 +64,11 @@ namespace l_language
     public:
         l_exception_to_string(l_language::l_thread* thread,const std::string& what) : l_exception(thread,"to_string",what) {}
     };
+    
+    class l_exception_not_valid_this : public l_exception
+    {
+    public:
+        l_exception_not_valid_this(l_language::l_thread* thread,const std::string& what) : l_exception(thread,"this",what) {}
+    };
+    
 };
