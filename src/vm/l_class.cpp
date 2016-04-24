@@ -22,6 +22,8 @@ namespace l_language
         m_class_name.mark();
         //mark parents
         m_parents.mark();
+        //mark ops
+        m_operators.mark();
         //mark
         l_ref::mark();
         //mark childs
@@ -59,6 +61,8 @@ namespace l_language
         m_class_name.unmark();
         //unmark parents
         m_parents.unmark();
+        //mark ops
+        m_operators.unmark();
         //unmark
         l_ref::unmark();
         //mark childs
@@ -113,9 +117,9 @@ namespace l_language
         m_maps[M_DEFS][key] = value;
     }
     
-    void l_class::add_operator (const l_variable& key,const l_variable&  value)
+    void l_class::add_operator (l_type_operator type,const l_variable&  value)
     {
-        m_maps[M_OPERS][key] = value;
+        m_operators[type] = value;
     }
     
     void l_class::add_parent(const l_variable& value)
@@ -170,6 +174,12 @@ namespace l_language
         }
         
         return l_variable();
+    }
+    
+    
+    l_variable l_class::get_operator(l_type_operator  type)
+    {
+        return m_operators[type];
     }
     
     l_variable l_class::new_object(l_thread* th)

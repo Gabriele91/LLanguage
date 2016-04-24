@@ -111,7 +111,7 @@ namespace l_language
         //macro
         #define raise(str)\
         {\
-            push_error(str, pc, (unsigned int)commands[pc].m_line);\
+            push_error(str, pc, (unsigned int)cmp.m_line);\
             return T_RETURN_ERROR;\
         }
         #define vconst(c)  function.m_costants[c]
@@ -205,25 +205,41 @@ namespace l_language
                     }
                 }
                 break;
-                    ////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////
+                #define operation(op,OP)\
+                if(!stack(1).op(stack(0),stack(1)))\
+                {\
+                    if(stack(0).is_object())\
+                    {\
+                        l_class* cobj = stack(0).object()->get_class().clazz();\
+                        l_variable op = cobj->get_operator(l_class::OP_ ## OP);\
+                        if(op.is_null()) raise("not valid operation");\
+                        get_this() = stack(0);\
+                        pop();\
+                        push(op);\
+                        execute_call(pc, {cmp.m_op_code , 1});\
+                    }\
+                    else\
+                        raise("not valid operation");\
+                }\
+                pop();
+                ////////////////////////////////////////////////////////////
                 case L_ADD:
-                    if(!stack(1).add(stack(0),stack(1))) raise("not valid operation");
-                    pop();
+                    operation(add,ADD);
                 break;
                     
                 case L_MUL:
-                    if(!stack(1).mul(stack(0),stack(1))) raise("not valid operation");
-                    pop();
+                    operation(mul,MUL);
                 break;
                     
                 case L_SUB:
-                    if(!stack(1).sub(stack(0),stack(1))) raise("not valid operation");
+                    operation(sub,SUB);
                     pop();
                 break;
                     
                 case L_DIV:
-                    if(!stack(1).div(stack(0),stack(1))) raise("not valid operation");
-                    pop();
+                    if(stack(0).is_false()) raise("division by zero not permitted");
+                    operation(div,DIV);
                 break;
                     
                 case L_MOD:
@@ -481,8 +497,6 @@ namespace l_language
                     //try
                     if ( r_a.is_ref_obj() )
                     {
-                        //get object
-                        l_ref* this_obj = (l_ref*)r_a.m_value.m_pobj;
                         //is a vector
                         if(r_a.is_array())
                         {
@@ -505,11 +519,26 @@ namespace l_language
                         else if (r_a.to<l_xrange>())
                         {
                             //types
-                            l_xrange* xrange = static_cast< l_xrange* > ( this_obj );
+                            l_xrange* xrange = static_cast< l_xrange* > ( r_a.m_value.m_pobj );
                             //pop value
                             pop();
                             //push it
                             push( xrange->get_it() );
+                        }
+                        else if (r_a.is_object())
+                        {
+                            //ref class
+                            l_class* ref_class = r_a.object()->get_class().clazz();
+                            //get call
+                            l_variable op_get_it = ref_class->get_operator(l_class::OP_GET_IT);
+                            //set this
+                            get_this() = r_a;
+                            //pop value r_a from stack
+                            pop();
+                            //push this call
+                            push(op_get_it);
+                            //execute call
+                            if(execute_call(pc,cmp)!=T_RETURN_VOID) return T_RETURN_ERROR;
                         }
                         else
                         {
@@ -570,6 +599,74 @@ namespace l_language
                             raise( "value isn't a valid iterator" );
                         }
                     }
+                    else if ( r_it.is_object() )
+                    {
+                        //ref class
+                        l_class* ref_class = r_it.object()->get_class().clazz();
+                        //..
+                        l_variable op_get_valid  = ref_class->get_operator(l_class::OP_GET_VALID);
+                        l_variable op_get_v_o_k = (cmp.m_op_code == L_FOR_OF) ?
+                                                    ref_class->get_operator(l_class::OP_GET_VALUE):
+                                                    ref_class->get_operator(l_class::OP_GET_KEY);
+                        l_variable op_get_next  = ref_class->get_operator(l_class::OP_GET_NEXT);
+                        //is a op
+                        if(
+                           (
+                            op_get_valid.is_closer() ||
+                            op_get_valid.is_cfunction()
+                           )
+                           &&
+                           (
+                            op_get_v_o_k.is_closer() ||
+                            op_get_v_o_k.is_cfunction()
+                           )
+                           &&
+                           (
+                            op_get_next.is_closer() ||
+                            op_get_next.is_cfunction()
+                           )
+                        )
+                        {
+                            //set this
+                            get_this() = r_it;
+                            //get iterator
+                            push(op_get_valid);
+                            //execute call
+                            if(execute_call(pc,{ cmp.m_op_code, 0 })!=T_RETURN_VOID) return T_RETURN_ERROR;
+                            //is valid?
+                            if(value(0).is_true())
+                            {
+                                //pop bool
+                                pop();
+                                //get value
+                                push(op_get_v_o_k);
+                                //execute call
+                                if(execute_call(pc,{ cmp.m_op_code, 0 })!=T_RETURN_VOID) return T_RETURN_ERROR;
+                                //get next it
+                                push(op_get_next);
+                                //execute call
+                                if(execute_call(pc,{ cmp.m_op_code, 0 })!=T_RETURN_VOID) return T_RETURN_ERROR;
+                            }
+                            else
+                            {
+                                //pop bool
+                                pop();
+                                //pop iterator
+                                pop();
+                                //and jump
+                                pc = cmp.m_arg - 1;
+                            }
+                        }
+                        else
+                        {
+                            //pop it
+                            pop();
+                            //and jump
+                            pc = cmp.m_arg - 1;
+                            //...
+                            raise( "value isn't an iterator" );
+                        }
+                    }
                     else
                     {
                         //pop it
@@ -583,183 +680,10 @@ namespace l_language
                 break;
                 case L_THIS_CALL:
                 case L_CALL:
-                {
-                    //get index
-                    get_temp1() = pop();
-                    //return this?
-                    bool b_ret_this = false;
-                    //get args
-                    if( get_temp1().is_cfunction() )
-                    {
-                        //return size
-                        int n_return = get_temp1().m_value.m_pcfun(this,cmp.m_arg);
-                        //assert (1 return)
-                        assert(n_return <= 1);
-                        //error
-                        if(n_return<0)
-                        {
-                            raise( "native call exception" );
-                        }
-                        else if(n_return>1)
-                        {
-                            raise( "native call can't return more than a value" );
-                        }
-                        //pop args
-                        for(int i=0; i < cmp.m_arg; ++i)
-                        {
-                            pop();
-                        }
-                        //if return
-                        if(n_return) push(get_return());
-                    }
-                    else if( get_temp1().is_closer() || get_temp1().is_class() )
-                    {
-                        if(get_temp1().is_class())
-                        {
-                            l_class* this_class = get_temp1().clazz();
-                            //this
-                            get_this() = this_class->new_object(this);
-                            //is a this call
-                            cmp.m_op_code = L_THIS_CALL;
-                            //return this
-                            b_ret_this = true;
-                            //get costructor
-                            get_temp1() = this_class->get_constructor();
-                            //is null?
-                            if(get_temp1().is_null())
-                            {
-                                //pop args
-                                for(unsigned int
-                                    arg  = 0;
-                                    arg != cmp.m_arg;
-                                    ++arg)
-                                {
-                                    pop();
-                                }
-                                //push this
-                                push(get_this());
-                                //remove this ref
-                                get_this() = l_variable();
-                                //..
-                                break;
-                            }
-                            else if( get_temp1().is_cfunction() )
-                            {
-                                //return size
-                                int n_return = get_temp1().m_value.m_pcfun(this,cmp.m_arg);
-                                //assert (1 return)
-                                assert(n_return <= 1);
-                                //error
-                                if(n_return<0)
-                                {
-                                    raise( "native call exception" );
-                                }
-                                else if(n_return>1)
-                                {
-                                    raise( "native call can't return more than a value" );
-                                }
-                                //pop args
-                                for(int i=0; i < cmp.m_arg; ++i)
-                                {
-                                    pop();
-                                }
-                                //if return
-                                if(n_return) push(get_return());
-                                //break
-                                break;
-                            }
-                        }
-                        //get context
-                        l_closer* closer = get_temp1().to<l_closer>();
-                        //else assert
-                        if(!closer){ assert(0); };
-                        //new function
-                        l_function& call_fun    = m_vm->function(closer->get_fun_id());
-                        //save last context
-                        l_variable last_ctx     = get_last_context();
-                        //new context
-                        get_temp2()            = l_call_context::gc_new(get_gc());
-                        l_call_context* new_ctx = get_temp2().to<l_call_context>();
-                        //this?
-                        if(cmp.m_op_code == L_THIS_CALL)
-                        {
-                            new_ctx->this_field() = get_this();
-                        }
-                        //init
-                        new_ctx->init(*closer);
-                        //lock context
-                        new_ctx->lock();
-                        //n args
-                        unsigned int n_fun_args = call_fun.m_args_size;
-                        //alloc array args..?
-                        if (call_fun.m_have_args_list)
-                        {
-                            //alloc array
-                            get_temp3() = l_array::gc_new(get_gc());
-                        }
-                        //put arguments
-                        for(unsigned int
-                            arg  = 0;
-                            arg != cmp.m_arg;
-                          ++arg)
-                        {
-                            if (arg < n_fun_args)
-                            {
-                                new_ctx->variable( call_fun.constant(arg) ) = pop();
-                            }
-                            else if (call_fun.m_have_args_list)
-                            {
-                                get_temp3().array()->push(pop());
-                            }
-                            else
-                            {
-                                pop();
-                            }
-                        }
-                        //add var list
-                        if (call_fun.m_have_args_list)
-                        {
-                            //push array
-                            new_ctx->variable( call_fun.constant(n_fun_args) ) = get_temp3();
-                            //to null
-                            get_temp3() = l_variable();
-                        }
-                        //save stack
-                        long stack_top_bf_call = m_top;
-                        //execute call
-                        type_return n_return = execute(*new_ctx);
-                        //error?
-                        if(n_return==T_RETURN_ERROR)
-                        {
-                            raise( "call exception" );
-                        }
-						else if (b_ret_this)
-						{
-							get_return() = new_ctx->this_field();
-						}
-                        //unlock context
-                        new_ctx->unlock();
-                        //reset last context
-                        get_last_context() = last_ctx;
-                        //restore stack
-                        m_top = stack_top_bf_call;
-                        //return?
-                        if(n_return == T_RETURN_VALUE || b_ret_this)
-                        {
-                            push(get_return());
-                        }
-                    }
-                    else
-                    {
-                        raise( "value isn't an function" );
-                    }
-                    //dealloc
-                    if(cmp.m_op_code == L_THIS_CALL)
-                    {
-                        get_this() = l_variable();
-                    }
-                }
-                    break;
+                    //Execute call
+                    if(execute_call(pc,cmp)!=T_RETURN_VOID) return T_RETURN_ERROR;
+                    //...
+                break;
                 case L_START_CLASS_DEC:
                     //alloc
                     get_class_temp() = l_class::gc_new(get_gc());
@@ -812,5 +736,170 @@ namespace l_language
         
         return T_RETURN_VOID;
     }
+    
+    l_thread::type_return l_thread::execute_call(int pc,l_command cmp)
+    {
+        //get index
+        get_temp1() = pop();
+        //return this?
+        bool b_ret_this = false;
+        //class call
+        if(get_temp1().is_class())
+        {
+            l_class* this_class = get_temp1().clazz();
+            //this
+            get_this() = this_class->new_object(this);
+            //is a this call
+            cmp.m_op_code = L_THIS_CALL;
+            //return this
+            b_ret_this = true;
+            //get costructor
+            get_temp1() = this_class->get_constructor();
+            //is null?
+            if(get_temp1().is_null())
+            {
+                //pop args
+                for(unsigned int
+                    arg  = 0;
+                    arg != cmp.m_arg;
+                    ++arg)
+                {
+                    pop();
+                }
+                //push this
+                push(get_this());
+                //remove this ref
+                get_this() = l_variable();
+                //..
+                return T_RETURN_VOID;
+            }
+        }
+        //get args
+        if( get_temp1().is_cfunction() )
+        {
+            //return size
+            int n_return = get_temp1().m_value.m_pcfun(this,cmp.m_arg);
+            //assert (1 return)
+            assert(n_return <= 1);
+            //error
+            if(n_return<0)
+            {
+                raise( "native call exception" );
+            }
+            else if(n_return>1)
+            {
+                raise( "native call can't return more than a value" );
+            }
+            //pop args
+            for(int i=0; i < cmp.m_arg; ++i)
+            {
+                pop();
+            }
+            //constructor
+            if(b_ret_this)
+            {
+                push(get_this());
+            }
+            //if return
+            else if(n_return)
+            {
+                push(get_return());
+            }
+        }
+        else if( get_temp1().is_closer() )
+        {
+            //get context
+            l_closer* closer = get_temp1().to<l_closer>();
+            //else assert
+            if(!closer){ assert(0); };
+            //new function
+            l_function& call_fun    = m_vm->function(closer->get_fun_id());
+            //save last context
+            l_variable last_ctx     = get_last_context();
+            //new context
+            get_temp2()            = l_call_context::gc_new(get_gc());
+            l_call_context* new_ctx = get_temp2().to<l_call_context>();
+            //this?
+            if(cmp.m_op_code == L_THIS_CALL)
+            {
+                new_ctx->this_field() = get_this();
+            }
+            //init
+            new_ctx->init(*closer);
+            //lock context
+            new_ctx->lock();
+            //n args
+            unsigned int n_fun_args = call_fun.m_args_size;
+            //alloc array args..?
+            if (call_fun.m_have_args_list)
+            {
+                //alloc array
+                get_temp3() = l_array::gc_new(get_gc());
+            }
+            //put arguments
+            for(unsigned int
+                arg  = 0;
+                arg != cmp.m_arg;
+                ++arg)
+            {
+                if (arg < n_fun_args)
+                {
+                    new_ctx->variable( call_fun.constant(arg) ) = pop();
+                }
+                else if (call_fun.m_have_args_list)
+                {
+                    get_temp3().array()->push(pop());
+                }
+                else
+                {
+                    pop();
+                }
+            }
+            //add var list
+            if (call_fun.m_have_args_list)
+            {
+                //push array
+                new_ctx->variable( call_fun.constant(n_fun_args) ) = get_temp3();
+                //to null
+                get_temp3() = l_variable();
+            }
+            //save stack
+            long stack_top_bf_call = m_top;
+            //execute call
+            type_return n_return = execute(*new_ctx);
+            //error?
+            if(n_return==T_RETURN_ERROR)
+            {
+                raise( "call exception" );
+            }
+            else if (b_ret_this)
+            {
+                get_return() = new_ctx->this_field();
+            }
+            //unlock context
+            new_ctx->unlock();
+            //reset last context
+            get_last_context() = last_ctx;
+            //restore stack
+            m_top = stack_top_bf_call;
+            //return?
+            if(n_return == T_RETURN_VALUE || b_ret_this)
+            {
+                push(get_return());
+            }
+        }
+        else
+        {
+            raise( "value isn't an function" );
+        }
+        //dealloc
+        if(cmp.m_op_code == L_THIS_CALL)
+        {
+            get_this() = l_variable();
+        }
+        //no errors
+        return T_RETURN_VOID;
+    }
+
     
 }

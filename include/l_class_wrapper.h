@@ -6,6 +6,8 @@
 //  Copyright © 2016 Gabriele Di Bari. All rights reserved.
 //
 #pragma once
+#include <l_variable.h>
+#include <l_class.h>
 #include <l_function_wrapper.h>
 
 namespace l_language
@@ -39,7 +41,7 @@ namespace l_language
                 //get this
                 l_language::l_object*  var_self = thread->get_this().to< l_object >();
                 //to C type
-                C* ptr_self = var_self->get_value( l_string::gc_new(thread->get_gc(), "$native$this") ).to< C >();
+                C* ptr_self = var_self->get_raw_pointer().to< C >();
                 //call
                 (ptr_self->*METHOD)(l_arg<ARGS>(thread, INDICES, success)...);
                 //return
@@ -71,7 +73,7 @@ namespace l_language
                 //get this
                 l_language::l_object*  var_self = thread->get_this().to< l_object >();
                 //to C type
-                C* ptr_self = var_self->get_value( l_string::gc_new(thread->get_gc(), "$native$this") ).to< C >();
+                C* ptr_self = var_self->get_raw_pointer().to< C >();
                 //call
                 l_return(thread,(ptr_self->*METHOD)(l_arg<ARGS>(thread, INDICES, success)...));
                 //return
@@ -107,11 +109,9 @@ namespace l_language
                 //alloc
                 l_language::l_variable raw_self = gc->new_obj< C >(l_arg<ARGS>(thread, INDICES, success)...);
                 //add
-                self->set_value( l_string::gc_new(thread->get_gc(), "$native$this") , raw_self);
-                //return this
-                thread->push_return(self);
+                self->set_raw_pointer(raw_self);
                 //return
-                return success ? 1 : -1;
+                return success ? 0 : -1;
             }
         };
         
@@ -121,11 +121,37 @@ namespace l_language
             std::string            m_name;
             l_language::l_variable m_field;
         };
+        struct l_class_operator
+        {
+            l_class::l_type_operator  m_type;
+            l_language::l_variable    m_field;
+        };
+        //iterator utility
+        template < typename C, typename IT_C >
+        inline
+        int l_create_it(l_language::l_thread* th,int args)
+        {
+           //this file
+           l_object*  othis    = th->get_this().object();
+           l_class*   cthis    = othis->get_class().clazz();
+           l_variable raw_pref = othis->get_raw_pointer();
+           //..
+           l_class* clazz = cthis->get_operator(l_class::OP_IT_CLASS).clazz();
+           l_variable obj = clazz->new_object(th);
+           l_variable oit = th->get_gc()->new_obj< IT_C >(raw_pref.to< C >());
+           //..
+           obj.object()->set_raw_pointer( oit );
+           //...
+           th->push_return(obj);
+           //...
+           return 1;
+        }
         //utility class wrapper
         inline
         l_language::l_variable l_create_class(l_language::l_vm* vm,
-                                              const std::string class_name,
-                                              const std::vector< l_class_field >& methods)
+                                              const std::string& class_name,
+                                              const std::vector< l_class_field >& methods,
+                                              const std::vector< l_class_operator >& operators)
         {
             using l_class       = l_language::l_class;
             using l_string      = l_language::l_string;
@@ -133,8 +159,6 @@ namespace l_language
             //add class
             l_variable var_class = l_class::gc_new(vm);
             l_class*   this_class = var_class.to< l_class >();
-            //add values
-            this_class->add_variable( l_string::gc_new(vm, "$native$this"), l_variable() );
             //set name
             this_class->set_class_name(l_string::gc_new(vm, class_name));
             //append
@@ -142,12 +166,26 @@ namespace l_language
             {
                 this_class->add_def( l_string::gc_new(vm, field.m_name), field.m_field );
             }
+            //...
+            for(auto& ops : operators)
+            {
+                this_class->add_operator( ops.m_type, ops.m_field );
+            }
             //return class object
             return { this_class };
+        }
+        
+        inline
+        l_language::l_variable l_create_class(l_language::l_vm* vm,
+                                              const std::string& class_name,
+                                              const std::vector< l_class_field >& methods)
+        {
+            return l_create_class(vm,class_name,methods,{});
         }
 
 
     }
+    #define l_create_iterator(...) ::l_language::l_wrapper::l_create_it< __VA_ARGS__ >
     #define l_constructor(...) ::l_language::l_wrapper::l_constructor< __VA_ARGS__ >::call
     #define l_method(C,x) ::l_language::l_wrapper::l_method< C, decltype(&C::x), &C::x >::call
 }

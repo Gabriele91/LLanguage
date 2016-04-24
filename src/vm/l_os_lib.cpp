@@ -5,11 +5,11 @@
 //  Created by Gabriele on 23/03/16.
 //  Copyright © 2016 Gabriele Di Bari. All rights reserved.
 //
+#include <ctime>
 #include <l_os_lib.h>
 #include <l_string.h>
 #include <l_variable.h>
-#include <cmath>
-#include <cstdlib>
+#include <l_function_wrapper.h>
 int l_system(l_language::l_thread* th, int args)
 {
     //have an arg?
@@ -43,14 +43,29 @@ int l_get_env(l_language::l_thread* th, int args)
     return 1;
 }
 
+int l_clock(l_language::l_thread* th, int args)
+{
+    clock_t clock = std::clock();
+    th->push_return({( (float)clock /  (float)CLOCKS_PER_SEC) });
+    return 1;
+}
+
+int l_time(l_language::l_thread* th, int args)
+{
+    th->push_return({ (int)(std::time(nullptr)) });
+    return 1;
+}
+
 namespace l_language
 {
     const l_language::l_vm::l_extern_libary& l_os_lib(l_vm* vm)
     {
         static l_language::l_vm::l_extern_libary l_lib
         {
-            { "system" ,  l_system   },
-            { "get_env",  l_get_env  }
+            { "system" , l_system              },
+            { "get_env", l_get_env             },
+            { "clock",   l_clock               },
+            { "time",    l_time                }
         };
         return l_lib;
     }

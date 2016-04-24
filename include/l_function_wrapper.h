@@ -39,6 +39,17 @@ namespace l_language
         }
         
         template < >
+        inline size_t l_arg< size_t >(l_language::l_thread* thread,int n, bool& success)
+        {
+            if(!thread->value(n).can_to_int())
+            {
+                thread->push_error( l_exception_to_int(thread,"can't cast value to int") );
+                success = false;
+            }
+            return (size_t)thread->value(n).to_int();
+        }
+        
+        template < >
         inline float l_arg< float >(l_language::l_thread* thread,int n, bool& success)
         {
             if(!thread->value(n).can_to_float())
@@ -47,6 +58,17 @@ namespace l_language
                 success = false;
             }
             return thread->value(n).to_float();
+        }
+        
+        template < >
+        inline double l_arg< double >(l_language::l_thread* thread,int n, bool& success)
+        {
+            if(!thread->value(n).can_to_float())
+            {
+                thread->push_error( l_exception_to_float(thread,"can't cast value to float") );
+                success = false;
+            }
+            return (double)thread->value(n).to_float();
         }
         
         template < >
@@ -60,6 +82,28 @@ namespace l_language
             return thread->value(n).to_string();
         }
         
+        template < >
+        inline  const std::string& l_arg< const std::string& >(l_language::l_thread* thread,int n, bool& success)
+        {
+            if(!thread->value(n).is_string())
+            {
+                thread->push_error( l_exception_to_string(thread,"can't cast value to string") );
+                success = false;
+            }
+            return thread->value(n).string()->str();
+        }
+        
+        template < >
+        inline  const char* l_arg< const char* >(l_language::l_thread* thread,int n, bool& success)
+        {
+            if(!thread->value(n).is_string())
+            {
+                thread->push_error( l_exception_to_string(thread,"can't cast value to string") );
+                success = false;
+            }
+            return thread->value(n).string()->str().c_str();
+        }
+        
         template < typename T >
         inline void l_return(l_language::l_thread* thread,const T& value)
         {
@@ -70,6 +114,24 @@ namespace l_language
         inline void l_return(l_language::l_thread* thread,const bool& value)
         {
             thread->push_return( l_variable(value) );
+        }
+        
+        template < >
+        inline void l_return(l_language::l_thread* thread,const double& value)
+        {
+            thread->push_return( l_variable((float)value) );
+        }
+        
+        template < >
+        inline void l_return(l_language::l_thread* thread,const long& value)
+        {
+            thread->push_return( l_variable((int)value) );
+        }
+        
+        template < >
+        inline void l_return(l_language::l_thread* thread,const size_t& value)
+        {
+            thread->push_return( l_variable((int)value) );
         }
         
         template < >
@@ -125,5 +187,6 @@ namespace l_language
         };
         
     };
-    #define l_def(x) ::l_language::l_wrapper::l_def< decltype(x), x >::call
+    #define l_def_t(type,x) ::l_language::l_wrapper::l_def< type, (type)(x) >::call
+    #define l_def(x)        ::l_language::l_wrapper::l_def< decltype(x), x >::call
 };

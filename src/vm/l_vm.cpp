@@ -183,6 +183,8 @@ namespace l_language
             regT1.to<l_closer>()->init( call_fun_id,
                                        &m_default_thread,
                                         m_default_thread.get_last_context());
+            //save last errors
+            auto l_errors = m_default_thread.m_errors;
             //start
             if(!execute_call(l_return,regT1,{}))
             {
@@ -191,7 +193,7 @@ namespace l_language
                     output.m_errors += std::to_string( error.m_line ) + ":" + error.m_error + "\n";
                 }
                 //clear errors
-                output.m_errors.clear();
+                m_default_thread.m_errors = l_errors;
                 //output errors
                 l_return = l_string::gc_new(this, output.m_errors);
             }
@@ -284,7 +286,15 @@ namespace l_language
         //execute call
         l_thread::type_return n_return = thread->execute(*new_ctx);
         //error?
-        if(n_return==l_thread::T_RETURN_ERROR) return false;
+        if(n_return==l_thread::T_RETURN_ERROR)
+        {
+            //errors...
+            for(auto& error:thread->m_errors)
+            {
+                m_default_thread.push_error(error.m_error, error.m_code, error.m_line);
+            }
+            return false;
+        }
         //unlock context
         new_ctx->unlock();
         //return?
@@ -297,6 +307,21 @@ namespace l_language
         //..
         return true;
     }
+    ////////////////////////////////////////////////////////////////////////////////////
+#if 0
+    //.. copy context
+    for (auto it : m_default_thread.main_context()->m_local_variables.raw())
+    {
+        thread->main_context()->variable(it.first) = it.second;
+    }
+    thread->main_context()->m_this = m_default_thread.main_context()->m_this;
+#endif
+#if 0
+    else if (thread->m_top >= 0)
+    {
+        v_return = (thread->value(0));
+    }
+#endif
     ////////////////////////////////////////////////////////////////////////////////////
     void l_vm::add_lib(const l_vm::l_extern_libary& libs)
     {

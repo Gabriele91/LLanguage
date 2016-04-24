@@ -198,6 +198,8 @@ namespace l_language
         };
         //execute context
         type_return execute(l_call_context& id_context);
+        //utility
+        type_return execute_call(int pcounter,l_command cmp);
     };
     
     //list threads

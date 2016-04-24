@@ -20,6 +20,8 @@ namespace l_language
         l_ref::mark();
         //mark class
         m_class.mark();
+        //mark
+        m_raw_pointer.mark();
         //mark fields
         for(auto it:m_attributes)
         {
@@ -54,6 +56,8 @@ namespace l_language
         l_ref::unmark();
         //unmark class
         m_class.unmark();
+        //unmark
+        m_raw_pointer.unmark();
         //unmark fields
         for(auto it:m_attributes)
         {

@@ -31,6 +31,7 @@ namespace l_language
         friend class l_class;
         //attributes
         l_variable   m_class;
+        l_variable   m_raw_pointer;
         l_map_object m_attributes;
         //mark event
         virtual void mark();
@@ -46,6 +47,21 @@ namespace l_language
         
         l_variable get_value(const l_variable&  key);
         bool       set_value(const l_variable&  key,const l_variable& value);
+        
+        l_variable get_class() const
+        {
+            return m_class;
+        }
+        
+        void  set_raw_pointer(const l_variable& pointer)
+        {
+            m_raw_pointer = pointer;
+        }
+        
+        l_variable get_raw_pointer() const
+        {
+            return m_raw_pointer;
+        }
     };
     
 };
