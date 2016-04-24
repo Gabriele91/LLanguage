@@ -12,6 +12,7 @@ namespace l_language
             
             "def",
             "function",
+            "operator",
             
             "while",
             "for",
@@ -61,10 +62,11 @@ namespace l_language
     }
     bool l_parser::is_a_value_keyword(const char* ptr)
     {
-        return KEYWORDCMP(ptr, NULL) ||
-               KEYWORDCMP(ptr, TRUE) ||
-               KEYWORDCMP(ptr, FALSE)||
-               KEYWORDCMP(ptr, ARGS) ;
+        return KEYWORDCMP(ptr, NULL)
+            || KEYWORDCMP(ptr, TRUE) 
+            || KEYWORDCMP(ptr, FALSE)
+          //|| KEYWORDCMP(ptr, ARGS)
+        ;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //put variable

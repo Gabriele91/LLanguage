@@ -43,11 +43,13 @@ namespace l_language
             OP_MUL,
             OP_SUB,
             OP_DIV,
+            OP_MOD,
             //...
             OP_RIGHT_ADD,
             OP_RIGHT_MUL,
             OP_RIGHT_SUB,
             OP_RIGHT_DIV,
+            OP_RIGHT_MOD,
             //
             OP_UNM,
             //GET ITEM
@@ -61,6 +63,7 @@ namespace l_language
             //
             OP_MAX
         };
+        static l_type_operator get_op_id(const std::string& name);
         
         l_class()
         {

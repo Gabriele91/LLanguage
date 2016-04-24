@@ -40,12 +40,14 @@ namespace l_language
         L_START_CLASS_DEC,
         L_CLASS_ATTR,
         L_CLASS_METHOD,
+        L_CLASS_OP,
         L_CLASS_PARENT,
         L_END_CLASS_DEC,
         //Loads
         L_PUSH_NULL,
         L_PUSH_TRUE,
         L_PUSH_FALSE,
+        L_PUSH_INT,
         L_PUSHK,
         //Allocs
         L_NEW_ARRAY,//new array

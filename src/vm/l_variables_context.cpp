@@ -141,6 +141,11 @@ namespace l_language
         {
             visit(fun, node, defs.m_method);
         }
+        //sub op
+        for(auto& defs : node->m_ops)
+        {
+            visit(fun, node, defs.m_method);
+        }
     }
     
     //assignable

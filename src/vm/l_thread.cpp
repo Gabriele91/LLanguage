@@ -183,11 +183,12 @@ namespace l_language
                     }
                 break;
                     
-                case L_PUSH:          push( stack(cmp.m_arg) );  break;
-                case L_PUSH_NULL:     push( l_variable() );      break;
-                case L_PUSH_TRUE:     push( l_variable(true) );  break;
-                case L_PUSH_FALSE:    push( l_variable(false) ); break;
-                case L_PUSHK:         push( vconst(cmp.m_arg) ); break;
+                case L_PUSH:       push( stack(cmp.m_arg) );      break;
+                case L_PUSH_NULL:  push( l_variable() );          break;
+                case L_PUSH_TRUE:  push( l_variable(true) );      break;
+                case L_PUSH_FALSE: push( l_variable(false) );     break;
+                case L_PUSH_INT:   push( l_variable(cmp.m_arg) ); break;
+                case L_PUSHK:      push( vconst(cmp.m_arg) );     break;
                 case L_CLOSER:
                 {
                     //get value
@@ -209,20 +210,18 @@ namespace l_language
                 #define operation(op,OP)\
                 if(!stack(1).op(stack(0),stack(1)))\
                 {\
-                    if(stack(0).is_object())\
+                    if(stack(1).is_object())\
                     {\
-                        l_class* cobj = stack(0).object()->get_class().clazz();\
+                        l_class* cobj = stack(1).object()->get_class().clazz();\
                         l_variable op = cobj->get_operator(l_class::OP_ ## OP);\
-                        if(op.is_null()) raise("not valid operation");\
-                        get_this() = stack(0);\
-                        pop();\
+                        if(op.is_null()) raise("operator not overloaded");\
+                        get_this() = stack(1);\
+                        stack(1) = pop();\
                         push(op);\
-                        execute_call(pc, {cmp.m_op_code , 1});\
+                        execute_call(pc, {L_THIS_CALL , 1});\
                     }\
-                    else\
-                        raise("not valid operation");\
-                }\
-                pop();
+                    else raise("not valid operation");\
+                } else pop();
                 ////////////////////////////////////////////////////////////
                 case L_ADD:
                     operation(add,ADD);
@@ -234,7 +233,6 @@ namespace l_language
                     
                 case L_SUB:
                     operation(sub,SUB);
-                    pop();
                 break;
                     
                 case L_DIV:
@@ -243,8 +241,7 @@ namespace l_language
                 break;
                     
                 case L_MOD:
-                    if(!stack(1).mod(stack(0),stack(1))) raise("not valid operation");
-                    pop();
+                    operation(mod,MOD);
                 break;
                     
                 case L_UNM:
@@ -703,17 +700,30 @@ namespace l_language
                 //end
                 break;
                 case L_CLASS_METHOD:
-				{
-					//values 
-					const l_variable& key   = stack(0);
-					const l_variable& value = stack(1);
-					//add
-					get_class_temp().clazz()->add_def(key, value);
-					//pop
-					pop();
-					pop();
-					//end
-				}
+                {
+                    //values
+                    const l_variable& key   = stack(0);
+                    const l_variable& value = stack(1);
+                    //add
+                    get_class_temp().clazz()->add_def(key, value);
+                    //pop
+                    pop();
+                    pop();
+                    //end
+                }
+                break;
+                case L_CLASS_OP:
+                {
+                    //values
+                    const l_variable& key   = stack(0);
+                    const l_variable& value = stack(1);
+                    //add
+                    get_class_temp().clazz()->add_operator((l_class::l_type_operator)key.to_int(), value);
+                    //pop
+                    pop();
+                    pop();
+                    //end
+                }
                 break;
                 case L_CLASS_PARENT:
                     //push class

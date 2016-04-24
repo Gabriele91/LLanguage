@@ -571,7 +571,7 @@ namespace l_language
             return true;
         }
         
-        output = l_variable(false);
+        /* output = l_variable(false); */
         return false;
     }
 }

@@ -155,6 +155,7 @@ namespace l_language
             K_ELSE,
             K_DEF,
             K_FUNCTION,
+            K_OPERATOR,
             
             K_WHILE,
             K_FOR,
@@ -1528,36 +1529,9 @@ namespace l_language
             //success
             return true;
         }
-        //parse def
-        bool parse_def(const char*& ptr, l_syntactic_tree::node*& node, bool is_exp = false)
+        //parse args
+        bool parse_def_args(const char*& ptr,l_syntactic_tree::function_def_node* l_def_node)
         {
-            l_syntactic_tree::node*              l_variable = nullptr;
-            l_syntactic_tree::function_def_node* l_def_node = nullptr;
-            //skip
-            skip_space_end_comment(ptr);
-            //serach def
-            if (!KEYWORDCMP_SKIP(ptr, DEF) && !KEYWORDCMP_SKIP(ptr, FUNCTION))
-            {
-                push_error("not found \"def/function\" keyword");
-                return false;
-            }
-            //skip
-            skip_space_end_comment(ptr);
-            //parse variable
-            if(is_exp && !is_variable(ptr))
-            {
-                //lambda
-                l_variable = nullptr;
-            }
-            else if(!parse_variable(ptr, l_variable))
-            {
-                push_error("not found \"variable\" of def");
-                return false;
-            }
-            //cast
-            node = l_syntactic_tree::function_def(l_variable, m_line);
-            //alloc node
-            l_def_node = (l_syntactic_tree::function_def_node*)node;
             //skip
             skip_space_end_comment(ptr);
             //parse args
@@ -1593,9 +1567,9 @@ namespace l_language
                         }
                         //push var
                         if(b_not_have_args_list)
-                            l_def_node->append_arg((l_syntactic_tree::variable_node*)l_variable);
+                        l_def_node->append_arg((l_syntactic_tree::variable_node*)l_variable);
                         else
-                            l_def_node->set_name_args_list((l_syntactic_tree::variable_node*)l_variable);
+                        l_def_node->set_name_args_list((l_syntactic_tree::variable_node*)l_variable);
                         //skip
                         skip_space_end_comment(ptr);
                     }
@@ -1604,18 +1578,111 @@ namespace l_language
                     if(!CSTRCMP_SKIP(ptr, ")"))
                     {
                         push_error("not found \")\" of args of def");
-                        //dealloc
-                        delete l_def_node;
                         //false
                         return false;
                     }
                 }
+            }
+            return true;
+        }
+        //parse def
+        bool parse_def(const char*& ptr, l_syntactic_tree::node*& node, bool is_exp = false)
+        {
+            l_syntactic_tree::node*              l_variable = nullptr;
+            l_syntactic_tree::function_def_node* l_def_node = nullptr;
+            //skip
+            skip_space_end_comment(ptr);
+            //serach def
+            if (!KEYWORDCMP_SKIP(ptr, DEF) && !KEYWORDCMP_SKIP(ptr, FUNCTION))
+            {
+                push_error("not found \"def/function\" keyword");
+                return false;
+            }
+            //skip
+            skip_space_end_comment(ptr);
+            //parse variable
+            if(is_exp && !is_variable(ptr))
+            {
+                //lambda
+                l_variable = nullptr;
+            }
+            else if(!parse_variable(ptr, l_variable))
+            {
+                push_error("not found \"variable\" of def");
+                return false;
+            }
+            //cast
+            node = l_syntactic_tree::function_def(l_variable, m_line);
+            //alloc node
+            l_def_node = (l_syntactic_tree::function_def_node*)node;
+            //parse args
+            if(!parse_def_args(ptr,l_def_node))
+            {
+                //dealloc
+                delete l_def_node;
+                //to null
+                node = nullptr;
+                //return..
+                return false;
             }
 			// parse '{' staments '}' | stament
 			if (!parse_stament_s_block(ptr, l_def_node->m_staments)) return false;
             //success
             return true;
         }
+        //parse def operator
+        bool parse_def_op(const char*& ptr, l_syntactic_tree::node*& node)
+        {
+            l_syntactic_tree::node*              l_variable = nullptr;
+            l_syntactic_tree::function_def_node* l_def_node = nullptr;
+            //skip
+            skip_space_end_comment(ptr);
+            //serach def
+            if (!KEYWORDCMP_SKIP(ptr, OPERATOR))
+            {
+                push_error("not found \"operator\" keyword");
+                return false;
+            }
+            //skip
+            skip_space_end_comment(ptr);
+            //parse variable
+            if(CSTRCMP(ptr, "+") ||
+               CSTRCMP(ptr, "-") ||
+               CSTRCMP(ptr, "*") ||
+               CSTRCMP(ptr, "/") ||
+               CSTRCMP(ptr, "%"))
+            {
+                //buffer
+                const char cstr_op [] = {*ptr,'\0'};
+                //add name
+                l_variable = l_syntactic_tree::variable(cstr_op,m_line);
+                //skip
+                ++ptr;
+            }
+            else
+            {
+                push_error("not found valid operator of def");
+                return false;
+            }
+            //cast
+            node = l_syntactic_tree::function_def(l_variable, m_line);
+            //alloc node
+            l_def_node = (l_syntactic_tree::function_def_node*)node;
+            //parse args
+            if(!parse_def_args(ptr,l_def_node))
+            {
+                //dealloc
+                delete l_def_node;
+                //to null
+                node = nullptr;
+                //return..
+                return false;
+            }
+            // parse '{' staments '}' | stament
+            if (!parse_stament_s_block(ptr, l_def_node->m_staments)) return false;
+            //success
+            return true;
+        }        
         //parse return
         bool parse_return(const char*& ptr, l_syntactic_tree::node*& node)
         {
@@ -1737,7 +1804,8 @@ namespace l_language
             //parse attribute and defs
             while(!CSTRCMP(ptr, "}"))
             {
-                if(KEYWORDCMP(ptr, DEF) || KEYWORDCMP(ptr, FUNCTION))
+                if(KEYWORDCMP(ptr, DEF) ||
+                   KEYWORDCMP(ptr, FUNCTION))
                 {
                     //ptr
                     l_syntactic_tree::node* node = nullptr;
@@ -1745,12 +1813,20 @@ namespace l_language
                     if(!parse_def(ptr, node)) return false;
                     //cast type
                     auto* def_node = (l_syntactic_tree::function_def_node*)node;
-                    //def name
-                    //auto& def_name = def_node->m_variable->m_name;
-                    //rename def
-                    //def_name = def_class_name+"|"+def_name;
                     //push
                     class_node->add_def(def_node,l_current_state);
+                    //..
+                }
+                else if(KEYWORDCMP(ptr, OPERATOR))
+                {
+                    //ptr
+                    l_syntactic_tree::node* node = nullptr;
+                    //parse
+                    if(!parse_def_op(ptr, node)) return false;
+                    //cast type
+                    auto* def_node = (l_syntactic_tree::function_def_node*)node;
+                    //push
+                    class_node->add_op(def_node,l_current_state);
                     //..
                 }
                 else if(KEYWORDCMP_SKIP(ptr, VAR))

@@ -926,6 +926,8 @@ namespace l_language
             std::vector < attribute >  m_attrs;
             //def types
             std::vector < method_def > m_defs;
+            //ops types
+            std::vector < method_def > m_ops;
             //init
             class_node()
             {
@@ -950,6 +952,10 @@ namespace l_language
             {
                 m_defs.push_back({ def, type });
             }
+            void add_op(function_def_node* op,attribute_def_type type= T_PUBLIC)
+            {
+                m_ops.push_back({ op, type });
+            }
             //get class name
             std::string get_class_name() const
             {
@@ -963,6 +969,7 @@ namespace l_language
                 if (m_class_name)                         delete m_class_name;
                 for(auto& node : m_parents)               delete node;
                 for(auto& node : m_defs)                  delete node.m_method;
+                for(auto& node : m_ops)                   delete node.m_method;
                 for(auto& node : m_attrs)                 delete node.m_var;
                 for(auto& node : m_attrs)  if(node.m_exp) delete node.m_exp;
             }

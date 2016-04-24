@@ -13,6 +13,17 @@
 
 namespace l_language
 {
+    
+    //op compare
+    l_class::l_type_operator l_class::get_op_id(const std::string& name)
+    {
+        if(name=="+") return l_class::OP_ADD;
+        if(name=="-") return l_class::OP_SUB;
+        if(name=="*") return l_class::OP_MUL;
+        if(name=="/") return l_class::OP_DIV;
+        if(name=="%") return l_class::OP_MOD;
+        return l_class::OP_MAX;
+    }
     //mark event
     void l_class::mark()
     {

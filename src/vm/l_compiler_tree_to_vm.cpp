@@ -8,6 +8,7 @@
 
 #include <l_compiler_tree_to_vm.h>
 #include <l_vm.h>
+#include <l_class.h>
 
 namespace l_language
 {
@@ -534,19 +535,39 @@ namespace l_language
             //..
             l_syntactic_tree::function_def_node* method = defs.m_method;
             //compile
-			//get function id
-			size_t id_function = ((size_t)method->m_data);
-			//compile staments
-			if (!compile_statements(&m_vm->function((unsigned int)id_function), method->m_staments))
-			{
-				return false;
-			}
-			//get closer
-			fun->push({ L_CLOSER, get_method_id(fun, class_node, method), method->m_line });
+            //get function id
+            size_t id_function = ((size_t)method->m_data);
+            //compile staments
+            if (!compile_statements(&m_vm->function((unsigned int)id_function), method->m_staments))
+            {
+                return false;
+            }
+            //get closer
+            fun->push({ L_CLOSER, get_method_id(fun, class_node, method), method->m_line });
             //add var
             fun->push({ L_PUSHK, get_var_id(fun,method->m_variable), method->m_variable->m_line });
             //method
             fun->push({ L_CLASS_METHOD,  defs.m_type, defs.m_method->m_line });
+        }
+        //add op
+        for(auto& defs : class_node->m_ops)
+        {
+            //..
+            l_syntactic_tree::function_def_node* method = defs.m_method;
+            //compile
+            //get function id
+            size_t id_function = ((size_t)method->m_data);
+            //compile staments
+            if (!compile_statements(&m_vm->function((unsigned int)id_function), method->m_staments))
+            {
+                return false;
+            }
+            //get closer
+            fun->push({ L_CLOSER, get_method_id(fun, class_node, method), method->m_line });
+            //add var
+            fun->push({ L_PUSH_INT, (int)l_class::get_op_id(defs.m_method->m_variable->m_name), method->m_variable->m_line });
+            //method
+            fun->push({ L_CLASS_OP,  defs.m_type, defs.m_method->m_line });
         }
         //create class object
         fun->push({ L_END_CLASS_DEC,   get_var_id(fun,class_node->m_class_name), class_node->m_line });

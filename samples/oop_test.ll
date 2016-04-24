@@ -164,3 +164,51 @@ m = manager(mario(),luigi())
 m.update()
 
 
+class vec2
+{
+    var x,y
+    
+    def vec2(x,y)
+    {
+        this.x = to_float(x) or 0.
+        this.y = to_float(y) or 0.
+    }
+    
+    operator + (value)
+    {
+        return vec2(this.x+value.x,this.y+value.y)
+    }
+    
+    operator - (value)
+    {
+        return vec2(this.x-value.x,this.y-value.y)
+    }
+    
+    operator * (value)
+    {
+        return vec2(this.x*value.x,this.y*value.y)
+    }
+    
+    operator / (value)
+    {
+        return vec2(this.x/value.x,this.y/value.y)
+    }
+    
+    operator % (value)
+    {
+        return vec2(this.x % value.x,this.y % value.y)
+    }
+    
+    def print()
+    {
+        io.println("(",this.x, ", ", this.y,")")
+    }
+}
+
+
+x = ( ( vec2(3,4) + vec2(3,4) - vec2(3,8) ) * vec2(4,1) / vec2(2,1) ) % vec2(4,1)
+x.print()
+
+
+
+

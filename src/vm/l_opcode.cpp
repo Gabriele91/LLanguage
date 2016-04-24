@@ -43,6 +43,7 @@ namespace l_language
         "START_CLASS_DEC",
         "CLASS_ATTR",
         "CLASS_METHOD",
+        "CLASS_OP",
         "CLASS_PARENT",
         "END_CLASS_DEC",
         
@@ -50,6 +51,7 @@ namespace l_language
         "PUSH_NULL",
         "PUSH_TRUE",
         "PUSH_FALSE",
+        "PUSH_INT",
         "PUSHK",
         
         //Allocs
