@@ -61,7 +61,7 @@ namespace l_language
      table_field := (constant | variable) ':' exp
      
      class_dec   := 'class' variable [ ':' variable {[',' variable]}] class_body
-     class_field := ( 'var' variable [assignament exp] {[',' variable [assignament exp]]} | def )
+     class_field := ( 'var' variable [assignament exp] {[',' variable [assignament exp]]} | def | def_op )
      class_body  := '{'  {[  ('public'|'private'|'protected') | class_field ]} '}'
      
 	//statments
@@ -81,6 +81,9 @@ namespace l_language
     for_each_args:= variable ('in'|'of') exp
     for          := 'for' ( (for_each_args | for_c_args) [';'] | '(' (for_each_args | for_c_args ) ')') stamentsblock
     def          := ('def'|'function') [variable] '(' ([ variable {[',' variable]} [',' '...' variable] ] | ['...'variable]) ')' stamentsblock
+    def_op       := 'operator' ['right'] ('+'|'-'|'*'|'/'|'%'|logic_comp|logic_op|logic_one)
+                   '(' ([ variable {[',' variable]} [',' '...' variable] ] | ['...'variable]) ')'
+                    stamentsblock
     return       := 'return' [exp]
     type context := ('global' | 'super') [ variable [assignament exp] {[ ',' variable [assignament exp] ]} ]
 	*/
@@ -156,6 +159,7 @@ namespace l_language
             K_DEF,
             K_FUNCTION,
             K_OPERATOR,
+            K_RIGHT,
             
             K_WHILE,
             K_FOR,
@@ -1633,7 +1637,7 @@ namespace l_language
         //parse def operator
         bool parse_def_op(const char*& ptr, l_syntactic_tree::node*& node)
         {
-            l_syntactic_tree::node*              l_variable = nullptr;
+            l_syntactic_tree::variable_node*     l_variable = nullptr;
             l_syntactic_tree::function_def_node* l_def_node = nullptr;
             //skip
             skip_space_end_comment(ptr);
@@ -1643,27 +1647,38 @@ namespace l_language
                 push_error("not found \"operator\" keyword");
                 return false;
             }
+            //variable string
+            std::string variable_name;
             //skip
             skip_space_end_comment(ptr);
-            //parse variable
-            if(CSTRCMP(ptr, "+") ||
-               CSTRCMP(ptr, "-") ||
-               CSTRCMP(ptr, "*") ||
-               CSTRCMP(ptr, "/") ||
-               CSTRCMP(ptr, "%"))
+            //right?
+            bool is_right = KEYWORDCMP_SKIP(ptr, RIGHT);
+            //append type to name
+            if(is_right)
             {
-                //buffer
-                const char cstr_op [] = {*ptr,'\0'};
-                //add name
-                l_variable = l_syntactic_tree::variable(cstr_op,m_line);
+                variable_name = get_keyword(K_RIGHT);
+                variable_name+= ":";
                 //skip
-                ++ptr;
+                skip_space_end_comment(ptr);
             }
+            //op type
+                 if(CSTRCMP_SKIP(ptr, "+"))                     variable_name+="+";
+            else if(CSTRCMP_SKIP(ptr, "-"))                     variable_name+="-";
+            else if(CSTRCMP_SKIP(ptr, "*"))                     variable_name+="*";
+            else if(CSTRCMP_SKIP(ptr, "/"))                     variable_name+="/";
+            else if(CSTRCMP_SKIP(ptr, "%"))                     variable_name+="%";
+            else if(!is_right && CSTRCMP_SKIP(ptr, "iterator")) variable_name+="iterator";
+            else if(!is_right && CSTRCMP_SKIP(ptr, "next"))     variable_name+="next";
+            else if(!is_right && CSTRCMP_SKIP(ptr, "key"))      variable_name+="key";
+            else if(!is_right && CSTRCMP_SKIP(ptr, "value"))    variable_name+="value";
+            else if(!is_right && CSTRCMP_SKIP(ptr, "valid"))    variable_name+="valid";
             else
             {
                 push_error("not found valid operator of def");
                 return false;
             }
+            //create node variable
+            l_variable = l_syntactic_tree::variable(variable_name,m_line);
             //cast
             node = l_syntactic_tree::function_def(l_variable, m_line);
             //alloc node
@@ -1677,6 +1692,11 @@ namespace l_language
                 node = nullptr;
                 //return..
                 return false;
+            }
+            //is - and not have args...
+            if(variable_name=="-" && !l_def_node->m_args.size())
+            {
+                l_variable->m_name = "one:-";
             }
             // parse '{' staments '}' | stament
             if (!parse_stament_s_block(ptr, l_def_node->m_staments)) return false;

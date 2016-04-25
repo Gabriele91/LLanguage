@@ -200,6 +200,8 @@ namespace l_language
         type_return execute(l_call_context& id_context);
         //utility
         type_return execute_call(int pcounter,l_command cmp);
+        //get operator
+        l_variable get_operator(int stack,int class_operator);
     };
     
     //list threads

@@ -96,7 +96,16 @@ namespace l_language
         l_variable& id = m_vm->function(fun.m_fun_id).m_costants[i];
         return fun.variable(id);
     }
-    
+    //get operator
+    l_variable l_thread::get_operator(int id_stack,int class_operator)
+    {
+        if(stack(id_stack).is_object())
+        {
+            l_class* cobj = stack(id_stack).object()->get_class().clazz();
+            return cobj->get_operator(l_class::l_type_operator(class_operator));
+        }
+        return l_variable();
+    }
     //execute context
     l_thread::type_return l_thread::execute(l_call_context&  context)
     {
@@ -210,17 +219,26 @@ namespace l_language
                 #define operation(op,OP)\
                 if(!stack(1).op(stack(0),stack(1)))\
                 {\
-                    if(stack(1).is_object())\
+                    l_variable op_left = get_operator(1,(int)l_class::OP_ ## OP);\
+                    if(!op_left.is_null())\
                     {\
-                        l_class* cobj = stack(1).object()->get_class().clazz();\
-                        l_variable op = cobj->get_operator(l_class::OP_ ## OP);\
-                        if(op.is_null()) raise("operator not overloaded");\
                         get_this() = stack(1);\
                         stack(1) = pop();\
-                        push(op);\
+                        push(op_left);\
                         execute_call(pc, {L_THIS_CALL , 1});\
                     }\
-                    else raise("not valid operation");\
+                    else\
+                    {\
+                        l_variable op_right = get_operator(0,(int)l_class::OP_RIGHT_ ## OP);\
+                        if(!op_right.is_null())\
+                        {\
+                            get_this() = stack(0);\
+                            pop();\
+                            push(op_right);\
+                            execute_call(pc, {L_THIS_CALL , 1});\
+                        }\
+                        else raise("not valid operation");\
+                    }\
                 } else pop();
                 ////////////////////////////////////////////////////////////
                 case L_ADD:
@@ -245,7 +263,17 @@ namespace l_language
                 break;
                     
                 case L_UNM:
-                    if(!stack(0).unm(stack(0))) raise("not valid operation");
+                    if(!stack(0).unm(stack(0)))
+                    {
+                        l_variable op = get_operator(0,(int)l_class::OP_UNM);
+                        if(!op.is_null())
+                        {
+                            get_this() = pop();
+                            push(op);
+                            execute_call(pc, {L_THIS_CALL , 0});
+                        }
+                        else raise("not valid operation");
+                    }
                 break;
                 ////////////////////////////////////////////////////////////
                 case L_EQ:

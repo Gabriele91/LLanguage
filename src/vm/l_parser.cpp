@@ -13,6 +13,7 @@ namespace l_language
             "def",
             "function",
             "operator",
+            "right",
             
             "while",
             "for",

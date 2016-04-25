@@ -85,7 +85,8 @@ namespace l_language
 
 	//method def
 	void l_variables_context::visit(l_function* fun, l_syntactic_tree::class_node* c_node,
-												     l_syntactic_tree::function_def_node* m_node)
+												     l_syntactic_tree::function_def_node* m_node,
+                                                     bool is_operator_def)
 	{
 		//alloc new function
 		l_function* new_fun = &m_vm->get_new_function();
@@ -93,7 +94,7 @@ namespace l_language
 		m_node->m_data = (void*)(m_vm->get_count_of_functions() - 1);
 		//add variable node
 		//...
-		visit(fun, m_node->m_variable);
+		if(!is_operator_def) visit(fun, m_node->m_variable);
 		//alloc variable
 		add_into_table(fun, l_variable((l_function_id)(m_vm->get_count_of_functions() - 1)), method_index(c_node,m_node));
 		//n args
@@ -144,7 +145,7 @@ namespace l_language
         //sub op
         for(auto& defs : node->m_ops)
         {
-            visit(fun, node, defs.m_method);
+            visit(fun, node, defs.m_method, true);
         }
     }
     

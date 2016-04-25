@@ -218,8 +218,9 @@ namespace l_language
 
 		//method def
 		void visit(l_function* fun, l_syntactic_tree::class_node*		 c_node,
-									l_syntactic_tree::function_def_node* m_node);
-                
+									l_syntactic_tree::function_def_node* m_node,
+                                    bool is_operator_def=false);
+        
         //assignable
         void visit(l_function* fun,l_syntactic_tree::variable_node* node);
         

@@ -22,6 +22,21 @@ namespace l_language
         if(name=="*") return l_class::OP_MUL;
         if(name=="/") return l_class::OP_DIV;
         if(name=="%") return l_class::OP_MOD;
+        
+        if(name=="one:-")   return l_class::OP_UNM;
+        
+        if(name=="right:+") return l_class::OP_RIGHT_ADD;
+        if(name=="right:-") return l_class::OP_RIGHT_SUB;
+        if(name=="right:*") return l_class::OP_RIGHT_MUL;
+        if(name=="right:/") return l_class::OP_RIGHT_DIV;
+        if(name=="right:%") return l_class::OP_RIGHT_MOD;
+        
+        if(name=="iterator")return l_class::OP_GET_IT;
+        if(name=="next")    return l_class::OP_GET_NEXT;
+        if(name=="value")   return l_class::OP_GET_VALUE;
+        if(name=="key")     return l_class::OP_GET_KEY;
+        if(name=="valid")   return l_class::OP_GET_VALID;
+        
         return l_class::OP_MAX;
     }
     //mark event
