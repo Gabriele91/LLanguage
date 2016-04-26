@@ -73,6 +73,12 @@ namespace l_language
         
         void set_class_name(const l_variable& c_name);
         
+        l_variable get_class_name() const;
+        
+        void set_class_function(l_function* function);
+        
+        l_function* get_class_function() const;
+        
         l_variable get_constructor();
         
         void add_variable (const l_variable& key,const l_variable&  value);
@@ -105,6 +111,7 @@ namespace l_language
             M_NMAP
         };
         //maps
+        l_function*  m_function   { nullptr };
         l_variable   m_class_name;
         l_array		 m_parents;
         l_array		 m_operators;

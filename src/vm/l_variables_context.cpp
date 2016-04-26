@@ -120,10 +120,13 @@ namespace l_language
 			visit(new_fun, st);
 		}
 	}
-
     //class
     void l_variables_context::visit(l_function*  fun, l_syntactic_tree::class_node* node)
     {
+        //alloc new function
+        l_function* class_fun = &m_vm->get_new_function();
+        //add data
+        node->m_data = (void*)(m_vm->get_count_of_functions() - 1);
         //class name
         visit(fun, node->m_class_name);
         //..
@@ -131,12 +134,7 @@ namespace l_language
         {
             visit(fun,parent);
         }
-        //staments
-        for(auto& attrs : node->m_attrs)
-        {
-            if(attrs.m_var) visit(fun,attrs.m_var);
-            if(attrs.m_exp) visit(fun,attrs.m_exp);
-        }
+        //////////////////////////////////
         //sub def
         for(auto& defs : node->m_defs)
         {
@@ -146,6 +144,37 @@ namespace l_language
         for(auto& defs : node->m_ops)
         {
             visit(fun, node, defs.m_method, true);
+        }
+        //////////////////////////////////
+        l_function* def_constructor = nullptr;
+        //search
+        for(auto& defs : node->m_defs)
+        {
+            if (defs.m_method->m_variable)
+            if (defs.m_method->m_variable->m_name == node->m_class_name->m_name)
+            {
+                def_constructor = &m_vm->function((unsigned int)(size_t(defs.m_method->m_data)));
+            }
+        }
+        //no constructor?
+        if(!def_constructor)
+        {
+            //alloc node
+            auto l_def = l_syntactic_tree::function_def(l_syntactic_tree::variable(node->m_class_name->m_name));
+            //add node
+            node->add_def(l_def,l_syntactic_tree::class_node::T_PUBLIC);
+            //visit
+            visit(fun, node, l_def);
+            //def
+            def_constructor = &m_vm->function((unsigned int)(size_t(l_def->m_data)));
+        }
+        //////////////////////////////////
+        //addictional staments constructor
+        for(auto& attrs : node->m_attrs)
+        {
+            visit(class_fun,attrs.m_op->m_assignable);
+            visit(def_constructor,attrs.m_op->m_assignable);
+            visit(def_constructor,attrs.m_op->m_exp);
         }
     }
     
@@ -160,7 +189,11 @@ namespace l_language
         //return variable
         if (node->m_type == l_syntactic_tree::VARIABLE_NODE)
         {
-            visit(fun,node->to_variable_node());
+            //ignore this
+            if(node->to_variable_node()->m_name != "this")
+            {
+                visit(fun,node->to_variable_node());
+            }
         }
         //is a call
         else if(node->m_type == l_syntactic_tree::CALL_NODE )

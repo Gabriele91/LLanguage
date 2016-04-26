@@ -10,7 +10,7 @@
 #include <l_function_wrapper.h>
 #define STR_VERSION_MAJOR "0"
 #define STR_VERSION_MINOR "5"
-#define STR_VERSION_MAINTENANCE "2"
+#define STR_VERSION_MAINTENANCE "3"
 
 
 int main(int argc,const char* args[])

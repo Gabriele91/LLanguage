@@ -880,25 +880,22 @@ namespace l_language
             //attribute struct
             struct attribute
             {
-                variable_node*     m_var{ nullptr };
-                exp_node*          m_exp{ nullptr };
+                op_node*           m_op { nullptr };
                 attribute_def_type m_type;
                 
                 attribute()
                 {
                 }
                 
-                attribute(variable_node* var, attribute_def_type type)
+                attribute(assignable_node* var, attribute_def_type type, unsigned int line = 0)
                 {
-                    m_var  = var;
-                    m_exp  = nullptr;
+                    m_op   = operation(var, op_node::OP_ASSIGNMENT, "=", constant_null(), line);
                     m_type = type;
                 }
     
-                attribute(variable_node* var, exp_node* exp, attribute_def_type type)
+                attribute(assignable_node* var, exp_node* exp, attribute_def_type type, unsigned int line = 0)
                 {
-                    m_var  = var;
-                    m_exp  = exp;
+                    m_op   = operation(var, op_node::OP_ASSIGNMENT, "=", exp, line);
                     m_type = type;
                 }
             };
@@ -939,13 +936,13 @@ namespace l_language
                 m_parents.push_back(var);
             }
             //utilities
-            void add_attr(variable_node* var,attribute_def_type type= T_PUBLIC)
+            void add_attr(assignable_node* var,attribute_def_type type= T_PUBLIC, unsigned int line = 0)
             {
-                m_attrs.push_back({ var, type });
+                m_attrs.push_back({ var, type, line });
             }
-            void add_attr(variable_node* var,exp_node* exp,attribute_def_type type= T_PUBLIC)
+            void add_attr(assignable_node* var,exp_node* exp,attribute_def_type type= T_PUBLIC, unsigned int line = 0)
             {
-                m_attrs.push_back({ var, exp, type });
+                m_attrs.push_back({ var, exp, type, line });
             }
             //utilities
             void add_def(function_def_node* def,attribute_def_type type= T_PUBLIC)
@@ -970,8 +967,7 @@ namespace l_language
                 for(auto& node : m_parents)               delete node;
                 for(auto& node : m_defs)                  delete node.m_method;
                 for(auto& node : m_ops)                   delete node.m_method;
-                for(auto& node : m_attrs)                 delete node.m_var;
-                for(auto& node : m_attrs)  if(node.m_exp) delete node.m_exp;
+                for(auto& node : m_attrs)  if(node.m_op)  delete node.m_op;
             }
         };
         

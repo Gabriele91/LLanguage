@@ -507,8 +507,11 @@ namespace l_language
                                                   l_syntactic_tree::class_node* class_node,
                                                   bool is_exp)
     {
+        //get class function
+        unsigned int id_function   =(unsigned int)(size_t(class_node->m_data));
+        l_function*  class_function=&m_vm->function(id_function);
         //create class
-        fun->push({ L_START_CLASS_DEC,  0, class_node->m_line });
+        fun->push({ L_START_CLASS_DEC, (int)id_function, class_node->m_line });
         //add super class
         for(auto& parent: class_node->m_parents)
         {
@@ -518,16 +521,43 @@ namespace l_language
         {
             fun->push({ L_CLASS_PARENT,  (int)class_node->m_parents.size(), class_node->m_parents[0]->m_line });
         }
+        //////////////////////////////////////////////////////////////////////////////
+        //constructor
+        l_function* constructor = nullptr;
+        //if constructor
+        for(auto& defs : class_node->m_defs)
+        {
+            //..
+            l_syntactic_tree::function_def_node* method = defs.m_method;
+            //get function id
+            size_t id_function   = ((size_t)method->m_data);
+            l_function* function = &m_vm->function((unsigned int)id_function);
+            //method
+            if(method->m_variable->m_name == class_node->m_class_name->m_name)
+            {
+                constructor = function;
+            }
+        }
+        //compile attribute
+        for(auto& attr : class_node->m_attrs)
+        {
+            if (!compile_op(constructor, attr.m_op)) return false;
+        }
+        //////////////////////////////////////////////////////////////////////////////
         //add variables
         for(auto& attr : class_node->m_attrs)
         {
             //add exp
-            if(attr.m_exp) compile_exp(fun, attr.m_exp);
-            else           fun->push({ L_PUSH_NULL,  0, attr.m_var->m_line });
+            fun->push({ L_PUSH_NULL,  0, attr.m_op->m_line });
+            //field
+            auto* field_node = attr.m_op->m_assignable->to_field_node();
+            auto* const_node = field_node->m_exp->to_constant_node();
+            //add var id
+            int const_id = get_const_id(class_function,const_node);
             //add var
-            fun->push({ L_PUSHK, get_var_id(fun,attr.m_var), attr.m_var->m_line });
+            fun->push({ L_PUSH_INT, const_id, attr.m_op->m_line});
             //type
-            fun->push({ L_CLASS_ATTR,  (int)attr.m_type, attr.m_var->m_line });
+            fun->push({ L_CLASS_ATTR,  (int)attr.m_type, attr.m_op->m_line });
         }
         //add methods
         for(auto& defs : class_node->m_defs)
@@ -536,9 +566,10 @@ namespace l_language
             l_syntactic_tree::function_def_node* method = defs.m_method;
             //compile
             //get function id
-            size_t id_function = ((size_t)method->m_data);
+            size_t id_function   = ((size_t)method->m_data);
+            l_function* function = &m_vm->function((unsigned int)id_function);
             //compile staments
-            if (!compile_statements(&m_vm->function((unsigned int)id_function), method->m_staments))
+            if (!compile_statements(function, method->m_staments))
             {
                 return false;
             }

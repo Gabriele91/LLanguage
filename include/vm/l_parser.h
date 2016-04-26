@@ -879,7 +879,7 @@ namespace l_language
                         m_do_loop = true;
                     }
                 }
-                //this fild return
+                //this field return
                 else
                 {
                     node = assignable_node;
@@ -1853,14 +1853,18 @@ namespace l_language
                 {
                     do
                     {
-                        //.. name
-                        l_syntactic_tree::node* variable_node;
-                        //..
-                        if(!parse_variable(ptr, variable_node))
+                        skip_space_end_comment(ptr);
+                        //get name
+                        std::string variable_name;
+                        if (!parse_name(ptr, &ptr, variable_name))
                         {
                             push_error("not valid attribute name");
                             return false;
                         }
+                        //append
+                        l_syntactic_tree::field_node* attr_variable=
+                        l_syntactic_tree::field(l_syntactic_tree::variable("this",m_line),
+                                                l_syntactic_tree::constant(variable_name,m_line));
                         //skip
                         skip_space_end_comment(ptr);
                         //..
@@ -1877,15 +1881,17 @@ namespace l_language
                                 return false;
                             }
                             //append
-                            class_node->add_attr((l_syntactic_tree::variable_node*)variable_node,
+                            class_node->add_attr(attr_variable,
                                                  exp_node,
-                                                 l_current_state);
+                                                 l_current_state,
+                                                 m_line);
                         }
                         else
                         {
                             //append
-                            class_node->add_attr((l_syntactic_tree::variable_node*)variable_node,
-                                                 l_current_state);
+                            class_node->add_attr(attr_variable,
+                                                 l_current_state,
+                                                 m_line);
                         }
                         //jmp
                         skip_space_end_comment(ptr);

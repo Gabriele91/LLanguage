@@ -7,6 +7,8 @@
 //
 #include <l_base_lib.h>
 #include <l_array.h>
+#include <l_object.h>
+#include <l_class.h>
 #include <l_xrange.h>
 #include <cmath>
 
@@ -199,48 +201,6 @@ int l_using(l_language::l_thread* th, int args)
 	return 0;
 }
 
-int l_length(l_language::l_thread* th,int args)
-{
-    std::string str;
-    //
-    auto type = th->value(0).m_type;
-    //length
-    int length = 0;
-    //
-    switch (type)
-    {
-        case l_language::l_variable::CLASS:
-        case l_language::l_variable::LNULL:
-        case l_language::l_variable::LBOOL:
-        case l_language::l_variable::INT:
-        case l_language::l_variable::FLOAT:
-        case l_language::l_variable::REF:
-        case l_language::l_variable::FUNCTION:
-        case l_language::l_variable::CFUNCTION:
-            return -1;
-        case l_language::l_variable::STRING:
-            length = (int)th->value(0).to_string().length();
-            break;
-        case l_language::l_variable::ARRAY:
-            //todo
-            break;
-        case l_language::l_variable::TABLE:
-            //todo
-            break;
-        case l_language::l_variable::OBJECT:
-            //todo
-            break;    
-        case l_language::l_variable::COBJECT:
-            //todo
-            break;
-        default: return -1; break;
-    }
-    //push type
-    th->push_return({ length });
-    //number of return
-    return 1;
-}
-
 int l_eval(l_language::l_thread* th, int args)
 {
     //get variable
@@ -261,10 +221,48 @@ int l_get_this(l_language::l_thread* th, int args)
     return 1;
 }
 
+int l_length(l_language::l_thread* th, int args)
+{
+    if(args <= 0) return -1;
+    //get variable
+    auto& arg = th->value(0);
+    //typs
+    switch (arg.m_type)
+    {
+        case l_language::l_variable::STRING: th->push_return({(int)arg.string()->str().length()});  break;
+        case l_language::l_variable::ARRAY:  th->push_return({(int)arg.array()->size()});           break;
+        case l_language::l_variable::TABLE:  th->push_return({(int)arg.table()->size()});           break;
+        default: return -1; break;
+    }
+    return 1;
+}
+
+int l_class_name(l_language::l_thread* th, int args)
+{
+    if(args <= 0) return -1;
+    //get variable
+    auto& arg = th->value(0);
+    //typs
+    switch (arg.m_type)
+    {
+        case l_language::l_variable::OBJECT:
+        {
+            auto* object = arg.object();
+            auto* clazz  = object->get_class().clazz();
+            th->push_return(clazz->get_class_name());
+        }
+        break;
+        default: return -1; break;
+    }
+    return 1;
+}
+
 namespace l_language
 {
     l_language::l_vm::l_extern_libary l_base_lib=
     {
+        { "length",     l_length        },
+        { "class_name", l_class_name    },
         { "get_global", l_get_global    },
         { "to_int",     l_to_int        },
         { "to_float",   l_to_float      },

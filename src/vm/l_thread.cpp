@@ -712,12 +712,16 @@ namespace l_language
                 case L_START_CLASS_DEC:
                     //alloc
                     get_class_temp() = l_class::gc_new(get_gc());
+                    //push function class
+                    get_class_temp().clazz()->set_class_function(&get_vm()->function(cmp.m_arg));
                     //end
                     break;
                 case L_CLASS_ATTR:
 				{
+                    //consts
+                    l_function* class_function = get_class_temp().clazz()->get_class_function();
 					//values 
-					const l_variable& key   = stack(0);
+					const l_variable& key   = class_function->constant(stack(0).to_int());
 					const l_variable& value = stack(1);
 					//add
 					get_class_temp().clazz()->add_variable(key, value);

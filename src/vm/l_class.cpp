@@ -127,6 +127,21 @@ namespace l_language
         m_class_name = c_name;
     }
     
+    l_variable l_class::get_class_name() const
+    {
+        return m_class_name ;
+    }
+    
+    void l_class::set_class_function(l_function* function)
+    {
+        m_function = function;
+    }
+    
+    l_function* l_class::get_class_function() const
+    {
+        return m_function;
+    }
+    
     l_variable l_class::get_constructor()
     {
         return get_def(m_class_name);
