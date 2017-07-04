@@ -122,30 +122,46 @@ namespace l_language
             return m_pool[i].variable();
         }
         
-        void push(l_variable variable)
+        const l_variable& operator[](size_t i) const
+        {
+            return m_pool[i].variable();
+        }
+        
+        l_variable operator[](const l_variable& variable);
+        
+        void push(const l_variable& variable)
         {
             m_pool.push_back(l_pool_object(variable));
         }
         
-        static l_variable gc_new(l_gc* gc)
+        void clear()
         {
-            return  gc->new_obj< l_array >();
+            m_pool.clear();
         }
         
-        static l_variable gc_new(l_gc& gc)
+        l_variable pop()
         {
-            return  gc.new_obj< l_array >();
+            if(!size()) return l_variable();
+            //gest last
+            l_variable last = m_pool[size()-1];
+            //pop
+            m_pool.pop_back();
+            //return
+            return last;
         }
         
-        static l_variable gc_new(l_vm* vm)
+        l_pool_object_list& get_raw_array()
         {
-            return  gc_new(vm->get_gc());
+            return m_pool;
         }
         
-        static l_variable gc_new(l_vm& vm)
-        {
-            return  gc_new(vm.get_gc());
-        }
+        static l_variable gc_new(l_gc* gc);
+        
+        static l_variable gc_new(l_gc& gc);
+        
+        static l_variable gc_new(l_vm* vm);
+        
+        static l_variable gc_new(l_vm& vm);
         
         l_variable get_it();
         
@@ -211,45 +227,21 @@ namespace l_language
             assert(0);
         }
         
-        static l_variable gc_new(l_gc* gc,l_array* vector)
-        {
-            return  gc->new_obj< l_array_it >(vector);
-        }
+        static l_variable gc_new(l_gc* gc,l_array* vector);
         
-        static l_variable gc_new(l_gc& gc,l_array* vector)
-        {
-            return  gc.new_obj< l_array_it >(vector);
-        }
+        static l_variable gc_new(l_gc& gc,l_array* vector);
         
-        static l_variable gc_new(l_vm* vm,l_array* vector)
-        {
-            return  vm->get_gc().new_obj< l_array_it >(vector);
-        }
+        static l_variable gc_new(l_vm* vm,l_array* vector);
         
-        static l_variable gc_new(l_vm& vm,l_array* vector)
-        {
-            return  vm.get_gc().new_obj< l_array_it >(vector);
-        }
+        static l_variable gc_new(l_vm& vm,l_array* vector);
         
-        static l_variable gc_new(l_gc* gc,l_array::l_pool_object_list_it c_it)
-        {
-            return  gc->new_obj< l_array_it >(c_it);
-        }
+        static l_variable gc_new(l_gc* gc,l_array::l_pool_object_list_it c_it);
         
-        static l_variable gc_new(l_gc& gc,l_array::l_pool_object_list_it c_it)
-        {
-            return  gc.new_obj< l_array_it >(c_it);
-        }
+        static l_variable gc_new(l_gc& gc,l_array::l_pool_object_list_it c_it);
         
-        static l_variable gc_new(l_vm* vm,l_array::l_pool_object_list_it c_it)
-        {
-            return  vm->get_gc().new_obj< l_array_it >(c_it);
-        }
+        static l_variable gc_new(l_vm* vm,l_array::l_pool_object_list_it c_it);
         
-        static l_variable gc_new(l_vm& vm,l_array::l_pool_object_list_it c_it)
-        {
-            return  vm.get_gc().new_obj< l_array_it >(c_it);
-        }
+        static l_variable gc_new(l_vm& vm,l_array::l_pool_object_list_it c_it);
         
         virtual l_variable get() const
         {

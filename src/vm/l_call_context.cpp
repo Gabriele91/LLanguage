@@ -30,6 +30,26 @@ namespace l_language
         //save next
         m_next = next;
     }
+    
+    void l_closer::init(unsigned int fun_id, const l_variable& clazz,l_thread *thread)
+    {
+        //save pointer
+        m_fun_id = fun_id;
+        m_clazz = clazz;
+        //save thread
+        m_thread = thread;
+    }
+    
+    void l_closer::init(unsigned int fun_id, const l_variable& clazz,l_thread *thread,const l_variable& next)
+    {
+        //save pointer
+        m_fun_id = fun_id;
+        m_clazz = clazz;
+        //save thread
+        m_thread = thread;
+        //save next
+        m_next = next;
+    }
     //unmark event
     void l_closer::mark()
     {
@@ -120,6 +140,7 @@ namespace l_language
     {
         //save pointer
         m_fun_id = closer.get_fun_id();
+        m_clazz = closer.get_clazz();
         //save thread
         m_thread = closer.thread();
         //save next

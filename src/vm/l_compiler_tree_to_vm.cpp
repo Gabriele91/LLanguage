@@ -577,8 +577,17 @@ namespace l_language
             fun->push({ L_CLOSER, get_method_id(fun, class_node, method), method->m_line });
             //add var
             fun->push({ L_PUSHK, get_var_id(fun,method->m_variable), method->m_variable->m_line });
-            //method
-            fun->push({ L_CLASS_METHOD,  defs.m_type, defs.m_method->m_line });
+
+            //Cast
+            switch (defs.m_type)
+            {
+                case l_syntactic_tree::class_node::T_PUBLIC:    function->m_type = l_function::T_IS_PUBLIC; break;
+                case l_syntactic_tree::class_node::T_PRIVATE:   function->m_type = l_function::T_IS_PRIVATE; break;
+                case l_syntactic_tree::class_node::T_PROTECTED: function->m_type = l_function::T_IS_PROTECTED; break;
+                default:  function->m_type = l_function::T_IS_FUNCTION;  break;
+            }
+            //
+            fun->push({ L_CLASS_METHOD, defs.m_type /* ignore */, defs.m_method->m_line });
         }
         //add op
         for(auto& defs : class_node->m_ops)

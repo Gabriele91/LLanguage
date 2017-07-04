@@ -257,6 +257,44 @@ int l_class_name(l_language::l_thread* th, int args)
     return 1;
 }
 
+int l_copy(l_language::l_thread* th, int args)
+{
+    if(args <= 0) return -1;
+    //get variable
+    auto& arg = th->value(0);
+    //types
+    switch (arg.m_type)
+    {
+        case l_language::l_variable::STRING:
+        {
+            th->push_return(l_language::l_string::gc_new(th->get_gc(), arg.string()->str()));
+        }
+        break;
+        case l_language::l_variable::ARRAY:
+        {
+            //get array
+            l_language::l_variable n_array = l_language::l_array::gc_new(th->get_gc());
+            //copy
+            n_array.array()->get_raw_array() = arg.array()->get_raw_array();
+            //push
+            th->push_return(n_array);
+        }
+        break;
+        case l_language::l_variable::TABLE:
+        {
+            //get array
+            l_language::l_variable n_table = l_language::l_array::gc_new(th->get_gc());
+            //copy
+            n_table.table()->get_raw_map() = arg.table()->get_raw_map();
+            //push
+            th->push_return(n_table);
+        }
+        break;
+        default: return -1; break;
+    }
+    return 1;
+}
+
 namespace l_language
 {
     l_language::l_vm::l_extern_libary l_base_lib=
@@ -273,6 +311,7 @@ namespace l_language
         { "xrange",     l_xrange_gen    },
         { "eval",       l_eval          },
         { "get_this",   l_get_this      },
-        { "length",     l_length        }
+        { "length",     l_length        },
+        { "copy",       l_copy          }
     };
 }

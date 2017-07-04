@@ -217,6 +217,23 @@ namespace l_language
         return l_variable();
     }
     
+    bool l_class::is_clazz(const l_variable& in_clazz) const
+    {
+        return in_clazz.is_class() && (this == in_clazz.clazz());
+    }
+    
+    bool l_class::is_derivate(const l_variable& clazz) const
+    {
+        for(size_t p = 0; p!=m_parents.size(); ++p)
+        {
+            if(m_parents[p].clazz()->is_clazz(clazz)) return true;
+        }
+        for(size_t p = 0; p!=m_parents.size(); ++p)
+        {
+            if(m_parents[p].clazz()->is_derivate(clazz)) return true;
+        }
+        return false;
+    }
     
     l_variable l_class::get_operator(l_type_operator  type)
     {

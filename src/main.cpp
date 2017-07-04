@@ -10,7 +10,7 @@
 #include <l_function_wrapper.h>
 #define STR_VERSION_MAJOR "0"
 #define STR_VERSION_MINOR "5"
-#define STR_VERSION_MAINTENANCE "3"
+#define STR_VERSION_MAINTENANCE "4"
 
 
 int main(int argc,const char* args[])
@@ -115,6 +115,7 @@ int main(int argc,const char* args[])
         //ouput:
         if(compiler_ouput.m_type & l_language::l_vm::ERRORS)
         {
+            std::cout << "Runtime errors:" << std::endl;
             std::cout << compiler_ouput.m_errors;
         }
     }

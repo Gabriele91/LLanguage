@@ -117,11 +117,13 @@ namespace l_language
         unsigned int     pc       = 0;
         l_function&      function = m_vm->function(context.get_fun_id());
         l_list_command&  commands = function.m_commands;
+        //access
+        l_variable thiz = context.this_field();
         //macro
         #define raise(str)\
         {\
-            push_error(str, pc, (unsigned int)cmp.m_line);\
-            return T_RETURN_ERROR;\
+        push_error(str, pc, (unsigned int)m_last_code_line);\
+        return T_RETURN_ERROR;\
         }
         #define vconst(c)  function.m_costants[c]
         #define top_size   (m_top+1)
@@ -209,10 +211,18 @@ namespace l_language
                         //new context
                         get_temp1() = l_closer::gc_new(get_gc());
                         //init context
-                        get_temp1().to<l_closer>()->init(call_fun.m_value.m_fid, this, l_variable(&context));
+                        if(!get_class_temp().is_class())
+                        {
+                            get_temp1().to<l_closer>()->init(call_fun.m_value.m_fid, this, l_variable(&context));
+                        }
+                        else //is a method
+                        {
+                            get_temp1().to<l_closer>()->init(call_fun.m_value.m_fid, get_class_temp(), this, l_variable(&context));
+                        }
                         //push context
                         push(get_temp1());
                     }
+                    else raise("closer argument isn't a function")
                 }
                 break;
                 ////////////////////////////////////////////////////////////
@@ -410,16 +420,13 @@ namespace l_language
                         {
                             //types
                             l_array* vector = r_b.array();
-                            //to size int
-                            size_t index = 0;
                             //cast
-                            if( r_c.is_int() )  index= (size_t)r_c.m_value.m_i;
-                            else if( r_c.is_float() )index= (size_t)r_c.m_value.m_f;
-                            else raise( "value isn't a valid key" );
+                            if( !r_c.is_string() && !r_c.can_to_int() )
+                               raise( "value isn't a valid key" );
                             //save last
                             get_this() = stack(1);
                             //get
-                            stack(1)   = vector->operator[](index) ;
+                            stack(1)   = vector->operator[](r_c) ;
                         }
                         else if(r_b.is_table())
                         {
@@ -705,6 +712,53 @@ namespace l_language
                 break;
                 case L_THIS_CALL:
                 case L_CALL:
+                    //test access
+                    if(top().is_closer())
+                    {
+                        //get closer
+                        l_closer* closer = top().to<l_closer>();
+                        //get function
+                        l_function& function = m_vm->function(closer->get_fun_id());
+                        //...
+                        switch (function.m_type)
+                        {
+                            default: /* ok */ break;
+                            //not public
+                            case l_function::T_IS_PROTECTED:
+                            case l_function::T_IS_PRIVATE:
+                            {
+                                ////////////////////////////////////////////////
+                                l_variable closer_clazz = closer->get_clazz();
+                                bool success = false;
+                                ////////////////////////////////////////////////
+                                if(thiz.is_object())
+                                {
+                                    //get this class
+                                    l_variable thiz_clazz = thiz.object()->get_class();
+                                    //test class
+                                    if(thiz_clazz.is_class())
+                                    {
+                                        success = thiz_clazz.clazz()->is_clazz(closer_clazz);
+                                    }
+                                    //is a derivate?
+                                    if(!success && function.m_type == l_function::T_IS_PROTECTED)
+                                    {
+                                        success = thiz_clazz.clazz()->is_derivate(closer_clazz);
+                                    }
+                                }
+                                //end
+                                if(!success)
+                                {
+                                    raise( "call a "
+                                          + std::string(function.m_type == l_function::T_IS_PROTECTED ? "protected" : "private")
+                                          + " method of class \""
+                                          + closer_clazz.clazz()->get_class_name().string()->str()
+                                          +"\"");
+                                }
+                            }
+                            break;
+                        }
+                    }
                     //Execute call
                     if(execute_call(pc,cmp)!=T_RETURN_VOID) return T_RETURN_ERROR;
                     //...
@@ -770,6 +824,8 @@ namespace l_language
                     get_class_temp().clazz()->set_class_name( vconst(cmp.m_arg) );
                     //push
                     push(get_class_temp());
+                    //to null
+                    get_class_temp()= l_variable();
                     //end
                     break;
                 default:  break;

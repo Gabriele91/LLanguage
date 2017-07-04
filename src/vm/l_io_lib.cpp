@@ -331,7 +331,7 @@ public:
     }
 };
 ////////////////////////////////////////////////////////////////////////
-int l_copy(const std::string& path_source,const std::string& path_dest)
+int l_file_copy(const std::string& path_source,const std::string& path_dest)
 {
     l_file source(path_source,"rb");
     l_file dest(path_dest,"wb");
@@ -389,13 +389,13 @@ namespace l_language
                                   
         static l_language::l_vm::l_extern_libary l_lib=
         {
-            { "print",   l_print              },
-            { "println", l_println            },
-            { "input",   l_input              },
-            { "file",    l_file_class         },
-            { "rename",  l_def(rename)        },
-            { "remove",  l_def(remove)        },
-            { "copy",    l_def(l_copy)        }
+            { "print",   l_print                   },
+            { "println", l_println                 },
+            { "input",   l_input                   },
+            { "file",    l_file_class              },
+            { "file_rename",  l_def(rename)        },
+            { "file_remove",  l_def(remove)        },
+            { "file_copy",    l_def(l_file_copy)   }
         };
         //return lib
         return l_lib;

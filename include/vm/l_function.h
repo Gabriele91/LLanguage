@@ -18,6 +18,16 @@ namespace l_language
     class l_function
     {
 	public:
+        //function type
+        enum l_type
+        {
+            T_IS_FUNCTION,
+            T_IS_PUBLIC,
+            T_IS_PRIVATE,
+            T_IS_PROTECTED
+        };
+        //type of function
+        l_type       m_type         { T_IS_FUNCTION };
         //allocs
         unsigned int m_up_val_size { 0 };
         unsigned int m_values_size { 0 };

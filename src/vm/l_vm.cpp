@@ -137,7 +137,7 @@ namespace l_language
                 {
                     for(auto& error:m_default_thread.m_errors)
                     {
-                        output.m_errors += std::to_string( error.m_line ) + ":" + error.m_error + "\n";
+                        output.m_errors += "At line: " + std::to_string( error.m_line ) + ", " + error.m_error + "\n";
                     }
                     //fail
                     output.m_type = ERRORS;

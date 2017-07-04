@@ -26,6 +26,9 @@ namespace l_language
         void init(unsigned int fun_id,l_thread* thread);
         void init(unsigned int fun_id,l_thread* thread,const l_variable& this_context);
         
+        void init(unsigned int fun_id, const l_variable & clazz, l_thread* thread);
+        void init(unsigned int fun_id, const l_variable & clazz, l_thread* thread,const l_variable& this_context);
+        
         static l_variable gc_new(l_gc* gc);
         
         static l_variable gc_new(l_gc& gc);
@@ -45,6 +48,11 @@ namespace l_language
         l_function_id get_fun_id() const
         {
             return m_fun_id;
+        }
+        
+        l_variable get_clazz() const
+        {
+            return m_clazz;
         }
         
         const l_call_context* next() const
@@ -71,6 +79,8 @@ namespace l_language
         l_thread*   m_thread { nullptr };
         //call fun id
         l_function_id m_fun_id { 0 };
+        //class class ref
+        l_variable m_clazz;
         //next
         l_variable m_next;
         //firends

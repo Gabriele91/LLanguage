@@ -102,24 +102,19 @@ class vector
     operator + (value)
     {
         o = vector()
-        
-        for this_v of this.data
-        {
-            o.data[length(o.data)] = this_v
-        }
-        
-        if type_of(value) == "object"
+        //copy data
+        o.data = copy(this.data)
+        //add...
+        if ( type_of(value)    == "object" &&
+             class_name(value) == "vector" )
         {
             for arg_v of value.data
-            {
-                o.data[length(o.data)] = arg_v
-            }
+                o.data.push(arg_v)
         }
         else
         {
-            o.data[length(o.data)] = value
+            o.data.push(value)
         }
-
         return o
     }
     
@@ -137,4 +132,33 @@ x.forall(def (x,y) println("key: ",x+1,"\t value: ",y))
 println(class_name(x))
 println(class_name(w))
 
+class protected_test
+{
+protected:
+    def pro()
+    {
+        io.println("call from protected")
+    }
+}
+
+class private_test : protected_test
+{
+public:
+    
+    def pub()
+    {
+        io.println("call from public n")
+        this.pro()
+        this.pri()
+    }
+    
+private:
+    def pri()
+    {
+        io.println("call from private")
+    }
+}
+
+p = private_test()
+p.pub()
 

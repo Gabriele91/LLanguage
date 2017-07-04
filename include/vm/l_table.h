@@ -155,6 +155,11 @@ namespace l_language
             return m_map.find(key)!=m_map.end();
         }
         
+        l_map_object& get_raw_map()
+        {
+            return m_map;
+        }
+        
         static l_variable gc_new(l_gc* gc);
         
         static l_variable gc_new(l_gc& gc);

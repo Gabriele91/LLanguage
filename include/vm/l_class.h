@@ -89,6 +89,10 @@ namespace l_language
         
         void add_parent(const l_variable& value);
         
+        bool is_clazz(const l_variable& clazz) const;
+        
+        bool is_derivate(const l_variable& clazz) const;
+        
         l_variable get_value(const l_variable&  key);
         
         l_variable get_def(const l_variable&  key);
