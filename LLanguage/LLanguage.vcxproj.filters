@@ -78,6 +78,18 @@
     <ClCompile Include="..\src\vm\l_math_lib.cpp">
       <Filter>File di origine\vm</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\vm\l_array.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_class.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_object.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm\l_attribute.cpp">
+      <Filter>File di origine\vm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\vm\l_array.h">
@@ -152,6 +164,9 @@
     <ClInclude Include="..\include\l_io_lib.h">
       <Filter>File di intestazione\vm</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\vm\l_attribute.h">
+      <Filter>File di intestazione\vm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\samples\def.ll">
@@ -188,6 +203,21 @@
       <Filter>File di risorse\samples</Filter>
     </None>
     <None Include="..\samples\while.ll">
+      <Filter>File di risorse\samples</Filter>
+    </None>
+    <None Include="..\samples\oop_test.ll">
+      <Filter>File di risorse\samples</Filter>
+    </None>
+    <None Include="..\samples\file.ll">
+      <Filter>File di risorse\samples</Filter>
+    </None>
+    <None Include="..\samples\oop_overload_op.ll">
+      <Filter>File di risorse\samples</Filter>
+    </None>
+    <None Include="..\samples\staments.ll">
+      <Filter>File di risorse\samples</Filter>
+    </None>
+    <None Include="..\samples\access_oop_test.ll">
       <Filter>File di risorse\samples</Filter>
     </None>
   </ItemGroup>

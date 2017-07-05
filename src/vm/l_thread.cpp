@@ -233,7 +233,8 @@ namespace l_language
                     if(!op_left.is_null())\
                     {\
                         get_this() = stack(1);\
-                        stack(1) = pop();\
+                        stack(1) = stack(0);\
+                        pop();\
                         push(op_left);\
                         execute_call(pc, {L_THIS_CALL , 1});\
                     }\
@@ -407,7 +408,10 @@ namespace l_language
                     //push table (n.b. gc run...)
                     push( get_temp1() );
                 }
-                break;
+				break;
+				////////////////////////////////////////////////////////////
+				
+				////////////////////////////////////////////////////////////
                 case L_GET_AT_VAL:
                 {
                           l_variable& r_b = stack(1);
@@ -443,12 +447,22 @@ namespace l_language
                         {
                             //types
                             l_object* object =  r_b.object();
+							l_class*  clazz  = object->get_class().clazz();
+							l_attribute attribute;
                             //is a string?
                             if(!r_c.is_string()) raise( "value isn't a valid key" );
-                            //save last
-                            get_this() = stack(1);
-                            //get and pop value
-                            stack(1) = object->get_value(r_c);
+							//save last
+							get_this() = stack(1);
+							//test
+							if (clazz->can_access_from_context(r_c, context, attribute))
+							{
+								//get and pop value
+								stack(1) = object->get_value(r_c);
+							}
+							else
+							{
+								raise("Can't access to attribute of class " + attribute.to_string());
+							}
                         }
                         else
                         {
@@ -499,10 +513,20 @@ namespace l_language
                         {
                             //types
                             l_object* object =  r_a.object();
+							l_class*  clazz = object->get_class().clazz();
+							l_attribute attribute;
                             //is a string?
                             if(!r_b.is_string()) raise( "value isn't a valid key" );
-                            //get and pop value
-                            if(!object->set_value(r_b, pop())) raise( "value is't an attribute" );
+							//test
+							if (clazz->can_access_from_context(r_b, context, attribute))
+							{
+								//get and pop value
+								if (!object->set_value(r_b, pop())) raise("value is't an attribute");
+							}
+							else
+							{
+								raise("Can't access to attribute of class " + attribute.to_string());
+							}
                         }
                         else
                         {
@@ -712,53 +736,6 @@ namespace l_language
                 break;
                 case L_THIS_CALL:
                 case L_CALL:
-                    //test access
-                    if(top().is_closer())
-                    {
-                        //get closer
-                        l_closer* closer = top().to<l_closer>();
-                        //get function
-                        l_function& function = m_vm->function(closer->get_fun_id());
-                        //...
-                        switch (function.m_type)
-                        {
-                            default: /* ok */ break;
-                            //not public
-                            case l_function::T_IS_PROTECTED:
-                            case l_function::T_IS_PRIVATE:
-                            {
-                                ////////////////////////////////////////////////
-                                l_variable closer_clazz = closer->get_clazz();
-                                bool success = false;
-                                ////////////////////////////////////////////////
-                                if(thiz.is_object())
-                                {
-                                    //get this class
-                                    l_variable thiz_clazz = thiz.object()->get_class();
-                                    //test class
-                                    if(thiz_clazz.is_class())
-                                    {
-                                        success = thiz_clazz.clazz()->is_clazz(closer_clazz);
-                                    }
-                                    //is a derivate?
-                                    if(!success && function.m_type == l_function::T_IS_PROTECTED)
-                                    {
-                                        success = thiz_clazz.clazz()->is_derivate(closer_clazz);
-                                    }
-                                }
-                                //end
-                                if(!success)
-                                {
-                                    raise( "call a "
-                                          + std::string(function.m_type == l_function::T_IS_PROTECTED ? "protected" : "private")
-                                          + " method of class \""
-                                          + closer_clazz.clazz()->get_class_name().string()->str()
-                                          +"\"");
-                                }
-                            }
-                            break;
-                        }
-                    }
                     //Execute call
                     if(execute_call(pc,cmp)!=T_RETURN_VOID) return T_RETURN_ERROR;
                     //...
@@ -778,7 +755,7 @@ namespace l_language
 					const l_variable& key   = class_function->constant(stack(0).to_int());
 					const l_variable& value = stack(1);
 					//add
-					get_class_temp().clazz()->add_variable(key, value);
+					get_class_temp().clazz()->add_variable(key, value, static_cast<l_attribute_access>(cmp.m_arg));
 					//pop
 					pop();
 					pop();
@@ -791,7 +768,7 @@ namespace l_language
                     const l_variable& key   = stack(0);
                     const l_variable& value = stack(1);
                     //add
-                    get_class_temp().clazz()->add_def(key, value);
+                    get_class_temp().clazz()->add_def(key, value, static_cast<l_attribute_access>(cmp.m_arg));
                     //pop
                     pop();
                     pop();
@@ -837,6 +814,8 @@ namespace l_language
     
     l_thread::type_return l_thread::execute_call(int pc,l_command cmp)
     {
+		//save (todo, a gc issue)
+		//l_variable last_temp1 = get_temp1();
         //get index
         get_temp1() = pop();
         //return this?
@@ -995,6 +974,8 @@ namespace l_language
         {
             get_this() = l_variable();
         }
+		//set old value value
+		//get_temp1() = last_temp1;
         //no errors
         return T_RETURN_VOID;
     }

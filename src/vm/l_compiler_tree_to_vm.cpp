@@ -543,6 +543,7 @@ namespace l_language
         {
             if (!compile_op(constructor, attr.m_op)) return false;
         }
+		//
         //////////////////////////////////////////////////////////////////////////////
         //add variables
         for(auto& attr : class_node->m_attrs)
@@ -556,8 +557,18 @@ namespace l_language
             int const_id = get_const_id(class_function,const_node);
             //add var
             fun->push({ L_PUSH_INT, const_id, attr.m_op->m_line});
+			//is public by default
+			l_attribute_access field_access_mode = l_attribute_access::PUBLIC;
+			//cast access
+			switch (attr.m_type)
+			{
+				default:
+				case l_syntactic_tree::class_node::T_PUBLIC:    field_access_mode = l_attribute_access::PUBLIC;    break;
+				case l_syntactic_tree::class_node::T_PRIVATE:   field_access_mode = l_attribute_access::PRIVATE;   break;
+				case l_syntactic_tree::class_node::T_PROTECTED: field_access_mode = l_attribute_access::PROTECTED; break;
+			}
             //type
-            fun->push({ L_CLASS_ATTR,  (int)attr.m_type, attr.m_op->m_line });
+            fun->push({ L_CLASS_ATTR,  (int)field_access_mode, attr.m_op->m_line });
         }
         //add methods
         for(auto& defs : class_node->m_defs)
@@ -577,17 +588,20 @@ namespace l_language
             fun->push({ L_CLOSER, get_method_id(fun, class_node, method), method->m_line });
             //add var
             fun->push({ L_PUSHK, get_var_id(fun,method->m_variable), method->m_variable->m_line });
-
-            //Cast
-            switch (defs.m_type)
-            {
-                case l_syntactic_tree::class_node::T_PUBLIC:    function->m_type = l_function::T_IS_PUBLIC; break;
-                case l_syntactic_tree::class_node::T_PRIVATE:   function->m_type = l_function::T_IS_PRIVATE; break;
-                case l_syntactic_tree::class_node::T_PROTECTED: function->m_type = l_function::T_IS_PROTECTED; break;
-                default:  function->m_type = l_function::T_IS_FUNCTION;  break;
-            }
+            //cast
+			function->m_type = l_function::IS_METHOD;
+			//is public by default
+			l_attribute_access field_access_mode = l_attribute_access::PUBLIC;
+			//cast access
+			switch (defs.m_type)
+			{
+				default:
+				case l_syntactic_tree::class_node::T_PUBLIC:    field_access_mode = l_attribute_access::PUBLIC;    break;
+				case l_syntactic_tree::class_node::T_PRIVATE:   field_access_mode = l_attribute_access::PRIVATE;   break;
+				case l_syntactic_tree::class_node::T_PROTECTED: field_access_mode = l_attribute_access::PROTECTED; break;
+			}
             //
-            fun->push({ L_CLASS_METHOD, defs.m_type /* ignore */, defs.m_method->m_line });
+            fun->push({ L_CLASS_METHOD, (int)field_access_mode, defs.m_method->m_line });
         }
         //add op
         for(auto& defs : class_node->m_ops)
@@ -606,8 +620,18 @@ namespace l_language
             fun->push({ L_CLOSER, get_method_id(fun, class_node, method), method->m_line });
             //add var
             fun->push({ L_PUSH_INT, (int)l_class::get_op_id(defs.m_method->m_variable->m_name), method->m_variable->m_line });
+			//is public by default
+			l_attribute_access field_access_mode = l_attribute_access::PUBLIC;
+			//cast access
+			switch (defs.m_type)
+			{
+				default:
+				case l_syntactic_tree::class_node::T_PUBLIC:    field_access_mode = l_attribute_access::PUBLIC;    break;
+				case l_syntactic_tree::class_node::T_PRIVATE:   field_access_mode = l_attribute_access::PRIVATE;   break;
+				case l_syntactic_tree::class_node::T_PROTECTED: field_access_mode = l_attribute_access::PROTECTED; break;
+			}
             //method
-            fun->push({ L_CLASS_OP,  defs.m_type, defs.m_method->m_line });
+            fun->push({ L_CLASS_OP, (int)field_access_mode, defs.m_method->m_line });
         }
         //create class object
         fun->push({ L_END_CLASS_DEC,   get_var_id(fun,class_node->m_class_name), class_node->m_line });

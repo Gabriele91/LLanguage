@@ -12,10 +12,11 @@
 #include <unordered_map>
 #include <l_ref.h>
 #include <l_gc.h>
-#include <l_object.h>
-#include <l_thread.h>
 #include <l_array.h>
 #include <l_table.h>
+#include <l_attribute.h>
+#include <l_object.h>
+#include <l_thread.h>
 
 namespace l_language
 {
@@ -28,9 +29,6 @@ namespace l_language
     class l_thread;
     class l_class;
     class l_object;
-    
-   
-    
     //implementation
     class l_class : public l_ref
     {
@@ -81,21 +79,21 @@ namespace l_language
         
         l_variable get_constructor();
         
-        void add_variable (const l_variable& key,const l_variable&  value);
+        void add_variable (const l_variable& key,const l_variable&  value, l_attribute_access access = l_attribute_access::PUBLIC);
         
-        void add_def      (const l_variable& key,const l_variable&  value);
+        void add_def      (const l_variable& key,const l_variable&  value, l_attribute_access access = l_attribute_access::PUBLIC);
         
         void add_operator (l_type_operator type,const l_variable&  value);
         
         void add_parent(const l_variable& value);
         
-        bool is_clazz(const l_variable& clazz) const;
-        
-        bool is_derivate(const l_variable& clazz) const;
-        
-        l_variable get_value(const l_variable&  key);
-        
-        l_variable get_def(const l_variable&  key);
+		l_attribute get_attribute(const l_variable&  key);
+
+		l_variable get_value(const l_variable&  key);
+
+		l_variable get_def(const l_variable&  key);
+		
+		bool can_access_from_context(const l_variable&  key, const l_call_context& context, l_attribute& attribute);
         
         l_variable get_operator(l_type_operator  type);
         
@@ -115,20 +113,23 @@ namespace l_language
             M_NMAP
         };
         //maps
-        l_function*  m_function   { nullptr };
-        l_variable   m_class_name;
-        l_array		 m_parents;
-        l_array		 m_operators;
-        l_map_object m_maps[M_NMAP];
+        l_function*     m_function   { nullptr };
+        l_variable      m_class_name;
+        l_array		    m_parents;
+        l_array		    m_operators;
+        l_map_attribute m_maps[M_NMAP];
         
         //mark event
         virtual void mark();
         
         //unmark event
         virtual void unmark();
-        
+
+		//used in can_access_from_context
+		bool is_derivate_of(const l_class* clazz) const;
+
         //exists def?
-        bool exists_def(const l_variable& key,l_map_object_const_it& it) const;
+        bool exists_def(const l_variable& key,l_map_attribute_const_it& it) const;
     };
 
 }

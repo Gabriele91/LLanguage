@@ -25,7 +25,7 @@ namespace l_language
         //mark fields
         for(auto it:m_attributes)
         {
-            l_variable& var = it.second;
+            l_variable& var = it.second.m_variable;
             
             if(var.is_ref_obj())
                 if(var.is_unmarked())
@@ -61,7 +61,7 @@ namespace l_language
         //unmark fields
         for(auto it:m_attributes)
         {
-            l_variable& var = it.second;
+            l_variable& var = it.second.m_variable;
             //...
             if(var.is_ref_obj())
                 if(var.is_marked())
@@ -82,33 +82,33 @@ namespace l_language
         }
     }
     
-    
     l_variable l_object::get_value(const l_variable&  key)
     {
         //first
-        l_map_object_it val_it = m_attributes.find(key);
+        l_map_attribute_it val_it = m_attributes.find(key);
         //find?
         if(val_it != m_attributes.end())
         {
             //return
-            return val_it->second;
+            return val_it->second.m_variable;
         }
         //from class
         return m_class.clazz()->get_def(key);
     }
-    
+
     bool l_object::set_value(const l_variable&  key,const l_variable& value)
     {
         //first
-        l_map_object_it val_it = m_attributes.find(key);
+		l_map_attribute_it val_it = m_attributes.find(key);
         //find?
         if(val_it != m_attributes.end())
         {
             //set
-            val_it->second=value;
+            val_it->second.m_variable=value;
             //return
             return true;
         }
         return false;
     }
+
 }

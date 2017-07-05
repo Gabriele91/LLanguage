@@ -12,6 +12,7 @@
 #include <memory>
 #include <l_ref.h>
 #include <l_variable.h>
+#include <l_attribute.h>
 
 namespace l_language
 {
@@ -30,9 +31,9 @@ namespace l_language
         //firend
         friend class l_class;
         //attributes
-        l_variable   m_class;
-        l_variable   m_raw_pointer;
-        l_map_object m_attributes;
+        l_variable      m_class;
+        l_variable      m_raw_pointer;
+        l_map_attribute m_attributes;
         //mark event
         virtual void mark();
         //mark event
@@ -44,10 +45,10 @@ namespace l_language
         {
             m_class = class_obj;
         }
-        
-        l_variable get_value(const l_variable&  key);
-        bool       set_value(const l_variable&  key,const l_variable& value);
-        
+
+		l_variable get_value(const l_variable&  key);
+		bool       set_value(const l_variable&  key, const l_variable& value);
+		        
         l_variable get_class() const
         {
             return m_class;

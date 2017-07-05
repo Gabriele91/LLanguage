@@ -50,7 +50,7 @@ namespace l_language
             return m_fun_id;
         }
         
-        l_variable get_clazz() const
+        l_variable get_class() const
         {
             return m_clazz;
         }
@@ -112,11 +112,16 @@ namespace l_language
         }
         
         //this
-        l_variable& this_field()
-        {
-            return m_this;
-        }
-        
+		l_variable& this_field()
+		{
+			return m_this;
+		}
+
+		const l_variable& this_field() const
+		{
+			return m_this;
+		}
+
         //info
         size_t get_size_vars() const
         {

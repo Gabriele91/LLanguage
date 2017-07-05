@@ -9,8 +9,8 @@
 #include <l_math_lib.h>
 #include <l_function_wrapper.h>
 #define STR_VERSION_MAJOR "0"
-#define STR_VERSION_MINOR "5"
-#define STR_VERSION_MAINTENANCE "4"
+#define STR_VERSION_MINOR "6"
+#define STR_VERSION_MAINTENANCE "0"
 
 
 int main(int argc,const char* args[])

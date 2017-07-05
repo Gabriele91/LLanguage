@@ -133,14 +133,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\vm\l_array.cpp" />
+    <ClCompile Include="..\src\vm\l_attribute.cpp" />
     <ClCompile Include="..\src\vm\l_base_lib.cpp" />
     <ClCompile Include="..\src\vm\l_call_context.cpp" />
+    <ClCompile Include="..\src\vm\l_class.cpp" />
     <ClCompile Include="..\src\vm\l_compiler_tree_to_vm.cpp" />
     <ClCompile Include="..\src\vm\l_compiler_utilities.cpp" />
     <ClCompile Include="..\src\vm\l_function.cpp" />
     <ClCompile Include="..\src\vm\l_gc.cpp" />
     <ClCompile Include="..\src\vm\l_io_lib.cpp" />
     <ClCompile Include="..\src\vm\l_math_lib.cpp" />
+    <ClCompile Include="..\src\vm\l_object.cpp" />
     <ClCompile Include="..\src\vm\l_opcode.cpp" />
     <ClCompile Include="..\src\vm\l_os_lib.cpp" />
     <ClCompile Include="..\src\vm\l_parser.cpp" />
@@ -155,6 +159,7 @@
     <ClInclude Include="..\include\l_config.h" />
     <ClInclude Include="..\include\l_io_lib.h" />
     <ClInclude Include="..\include\vm\l_array.h" />
+    <ClInclude Include="..\include\vm\l_attribute.h" />
     <ClInclude Include="..\include\vm\l_base_lib.h" />
     <ClInclude Include="..\include\vm\l_call_context.h" />
     <ClInclude Include="..\include\vm\l_class.h" />
@@ -178,16 +183,21 @@
     <ClInclude Include="..\include\vm\l_xrange.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\samples\access_oop_test.ll" />
     <None Include="..\samples\def.ll" />
     <None Include="..\samples\def2.ll" />
     <None Include="..\samples\def3.ll" />
     <None Include="..\samples\fields.ll" />
+    <None Include="..\samples\file.ll" />
     <None Include="..\samples\for.ll" />
     <None Include="..\samples\for2.ll" />
     <None Include="..\samples\lambda_function.ll" />
     <None Include="..\samples\logic_ops.ll" />
+    <None Include="..\samples\oop_overload_op.ll" />
+    <None Include="..\samples\oop_test.ll" />
     <None Include="..\samples\runtimeerrors.ll" />
     <None Include="..\samples\slow_test.ll" />
+    <None Include="..\samples\staments.ll" />
     <None Include="..\samples\this.ll" />
     <None Include="..\samples\while.ll" />
   </ItemGroup>

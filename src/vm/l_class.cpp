@@ -56,7 +56,7 @@ namespace l_language
         for(auto& map:m_maps)
             for(auto it:map)
             {
-                l_variable& var = it.second;
+                l_variable& var = it.second.m_variable;
                 
                 if(var.is_ref_obj())
                     if(var.is_unmarked())
@@ -95,7 +95,7 @@ namespace l_language
         for(auto& map:m_maps)
             for(auto it:map)
             {
-                l_variable& var = it.second;
+                l_variable& var = it.second.m_variable;
                 
                 if(var.is_ref_obj())
                     if(var.is_marked())
@@ -117,7 +117,7 @@ namespace l_language
     }
     
     //exists def?
-    bool l_class::exists_def(const l_variable& key,l_map_object_const_it& it) const
+    bool l_class::exists_def(const l_variable& key, l_map_attribute_const_it& it) const
     {
         return (it=m_maps[M_DEFS].find(key))!=m_maps[M_DEFS].end();
     }
@@ -146,16 +146,15 @@ namespace l_language
     {
         return get_def(m_class_name);
     }
-    
-    
-    void l_class::add_variable (const l_variable& key,const l_variable&  value)
+        
+    void l_class::add_variable (const l_variable& key,const l_variable&  value, l_attribute_access access)
     {
-        m_maps[M_ATTRS][key] = value;
+        m_maps[M_ATTRS][key] = l_attribute(access, this, value);
     }
     
-    void l_class::add_def      (const l_variable& key,const l_variable&  value)
+    void l_class::add_def      (const l_variable& key,const l_variable&  value, l_attribute_access access)
     {
-        m_maps[M_DEFS][key] = value;
+        m_maps[M_DEFS][key] = l_attribute(access, this, value);
     }
     
     void l_class::add_operator (l_type_operator type,const l_variable&  value)
@@ -170,25 +169,25 @@ namespace l_language
         //get class
         const l_class* p_class = value.clazz();
         //get attributes
-        const l_map_object& p_attrs = p_class->m_maps[M_ATTRS];
+        const l_map_attribute& p_attrs = p_class->m_maps[M_ATTRS];
         //add attributes
         for (auto it : p_attrs)
         {
             m_maps[M_ATTRS][it.first] = it.second;
-        }
+        }		
     }
     
     l_variable l_class::get_value(const l_variable&  key)
     {
-        for(l_map_object& map : m_maps)
+        for(l_map_attribute& map : m_maps)
         {
             //first
-            l_map_object_it val_it = map.find(key);
+			l_map_attribute_it val_it = map.find(key);
             //find?
             if(val_it != map.end())
             {
                 //return
-                return val_it->second;
+                return val_it->second.m_variable;
             }
         }
         
@@ -198,11 +197,12 @@ namespace l_language
     l_variable l_class::get_def(const l_variable&  key)
     {
         //first
-        l_map_object_it val_it = m_maps[M_DEFS].find(key);
+		l_map_attribute_it val_it = m_maps[M_DEFS].find(key);
         //find?
-        if(val_it != m_maps[M_DEFS].end()) return val_it->second;
+        if(val_it != m_maps[M_DEFS].end()) return val_it->second.m_variable;
         //search from parens
-        for (auto rit = m_parents.m_pool.rbegin();
+        for (auto 
+			 rit = m_parents.m_pool.rbegin();
              rit != m_parents.m_pool.rend();
              ++rit)
         {
@@ -216,29 +216,108 @@ namespace l_language
         
         return l_variable();
     }
-    
-    bool l_class::is_clazz(const l_variable& in_clazz) const
-    {
-        return in_clazz.is_class() && (this == in_clazz.clazz());
-    }
-    
-    bool l_class::is_derivate(const l_variable& clazz) const
+
+	l_variable l_class::get_operator(l_type_operator  type)
+	{        
+		//get operator
+		const l_variable& a_operator = m_operators[type];
+		//return
+		if (!a_operator.is_null()) return a_operator;
+		//search from parens
+		for (auto
+			rit = m_parents.m_pool.rbegin();
+			rit != m_parents.m_pool.rend();
+			++rit)
+		{
+			//..
+			l_variable& it_class = *rit;
+			//pointer
+			const l_variable& a_operator = it_class.clazz()->get_operator(type);
+			//find?
+			if (!a_operator.is_null()) return a_operator;
+		}
+		return l_variable();
+	}
+
+	bool l_class::can_access_from_context(const l_variable&  key, const l_call_context& context, l_attribute& attribute)
+	{
+		//variables
+		bool success = false;
+		//get attribute
+		attribute = get_attribute(key);
+		//test exits
+		if (!attribute.is_valid()) return false;
+		//type of access
+		switch (attribute.m_access)
+		{
+			default:
+			case l_attribute_access::PUBLIC: success = true;
+			break;
+			case l_attribute_access::PROTECTED:
+			{
+				l_variable closer_class = context.get_class();
+				if (closer_class.is_class())
+				{
+					success = 
+						closer_class.clazz() == attribute.m_class
+					 || closer_class.clazz()->is_derivate_of(attribute.m_class);
+				}
+			}
+			break;
+			case l_attribute_access::PRIVATE:
+			{
+				l_variable closer_class = context.get_class();
+				if (closer_class.is_class())
+				{
+					success = closer_class.clazz() == attribute.m_class;
+				}
+			}
+			break;
+		}
+		return success;
+	}
+	
+	l_attribute l_class::get_attribute(const l_variable&  key)
+	{
+		for (l_map_attribute& map : m_maps)
+		{
+			//first
+			l_map_attribute_it val_it = map.find(key);
+			//find?
+			if (val_it != map.end())
+			{
+				return  val_it->second;
+			}
+		}
+		//parent
+		for (auto 
+			 rit = m_parents.m_pool.rbegin();
+			 rit != m_parents.m_pool.rend();
+			 ++rit)
+		{
+			//..
+			l_variable& it_class = *rit;
+			//get attribute
+			l_attribute attribute = it_class.clazz()->get_attribute(key);
+			//find?
+			if (attribute.is_valid()) return attribute;
+		}
+		return l_attribute();
+	}
+
+    bool l_class::is_derivate_of(const l_class* clazz) const
     {
         for(size_t p = 0; p!=m_parents.size(); ++p)
         {
-            if(m_parents[p].clazz()->is_clazz(clazz)) return true;
+            if(m_parents[p].clazz() == clazz) return true;
         }
         for(size_t p = 0; p!=m_parents.size(); ++p)
         {
-            if(m_parents[p].clazz()->is_derivate(clazz)) return true;
+            if(m_parents[p].clazz()->is_derivate_of(clazz)) return true;
         }
         return false;
     }
     
-    l_variable l_class::get_operator(l_type_operator  type)
-    {
-        return m_operators[type];
-    }
     
     l_variable l_class::new_object(l_thread* th)
     {

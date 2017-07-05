@@ -140,7 +140,7 @@ namespace l_language
     {
         //save pointer
         m_fun_id = closer.get_fun_id();
-        m_clazz = closer.get_clazz();
+        m_clazz = closer.get_class();
         //save thread
         m_thread = closer.thread();
         //save next
