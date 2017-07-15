@@ -156,8 +156,10 @@
     <ClCompile Include="..\src\vm\l_vm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\l_class_wrapper.h" />
     <ClInclude Include="..\include\l_config.h" />
-    <ClInclude Include="..\include\l_io_lib.h" />
+    <ClInclude Include="..\include\l_function_wrapper.h" />
+    <ClInclude Include="..\include\l_meta_help.h" />
     <ClInclude Include="..\include\vm\l_array.h" />
     <ClInclude Include="..\include\vm\l_attribute.h" />
     <ClInclude Include="..\include\vm\l_base_lib.h" />
@@ -166,13 +168,17 @@
     <ClInclude Include="..\include\vm\l_commands.h" />
     <ClInclude Include="..\include\vm\l_compiler_tree_to_vm.h" />
     <ClInclude Include="..\include\vm\l_compiler_utilities.h" />
+    <ClInclude Include="..\include\vm\l_exception.h" />
     <ClInclude Include="..\include\vm\l_function.h" />
     <ClInclude Include="..\include\vm\l_gc.h" />
+    <ClInclude Include="..\include\vm\l_io_lib.h" />
     <ClInclude Include="..\include\vm\l_iterator.h" />
+    <ClInclude Include="..\include\vm\l_math_lib.h" />
     <ClInclude Include="..\include\vm\l_object.h" />
     <ClInclude Include="..\include\vm\l_opcode.h" />
     <ClInclude Include="..\include\vm\l_os_lib.h" />
     <ClInclude Include="..\include\vm\l_parser.h" />
+    <ClInclude Include="..\include\vm\l_ref.h" />
     <ClInclude Include="..\include\vm\l_string.h" />
     <ClInclude Include="..\include\vm\l_syntactic_tree.h" />
     <ClInclude Include="..\include\vm\l_table.h" />
