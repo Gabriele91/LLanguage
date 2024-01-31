@@ -88,7 +88,7 @@ int main()
     using program_language = l_language::l_vm;
     using compiler_flags   = l_language::l_vm::compiler_flags;
     //source file
-    std::string i_source        = "scripts/function.ll";
+    std::string i_source        = "function.ll";
     int         f_compier_flags = compiler_flags::EXECUTE;
     //compiler object
     program_language it_compiler;
@@ -200,7 +200,7 @@ int main()
     
     TEST("for range(start,len) rand",                    // test name
          for_range_2_rand,                               // function
-         gauss(range_values-1)-gauss(start_values),      // return
+         gauss(range_values-1)-gauss(start_values-1),    // return
          start_values,range_values                       // args
          );
     
@@ -247,4 +247,6 @@ int main()
     if(s_tests_fails.size())
         for(const std::string& test_name : s_tests_fails)
             std::cout << "- failed \"" << test_name << "\" test" << std::endl;
+    // Return number of fails
+    return int(s_tests_fails.size());
 }

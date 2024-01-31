@@ -115,5 +115,8 @@ def lambda_calc_2(n,c,d)
 
 def lambda_calc_fib(n)
 {
-    return def fib (n) { if n <= 1 { return 1 }  return fib(n-1)+fib(n-2) } (n)
+    return (def fib (n) {
+         if n <= 1 { return 1 }  
+         return fib(n-1)+fib(n-2) 
+    }) (n);
 }
