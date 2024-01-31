@@ -18,6 +18,10 @@ This repository contains the interpreter for the L language, a dynamically typed
       - [Class Definition](#class-definition)
       - [Inheritance](#inheritance)
       - [Access Modifiers](#access-modifiers)
+  - [Examples](#examples)
+    - [Operators overloading](#operators-overloading)
+    - [Inheritance, call the parent constructor](#inheritance-call-the-parent-constructor)
+    - [Variadic arguments](#variadic-arguments)
   - [Contributing](#contributing)
   - [License](#license)
 
@@ -120,6 +124,174 @@ class SubClassName : SuperClassName
 - **protected**: Accessible within the class and its subclasses.
 - **private**: Accessible only within the class.
 
+## Examples
+In this section, we present a couple of examples of L Language
+
+### Operators overloading
+Example of a vec2 class with the operators overload
+
+```
+class vec2
+{
+    var x,y
+    
+    def vec2(x,y)
+    {
+        this.x = to_float(x) or 0.
+        this.y = to_float(y) or 0.
+    }
+    
+    operator + (value)
+    {
+        if type_of(value) == "object"
+            return vec2(this.x+value.x,this.y+value.y)
+        else
+            return vec2(this.x+to_float(value),this.y+to_float(value))
+    }
+    
+    operator - (value)
+    {
+        if type_of(value) == "object"
+            return vec2(this.x-value.x,this.y-value.y)
+        else
+            return vec2(this.x-to_float(value),this.y-to_float(value))
+    }
+    
+    operator -
+    {
+        return vec2(-this.x,-this.y)
+    }
+    
+    operator * (value)
+    {
+        if type_of(value) == "object"
+            return vec2(this.x*value.x,this.y*value.y)
+        else
+            return vec2(this.x*to_float(value),this.y*to_float(value))
+    }
+    
+    operator / (value)
+    {
+        if type_of(value) == "object"
+            return vec2(this.x/value.x,this.y/value.y)
+        else
+            return vec2(this.x/to_float(value),this.y/to_float(value))
+    }
+    
+    operator % (value)
+    {
+        if type_of(value) == "object"
+            return vec2(this.x%value.x,this.y%value.y)
+        else
+            return vec2(this.x%to_float(value),this.y%to_float(value))
+    }
+    
+    operator right * (value)
+    {
+        return vec2(to_float(value) * this.x,to_float(value) * this.y)
+    }
+    
+    
+    def print()
+    {
+        io.println("(",this.x, ", ", this.y,")")
+    }
+}
+
+x = ( ( vec2(3,4) + vec2(3,4) - vec2(3,8) ) * vec2(4,1) / vec2(2,1) ) % vec2(4,1)
+y = vec2(4,1) % 4
+z = 3 * vec2(3,2)
+w = -vec2(3,2)
+x.print()
+y.print()
+z.print()
+w.print()
+```
+### Inheritance, call the parent constructor
+```
+class User
+{
+	def print_name_and_sum()
+	{
+		println(this.name, " - ", this.sum)
+	}
+	def sum_inc()
+	{
+		this.sum += 1
+	}
+	
+	operator + (right) //always public
+	{
+		u = User()
+		u.name = this.name + right.name
+		return u
+    }
+
+protected:
+	
+	var name = ""
+
+private:
+
+	var sum = 0
+			
+}
+
+class Mario : User
+{	
+	def Mario()
+	{
+		this.User()
+		this.name = "Mario"
+	}
+	def sum_to_0()
+	{
+		this.sum = 0 //<- error is private
+	}
+}
+```
+### Variadic arguments
+```
+class vector
+{
+    var data = []
+    
+    def vector(...args) this.data = args
+    
+    def get(i) return this.data[i]
+    
+    def set(i,value) this.data[i] = value
+    
+    operator + (value)
+    {
+        o = vector()
+        //copy data
+        o.data = copy(this.data)
+        //add...
+        if ( type_of(value)    == "object" &&
+             class_name(value) == "vector" )
+        {
+            for arg_v of value.data
+                o.data.push(arg_v)
+        }
+        else
+        {
+            o.data.push(value)
+        }
+        return o
+    }
+    
+    def forall(call)
+    {
+        for (k in this.data) call(k,this.data[k])
+    }
+}
+
+x = vector( 2, 3, 4 )
+x+= vector(-5,-6,-7 )
+
+x.forall(def (x,y) println("key: ",x+1,"\t value: ",y))
+```
 
 ## Contributing
 
