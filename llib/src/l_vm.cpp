@@ -304,7 +304,7 @@ namespace l_language
         //execute call
         l_thread::type_return n_return = thread->execute(*new_ctx);
         //error?
-        if(n_return==l_thread::T_RETURN_ERROR)
+        if(n_return == l_thread::T_RETURN_ERROR)
         {
             //errors...
             for(auto& error:thread->m_errors)
