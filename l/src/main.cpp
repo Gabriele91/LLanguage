@@ -16,7 +16,7 @@ void print_return(const l_language::l_variable& var)
 {
     switch (var.m_type)
     {
-        case l_language::l_variable::LNULL: printf("null\n"); break;
+      //case l_language::l_variable::LNULL: printf("null\n"); break;
         case l_language::l_variable::LBOOL: printf("%s\n",var.m_value.m_b?"true":"false"); break;
         case l_language::l_variable::INT: printf("%d\n",var.m_value.m_i); break;
         case l_language::l_variable::FLOAT: printf("%g\n",var.m_value.m_f); break;
@@ -63,6 +63,7 @@ void interactive_mode()
     l_vmruntime.add_lib("os",  l_language::l_os_lib);
     l_vmruntime.add_lib("math",l_language::l_math_lib);
     // Read lines
+    std::string source_ctx;
     std::string source_buffer;
     std::string source_line;
     std::cout << "> ";
@@ -72,7 +73,7 @@ void interactive_mode()
         source_buffer += source_line;
         // Compile
         compiler_ouput output;
-        l_variable eval_return = l_vmruntime.eval(source_buffer, output);
+        l_variable eval_return = l_vmruntime.eval(source_ctx + source_buffer, output);
         // Test error
         if(output.m_type == l_language::l_vm::SYNTAX_ERROR && source_line.size())
         {    
@@ -93,6 +94,9 @@ void interactive_mode()
                 std::cout << "Runtime errors:" << std::endl;
                 std::cout << output.m_errors;
             }
+            // append context
+            source_ctx += source_buffer;
+            source_ctx += "\n";
         }
         source_buffer.clear();
         std::cout << "> ";
