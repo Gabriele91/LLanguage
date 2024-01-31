@@ -1,4 +1,4 @@
-using("io")
+using(io)
 
 function fun(x,y)
 {

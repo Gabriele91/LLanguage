@@ -1,6 +1,6 @@
 
 while a < 100
 {
-    std.println(a)
+    io.println(a)
     a+=1
 }

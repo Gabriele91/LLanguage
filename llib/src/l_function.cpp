@@ -50,7 +50,7 @@ namespace l_language
             
             //cmd len
             size_t len = std::strlen(l_op_code_str[cmd.m_op_code]);
-            for(int i=0; i< (spaces-len); ++i) std::cout << " ";
+            for(size_t i=0; i < (spaces-len); ++i) std::cout << " ";
             
             // cmd value
             std::cout <<  cmd.m_arg;
@@ -181,7 +181,7 @@ namespace l_language
             
             //cmd len
             size_t len = std::strlen(l_op_code_str[cmd.m_op_code]);
-            for(int i=0; i< (spaces-len); ++i) std::cout << " ";
+            for(size_t i=0; i < (spaces-len); ++i) std::cout << " ";
             
             //..
             std::cout  <<  cmd.m_arg;

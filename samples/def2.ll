@@ -1,8 +1,8 @@
-std.using("std");
+using(io);
 
 def a
 {
-    std.println("ciao");
+    io.println("ciao");
     return 0
 }
 println(a());

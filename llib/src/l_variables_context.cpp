@@ -28,7 +28,8 @@ namespace l_language
             case l_syntactic_tree::FUNCTION_DEF_NODE:    visit(fun,node->to<l_syntactic_tree::function_def_node>());    break;
             case l_syntactic_tree::RETURN_NODE:          visit(fun,node->to<l_syntactic_tree::return_node>());          break;
             case l_syntactic_tree::CONTEXT_TYPE_NODE:    visit(fun,node->to<l_syntactic_tree::context_type_node>());    break;
-            case l_syntactic_tree::CLASS_NODE:           visit(fun,node->to<l_syntactic_tree::class_node>());    break;
+            case l_syntactic_tree::CLASS_NODE:           visit(fun,node->to<l_syntactic_tree::class_node>());           break;
+            case l_syntactic_tree::VARIABLE_NODE:        visit(fun,node->to<l_syntactic_tree::variable_node>());        break;
             default: assert(0); break;
         }
     }

@@ -1,4 +1,4 @@
-std.using("std")
+using(io)
 
 c = {}
 c.global = get_global

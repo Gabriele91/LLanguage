@@ -130,7 +130,7 @@ namespace l_language
         
         l_variable get_local_variables() const
         {
-            return l_variable((l_ref*)&m_local_variables);
+            return l_variable((l_table*)&m_local_variables);
         }
         
         static l_variable gc_new(l_gc* gc);

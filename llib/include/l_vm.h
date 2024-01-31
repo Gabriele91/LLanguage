@@ -66,21 +66,23 @@ namespace l_language
         //flags
         enum compiler_flags
         {
-            NONE    = 0x0000,
-            ERRORS  = 0b0001,
-            EXECUTE = 0b0010,
-            DUMP    = 0b0100,
+            NONE           = 0x000000,
+            ERRORS         = 0b000001,
+            SYNTAX_ERROR   = 0b000011,
+            COMPILE_ERROR  = 0b000101,
+            RUNTIME_ERROR  = 0b001001,
+            EXECUTE        = 0b010000,
+            DUMP           = 0b100000,
         };
         
         struct compiler_ouput
         {
             int         m_type{ NONE };
-            std::string m_out_js;
-            std::string m_out_cpp;
             std::string m_errors;
         };
         compiler_ouput compile(const std::string& source_code,int flags = EXECUTE);
         l_variable eval(std::string source_code);
+        l_variable eval(std::string source_code, compiler_ouput& output);
         bool pcall(l_variable& l_return,  const std::string& function, std::initializer_list<l_variable> args);
         bool pcall(const std::string& function, std::initializer_list<l_variable> args);
         //execute

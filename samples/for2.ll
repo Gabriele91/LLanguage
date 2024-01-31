@@ -1,6 +1,6 @@
 for  x=12 , y=2 ;  x > y  ; x+=5 , y*=2
 {
-    std.println(x,"\t",y)
+    io.println(x,"\t",y)
 }
 
 for
@@ -12,12 +12,12 @@ for
     n += 1
 )
 {
-    std.println(n,"\t",x)
+    io.println(n,"\t",x)
 }
 
 for  x=12  y=2 ;  x > y  ; x+=5  y*=2
 {
-    std.println(x,"\t",y)
+    io.println(x,"\t",y)
 }
 
 for
@@ -27,5 +27,5 @@ for
  x -= 1
  n += 1
 {
-    std.println(n,"\t",x)
+    io.println(n,"\t",x)
 }

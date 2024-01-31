@@ -1,6 +1,6 @@
 for v of [1,2,3,4,5]
 {
-    std.println(v)
+    io.println(v)
 }
 
 
@@ -12,13 +12,13 @@ else if 0
 {
     for v of 0
     {
-        std.println(v)
+        io.println(v)
     }
 }
 else if 0
 {
     a=2+"<-is 2"
-    std.println(a)
+    io.println(a)
     a=a-1
 }
 else if 0
@@ -29,5 +29,5 @@ else if 0
 }
 else
 {
-    std.println(5.9%"str")
+    io.println(5.9%"str")
 }

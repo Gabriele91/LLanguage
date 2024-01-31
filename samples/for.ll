@@ -1,22 +1,22 @@
 
 a = [1,2,3,"hello",2.2]
 
-std.println("-----------------------")
+io.println("-----------------------")
 
 for v in a
 {
-    std.println(v)
+    io.println(v)
 }
 
-std.println("-----------------------")
+io.println("-----------------------")
 
 for v of a
 {
-    std.println(v)
+    io.println(v)
 }
 
-std.println("-----------------------")
-std.println("-----------------------")
+io.println("-----------------------")
+io.println("-----------------------")
 
 
 a = { "age" : 1,
@@ -27,23 +27,23 @@ a = { "age" : 1,
 
 for v in a
 {
-    std.println(v)
+    io.println(v)
 }
 
-std.println("-----------------------")
+io.println("-----------------------")
 
 for v of a
 {
-    std.println(v)
+    io.println(v)
 }
 
-std.println("-----------------------")
-std.println("-----------------------")
+io.println("-----------------------")
+io.println("-----------------------")
 
 
 for v of [2,3,"wooohhhh!?@#+*[]"]
 {
-    std.println(v)
+    io.println(v)
 }
 
-std.println("-----------------------")
+io.println("-----------------------")

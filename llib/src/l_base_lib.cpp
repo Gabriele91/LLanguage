@@ -311,7 +311,6 @@ namespace l_language
         { "xrange",     l_xrange_gen    },
         { "eval",       l_eval          },
         { "get_this",   l_get_this      },
-        { "length",     l_length        },
         { "copy",       l_copy          }
     };
 }

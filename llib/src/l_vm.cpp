@@ -93,15 +93,15 @@ namespace l_language
         //output
         compiler_ouput   output;
         //
-        if (!m_parser.italanguage(source_code,it_tree))
-            //ouput errors
+        if (!m_parser.llanguage(source_code,it_tree))
+        //ouput errors
         {
             for (auto& error : m_parser.m_errors)
             {
                 output.m_errors += std::to_string( error.m_line ) + ":" + error.m_error + "\n";
             }
             //fail
-            output.m_type = ERRORS;
+            output.m_type = SYNTAX_ERROR;
             //return
             return output;
         }
@@ -116,7 +116,7 @@ namespace l_language
             {
                 output.m_errors += "fail to compile tree\n";
                 //fail
-                output.m_type = ERRORS;
+                output.m_type = COMPILE_ERROR;
                 //return
                 return output;
             }
@@ -130,9 +130,11 @@ namespace l_language
                     function((unsigned int)i).dump_all_function();
                     std::cout<< "\n";
                 }
+                output.m_type = DUMP;
             }
             //start
             if(flags & EXECUTE)
+            {
                 if(!execute(&m_default_thread))
                 {
                     for(auto& error:m_default_thread.m_errors)
@@ -140,24 +142,33 @@ namespace l_language
                         output.m_errors += "At line: " + std::to_string( error.m_line ) + ", " + error.m_error + "\n";
                     }
                     //fail
-                    output.m_type = ERRORS;
+                    output.m_type = RUNTIME_ERROR;
                 }
+                else 
+                {
+                    output.m_type = EXECUTE;
+                }
+            }
         }
         //return...
         return output;
     }
-    
+
     l_variable l_vm::eval(std::string source_code)
+    {
+        compiler_ouput output;
+        return eval(std::move(source_code), output);
+    }
+    
+    l_variable l_vm::eval(std::string source_code,  compiler_ouput& output)
     {
         //targets
         l_syntactic_tree it_tree;
-        //output
-        compiler_ouput output;
         //return
         l_variable l_return;
         //parsing
-        if (!m_parser.italanguage(source_code,it_tree))
-            //ouput errors
+        if (!m_parser.llanguage(source_code,it_tree))
+        //ouput errors
         {
             for (auto& error : m_parser.m_errors)
             {
@@ -166,7 +177,7 @@ namespace l_language
             //clear errors
             m_parser.m_errors.clear();
             //fail
-            output.m_type = ERRORS;
+            output.m_type = SYNTAX_ERROR;
             //return...
             l_return = l_string::gc_new(this, output.m_errors);
         }
@@ -194,8 +205,15 @@ namespace l_language
                 }
                 //clear errors
                 m_default_thread.m_errors = l_errors;
+                //Not fail
+                output.m_type = RUNTIME_ERROR;
                 //output errors
                 l_return = l_string::gc_new(this, output.m_errors);
+            }
+            else 
+            {
+                //Not fail
+                output.m_type = EXECUTE;
             }
         }
         //return

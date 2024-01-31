@@ -1,19 +1,19 @@
 y = 1
 n = x and y
-std.println(n)
+io.println(n)
 
 a = 9
 b = 60
 c = a or b
-std.println(c)
+io.println(c)
 
 c = 1
 e = c and 0
-std.println(e)
+io.println(e)
 
 c = 2
 e = c and 1 or 5
-std.println(e)
+io.println(e)
 
 tab = 0 || 1 && { "hello": "Jim" }
-std.println(tab.hello)
+io.println(tab.hello)

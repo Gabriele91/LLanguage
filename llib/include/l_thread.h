@@ -65,7 +65,7 @@ namespace l_language
         }
         l_variable& get_temp3()
         {
-            return m_register[R_TEMP2];
+            return m_register[R_TEMP3];
         }
         l_variable& get_last_context()
         {
