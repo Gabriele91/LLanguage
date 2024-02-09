@@ -916,7 +916,7 @@ namespace l_language
                 }
             };
             //name class
-            variable_node* m_class_name;
+            variable_node* m_class_name { nullptr };
             //parent types
             list_vars  m_parents;
             //attribute types

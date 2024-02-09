@@ -92,16 +92,21 @@ namespace l_language
         l_syntactic_tree it_tree;
         //output
         compiler_ouput   output;
+        // Clean errors
+        m_parser.m_errors.clear();
         //
         if (!m_parser.llanguage(source_code,it_tree))
         //ouput errors
         {
+            int type_error = SYNTAX_ERROR;
+            // Append all errors
             for (auto& error : m_parser.m_errors)
             {
-                output.m_errors += std::to_string( error.m_line ) + ":" + error.m_error + "\n";
+                output.m_errors += std::to_string( error.m_line ) + ":(" + std::to_string(error.m_type) + "):" + error.m_error + "\n";
+                if(error.m_type == l_parser::error_info::ERROR_INCOMPLETE) type_error = INCOMPLETE_ERROR;
             }
             //fail
-            output.m_type = SYNTAX_ERROR;
+            output.m_type = type_error;
             //return
             return output;
         }
@@ -166,18 +171,23 @@ namespace l_language
         l_syntactic_tree it_tree;
         //return
         l_variable l_return;
+        // Clean errors
+        m_parser.m_errors.clear();
         //parsing
         if (!m_parser.llanguage(source_code,it_tree))
         //ouput errors
         {
+            int type_error = SYNTAX_ERROR;
+            // Conver as string
             for (auto& error : m_parser.m_errors)
             {
-                output.m_errors += std::to_string( error.m_line ) + ":" + error.m_error + "\n";
+                output.m_errors += std::to_string( error.m_line ) + ":(" + std::to_string(error.m_type) + "):" + error.m_error + "\n";
+                if(error.m_type == l_parser::error_info::ERROR_INCOMPLETE) type_error = INCOMPLETE_ERROR;
             }
             //clear errors
             m_parser.m_errors.clear();
             //fail
-            output.m_type = SYNTAX_ERROR;
+            output.m_type = type_error;
             //return...
             l_return = l_string::gc_new(this, output.m_errors);
         }

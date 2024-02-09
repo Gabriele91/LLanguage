@@ -53,6 +53,7 @@ void interactive_mode()
     //fast access
     using l_vmachine       = l_language::l_vm;
     using l_variable       = l_language::l_variable;
+    using l_function       = l_language::l_function;
     using compiler_flags   = l_language::l_vm::compiler_flags;
     using compiler_ouput   = l_language::l_vm::compiler_ouput;
     //compiler object
@@ -67,38 +68,48 @@ void interactive_mode()
     std::string source_buffer;
     std::string source_line;
     std::cout << "> ";
+    // Copy context
+    int main_function_id = l_vmruntime.thread(0).main_context()->get_fun_id();
+    l_function main_function = l_vmruntime.function(main_function_id);
+    // Get lines
     while (std::getline(std::cin, source_line)) 
     {
         // Append 
         source_buffer += source_line;
         // Compile
-        compiler_ouput output;
-        l_variable eval_return = l_vmruntime.eval(source_ctx + source_buffer, output);
+        compiler_ouput output = l_vmruntime.compile(source_buffer, 0);
         // Test error
-        if(output.m_type == l_language::l_vm::SYNTAX_ERROR && source_line.size())
-        {    
+        if(!!(output.m_type & l_language::l_vm::INCOMPLETE_ERROR))
+        {  
             std::cout << ". ";
             continue;
         }
         else if(output.m_type & l_language::l_vm::ERRORS)
         {
-            std::cout << "Runtime errors:" << std::endl;
+            std::cout << "Errors:" << std::endl;
             std::cout << output.m_errors;
         }
         else 
         {
-            print_return(eval_return);
+            // execute
+            output = l_vmruntime.compile(source_buffer, l_language::l_vm::DUMP | l_language::l_vm::EXECUTE);
             // Output errors 
-            if(output.m_type & l_language::l_vm::ERRORS)
+            if(output.m_type & l_language::l_vm::RUNTIME_ERROR)
             {
                 std::cout << "Runtime errors:" << std::endl;
                 std::cout << output.m_errors;
             }
-            // append context
-            source_ctx += source_buffer;
-            source_ctx += "\n";
+            else if (l_vmruntime.thread(0).size())
+            {
+                print_return(l_vmruntime.thread(0).top());
+            }
         }
+        // Free source context
         source_buffer.clear();
+        // Reset main function
+        l_vmruntime.function(main_function_id) = main_function;
+        // Clean GC, todo: fix class closer!
+        // l_vmruntime.get_gc().delete_garbage();
         std::cout << "> ";
     }
 }

@@ -12,6 +12,9 @@
 #include <l_vm.h>
 #include <l_variable.h>
 #include <l_array.h>
+#include <l_class.h>
+#include <l_object.h>
+#include <l_call_context.h>
 
 
 namespace  l_language
@@ -52,6 +55,11 @@ namespace  l_language
                  //if is a vector?
                  l_array_it*  vector_it = dynamic_cast< l_array_it* >(it->m_obj);
                  l_table_it*  table_it  = dynamic_cast< l_table_it* >(it->m_obj);
+                 //if is a class?
+                 l_class*  clazz = dynamic_cast< l_class* >(it->m_obj);
+                 l_object* object = dynamic_cast< l_object* >(it->m_obj);
+                 // Closer
+                 l_closer*  closer = dynamic_cast< l_closer* >(it->m_obj);
                  //print vector
                       if(array)
                         printf("; array[%u]", (unsigned)array->size());
@@ -61,6 +69,10 @@ namespace  l_language
                         printf("; array it");
                  else if(table_it)
                         printf("; table it");
+                 else if(clazz)
+                        printf("; class");
+                 else if(closer)
+                        printf("; closer");
                  //new line
                  printf("\n");
             )

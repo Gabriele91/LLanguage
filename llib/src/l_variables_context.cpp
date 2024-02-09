@@ -30,6 +30,10 @@ namespace l_language
             case l_syntactic_tree::CONTEXT_TYPE_NODE:    visit(fun,node->to<l_syntactic_tree::context_type_node>());    break;
             case l_syntactic_tree::CLASS_NODE:           visit(fun,node->to<l_syntactic_tree::class_node>());           break;
             case l_syntactic_tree::VARIABLE_NODE:        visit(fun,node->to<l_syntactic_tree::variable_node>());        break;
+            // Interactive mode
+            case l_syntactic_tree::EXP_NODE:             visit(fun,node->to<l_syntactic_tree::exp_node>());             break;
+            case l_syntactic_tree::CONSTANT_NODE:        visit(fun,node->to<l_syntactic_tree::constant_node>());        break;
+            // Unknown
             default: assert(0); break;
         }
     }

@@ -92,9 +92,9 @@ namespace l_language
         return exists_variable(str);
     }
     //push error
-    void l_parser::push_error(const std::string& error)
+    void l_parser::push_error(const std::string& error, error_info::error_type type)
     {
-        if(m_push_errors) m_errors.push_front(error_info( m_line, error ));
+        if(m_push_errors) m_errors.push_front(error_info( m_line, error, type ));
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //compare string
@@ -189,6 +189,15 @@ namespace l_language
     {
         return (c == '.');
     }
+    bool l_parser::is_start_const(char c) 
+    {
+        return is_start_float_number(c) // is a number
+            || is_start_name(c)         // is a name
+            || is_start_arg(c)          // ( 
+            || is_start_index(c)        // [
+            || c == '{'                 // [
+            ;
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////////
     bool l_parser::is_int_number(const char* c)
     {
@@ -253,6 +262,16 @@ namespace l_language
             m_line += count_lines && m_count_lines ? (*(inout)) == '\n' : 0;
             ++(inout);
         }
+    }
+    bool l_parser::next_token_is_the_eof(const char* in)
+    {
+        const char* ptr_copy = in;
+        skip_space_end_comment(ptr_copy, false);
+        return *(ptr_copy) == EOF || *(ptr_copy) == '\0';
+    }
+    l_parser::error_info::error_type l_parser::is_incomplete_or(const char* in, l_parser::error_info::error_type or_type)
+    {
+        return next_token_is_the_eof(in) ? error_info::ERROR_INCOMPLETE : or_type;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////

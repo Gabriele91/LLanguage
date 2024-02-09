@@ -97,13 +97,21 @@ namespace l_language
         //errors
         struct error_info
         {
+            enum error_type 
+            {
+                ERROR_SYNTAX,
+                ERROR_INCOMPLETE
+            };
+
             size_t m_line { 0 };
             std::string m_error;
+            error_type m_type;
             
-            error_info(size_t line,const std::string& error)
+            error_info(size_t line,const std::string& error,error_type type)
             {
                 m_line = line;
                 m_error= error;
+                m_type = type;
             }
             
         };
@@ -138,7 +146,7 @@ namespace l_language
         bool exists_variable(const std::string& str) const;
         bool is_variable(const std::string& str);
 		//push error
-        void push_error(const std::string& error);
+        void push_error(const std::string& error, error_info::error_type type);
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		//compare string
         static bool strcmp(const char* left, const char* right, size_t len);
@@ -213,15 +221,18 @@ namespace l_language
         static bool is_start_index(char c);
         static bool is_end_index(char c);
         static bool is_point(char c);
+        static bool is_start_const(char c);
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        bool is_int_number(const char* c);
-        bool is_float_number(const char* c);
+        static bool is_int_number(const char* c);
+        static bool is_float_number(const char* c);
 		///////////////////////////////////////////////////////////////////////////////////////////////
-        void skip_line_space(const char*& inout);
-        void skip_space(const char*& inout);
-        void skip_line_comment(const char*& inout);
+        static void skip_line_space(const char*& inout);
+        static void skip_space(const char*& inout);
+        static void skip_line_comment(const char*& inout);
         void skip_multy_line_comment(const char*& inout,bool count_lines=true);
         void skip_space_end_comment(const char*& inout,bool count_lines=true);
+        bool next_token_is_the_eof(const char* in);
+        error_info::error_type is_incomplete_or(const char* in, error_info::error_type or_type = error_info::ERROR_SYNTAX);
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		//parser
 		//parser of a unsigned int number
@@ -262,7 +273,7 @@ namespace l_language
                 int value = 0;
                 if (!parse_int_number(ptr, value))
                 {
-                    push_error("not valid float costant");
+                    push_error("not valid int costant", is_incomplete_or(ptr));
                     return false;
                 }
                 node = l_syntactic_tree::constant((int)value, m_line);
@@ -273,7 +284,7 @@ namespace l_language
                 float value = 0;
                 if (!parse_float_number(ptr, value))
                 {
-                    push_error("not valid float costant");
+                    push_error("not valid float costant", is_incomplete_or(ptr));
                     return false;
                 }
                 node = l_syntactic_tree::constant(value, m_line);
@@ -284,7 +295,7 @@ namespace l_language
 				std::string value;
 				if (!parse_cstring(ptr, &ptr, value))
 				{
-					push_error("not valid string costant");
+					push_error("not valid string costant", is_incomplete_or(ptr));
 					return false;
 				}
 				node = l_syntactic_tree::constant(value, m_line);
@@ -306,7 +317,7 @@ namespace l_language
 				//parse exp
 				if (!parse_exp(ptr, node))
 				{
-					push_error("not valid expression (value)");
+					push_error("not valid expression (value)", error_info::ERROR_SYNTAX);
 					return false;
 				}
 				//skip
@@ -314,7 +325,7 @@ namespace l_language
 				//end )
 				if (!is_end_arg(*ptr))
 				{
-					push_error("not valid expression (value)");
+					push_error("not valid expression (value)", is_incomplete_or(ptr));
 					return false;
 				}
 				//skip )
@@ -359,7 +370,7 @@ namespace l_language
                         //parsing..
                         if (!parse_exp(ptr, exp_node))
                         {
-                            push_error("not valid expression (value)");
+                            push_error("not valid expression (value)", error_info::ERROR_SYNTAX);
                             return false;
                         }
                         //parse list exp
@@ -372,7 +383,7 @@ namespace l_language
 				//end ]
 				if (!is_end_index(*ptr))
 				{
-					push_error("not valid array declaretion (value)");
+					push_error("not valid array declaretion (value)", is_incomplete_or(ptr));
 					return false;
 				}
 				//skip ]
@@ -400,7 +411,7 @@ namespace l_language
                         //parsing..
                         if (!parse_exp(ptr, exp_left))
                         {
-                            push_error("not valid expression (value)");
+                            push_error("not valid expression (value)", error_info::ERROR_SYNTAX);
                             return false;
                         }
                         //skip space
@@ -412,13 +423,13 @@ namespace l_language
                             parse_assignment(ptr,op_name);
                             if(op_name!="=")
                             {
-                                push_error("not found valid assignment statement");
+                                push_error("not found valid assignment statement", is_incomplete_or(ptr));
                                 return false;
                             }
                         }
                         else if(!CSTRCMP_SKIP(ptr,":"))
                         {
-                            push_error("not found assignment statement");
+                            push_error("not found assignment statement", is_incomplete_or(ptr));
                             return false;
                         }
                         //skip space
@@ -426,7 +437,7 @@ namespace l_language
                         //parsing..
                         if (!parse_exp(ptr, exp_right))
                         {
-                            push_error("not valid expression (value)");
+                            push_error("not valid expression (value)", error_info::ERROR_SYNTAX);
                             return false;
                         }
                         //parse list exp
@@ -442,7 +453,7 @@ namespace l_language
                 //end }
                 if (!CSTRCMP_SKIP(ptr,"}"))
                 {
-                    push_error("not valid table declaretion (value)");
+                    push_error("not valid table declaretion (value)", is_incomplete_or(ptr));
                     return false;
                 }
                 //field node is a exp node
@@ -473,7 +484,7 @@ namespace l_language
 			//parser value
 			if (!parse_value(ptr, value))
 			{
-				push_error("not valid expression (one op)");
+				push_error("not valid expression (one op)", error_info::ERROR_SYNTAX);
 				return false;
 			}
 			// oneop := ('-' value) | (logicOne value) | | value
@@ -725,7 +736,7 @@ namespace l_language
 				//then
 				if (!CSTRCMP_SKIP(ptr, "}"))
 				{
-					push_error("not found \'}\' keyword");
+					push_error("not found \'}\' keyword", is_incomplete_or(ptr));
 					return false;
 				}
 				//skip spaces
@@ -753,8 +764,15 @@ namespace l_language
             if (KEYWORDCMP(ptr, GLOBAL)||KEYWORDCMP(ptr, SUPER))   return parse_type(ptr, node);
             if (KEYWORDCMP(ptr, RETURN))                           return parse_return(ptr, node);
 			if (is_operation(ptr))						           return parse_operation(ptr, node);
+            if (is_start_const(*ptr)) 
+            {
+                l_syntactic_tree::exp_node* exp_node = nullptr;
+                if(!parse_exp(ptr, exp_node)) return false;
+                node = exp_node;
+                return true;
+            }
 			//error
-			push_error("not valid stament");
+			push_error("not valid stament", is_incomplete_or(ptr));
 			return false;
 		}
         //is index field request?
@@ -829,7 +847,7 @@ namespace l_language
                         //
                         if (!parse_def(ptr,def_node,true))
                         {
-                            push_error("not valid lambda declaretion (value)");
+                            push_error("not valid lambda declaretion (value)", error_info::ERROR_SYNTAX);
                             return false;
                         }
                         //cast
@@ -914,7 +932,7 @@ namespace l_language
                     std::string field_name;
                     if (!parse_name(ptr, &ptr, field_name))
                     {
-                        push_error("not valid field name");
+                        push_error("not valid field name", is_incomplete_or(ptr));
                         return false;
                     }
                     //append node
@@ -931,7 +949,7 @@ namespace l_language
                     //parse exp
                     if (!parse_exp(ptr, exp_node))
                     {
-                        push_error("not valid indexing expression (value)");
+                        push_error("not valid indexing expression (value)", error_info::ERROR_SYNTAX);
                         return false;
                     }
                     //skip
@@ -939,7 +957,7 @@ namespace l_language
                     //end ']'
                     if (!is_end_index(*ptr))
                     {
-                        push_error("not valid indexing, not found ']'");
+                        push_error("not valid indexing, not found ']'", is_incomplete_or(ptr));
                         return false;
                     }
                     //skip ']'
@@ -986,7 +1004,7 @@ namespace l_language
 			std::string variable_name;
 			if (!parse_name(ptr, &ptr, variable_name))
 			{
-				push_error("not valid variable name");
+				push_error("not valid variable name", is_incomplete_or(ptr));
 				return false;
 			}
 			if (!exists_variable(variable_name))
@@ -1015,7 +1033,7 @@ namespace l_language
                KEYWORDCMP(ptr,FALSE) )
             {
                 //error
-                push_error("the assignable attribute isn't valid, is a keyword");
+                push_error("the assignable attribute isn't valid, is a keyword", error_info::ERROR_SYNTAX);
                 return false;
             }
 			else
@@ -1027,7 +1045,7 @@ namespace l_language
 				if (parse_field_or_def_and_call(ptr, node)) return true;
 			}
 			//error
-			push_error("the assignable attribute isn't valid");
+			push_error("the assignable attribute isn't valid", is_incomplete_or(ptr));
 			return false;
 		}
         //is assignment?
@@ -1068,7 +1086,7 @@ namespace l_language
             // /= ?
             if (CSTRCMP_SKIP(ptr, "/=")){ name="/="; return true; }
             //error
-            push_error("not find (+|-|*|/)?= or <-");
+            push_error("not find (+|-|*|/)?= or <-", is_incomplete_or(ptr));
             return false;
         }
         //is operation?
@@ -1133,7 +1151,7 @@ namespace l_language
                 else
                 {
                     delete assignable_node;
-                    push_error("not valid assignament");
+                    push_error("not valid assignament", is_incomplete_or(ptr));
                     return false;
                 }
             }
@@ -1283,9 +1301,9 @@ namespace l_language
             {
                 switch (state)
                 {
-                    case IF_STATE: push_error("not valid if stament"); break;
-                    case ELSE_IF_STATE: push_error("not valid else if stament"); break;
-                    case ELSE_STATE: push_error("not valid else stament"); break;
+                    case IF_STATE: push_error("not valid if stament", is_incomplete_or(ptr)); break;
+                    case ELSE_IF_STATE: push_error("not valid else if stament", is_incomplete_or(ptr)); break;
+                    case ELSE_STATE: push_error("not valid else stament", is_incomplete_or(ptr)); break;
                     default: break;
                 }
                 //dealloc
@@ -1325,7 +1343,7 @@ namespace l_language
             //parse for
             if (!KEYWORDCMP_SKIP(ptr, FOR))
             {
-                push_error("not found \"for\" keyword");
+                push_error("not found \"for\" keyword", is_incomplete_or(ptr));
                 return false;
             }
             //skip
@@ -1371,7 +1389,7 @@ namespace l_language
                 //skip ';'
                 if(!CSTRCMP_SKIP(ptr, ";"))
                 {
-                    push_error("not found \";\" character");
+                    push_error("not found \";\" character", is_incomplete_or(ptr));
                     delete for_c_node;
                     return false;
                 }
@@ -1409,7 +1427,7 @@ namespace l_language
                     //try
                     if (!KEYWORDCMP_SKIP(ptr, OF))
                     {
-                        push_error("not found \"in\"/\"of\" keyword");
+                        push_error("not found \"in\"/\"of\" keyword", is_incomplete_or(ptr));
                         if(node_left) delete node_left;
                         return false;
                     }
@@ -1439,7 +1457,7 @@ namespace l_language
             if (have_parenthesis)
             if (!CSTRCMP_SKIP(ptr, ")"))
             {
-                push_error("not found \")\" character");
+                push_error("not found \")\" character", is_incomplete_or(ptr));
                 if(node)  delete node;
                 return false;
                 
@@ -1483,7 +1501,7 @@ namespace l_language
             }
             else
             {
-                push_error("not found \"global/super\" keyword");
+                push_error("not found \"global/super\" keyword", is_incomplete_or(ptr));
                 return false;
             }
             //skip
@@ -1510,7 +1528,7 @@ namespace l_language
                     //parse variable
                     if(!parse_variable(ptr, l_variable))
                     {
-                        push_error("not found \"variable\" of args of def");
+                        push_error("not found \"variable\" of args of def", is_incomplete_or(ptr));
                         //dealloc
                         delete l_context_type;
                         //false
@@ -1565,7 +1583,7 @@ namespace l_language
                         //parse variable
                         if(!parse_variable(ptr, l_variable))
                         {
-                            push_error("not found \"variable\" of args of def");
+                            push_error("not found \"variable\" of args of def", error_info::ERROR_SYNTAX);
                             //false
                             return false;
                         }
@@ -1581,7 +1599,7 @@ namespace l_language
                     //end?
                     if(!CSTRCMP_SKIP(ptr, ")"))
                     {
-                        push_error("not found \")\" of args of def");
+                        push_error("not found \")\" of args of def", is_incomplete_or(ptr));
                         //false
                         return false;
                     }
@@ -1599,7 +1617,7 @@ namespace l_language
             //serach def
             if (!KEYWORDCMP_SKIP(ptr, DEF) && !KEYWORDCMP_SKIP(ptr, FUNCTION))
             {
-                push_error("not found \"def/function\" keyword");
+                push_error("not found \"def/function\" keyword", is_incomplete_or(ptr));
                 return false;
             }
             //skip
@@ -1612,7 +1630,7 @@ namespace l_language
             }
             else if(!parse_variable(ptr, l_variable))
             {
-                push_error("not found \"variable\" of def");
+                push_error("not found \"variable\" of def", error_info::ERROR_SYNTAX);
                 return false;
             }
             //cast
@@ -1644,7 +1662,7 @@ namespace l_language
             //serach def
             if (!KEYWORDCMP_SKIP(ptr, OPERATOR))
             {
-                push_error("not found \"operator\" keyword");
+                push_error("not found \"operator\" keyword", is_incomplete_or(ptr));
                 return false;
             }
             //variable string
@@ -1674,7 +1692,7 @@ namespace l_language
             else if(!is_right && CSTRCMP_SKIP(ptr, "valid"))    variable_name+="valid";
             else
             {
-                push_error("not found valid operator of def");
+                push_error("not found valid operator of def", is_incomplete_or(ptr));
                 return false;
             }
             //create node variable
@@ -1713,7 +1731,7 @@ namespace l_language
             //...
             if (!KEYWORDCMP_SKIP(ptr, RETURN))
             {
-                push_error("not found \"return\" keyword");
+                push_error("not found \"return\" keyword", is_incomplete_or(ptr));
                 return false;
             }
             //skip
@@ -1751,7 +1769,7 @@ namespace l_language
             //class
             if(!KEYWORDCMP_SKIP(ptr, CLASS))
             {
-                push_error("Not found class keyword");
+                push_error("Not found class keyword", is_incomplete_or(ptr));
                 return false;
             }
             //alloc
@@ -1812,7 +1830,7 @@ namespace l_language
             //{
             if (!CSTRCMP_SKIP(ptr, "{"))
             {
-                push_error("not found \'{\' keyword");
+                push_error("not found \'{\' keyword", is_incomplete_or(ptr));
                 return false;
             }
             //skip
@@ -1858,7 +1876,7 @@ namespace l_language
                         std::string variable_name;
                         if (!parse_name(ptr, &ptr, variable_name))
                         {
-                            push_error("not valid attribute name");
+                            push_error("not valid attribute name", is_incomplete_or(ptr));
                             return false;
                         }
                         //append
@@ -1908,7 +1926,7 @@ namespace l_language
                     //jmp :
                     if (!CSTRCMP_SKIP(ptr, ":"))
                     {
-                        push_error("not found \':\' keyword");
+                        push_error("not found \':\' keyword", is_incomplete_or(ptr));
                         return false;
                     }
                 }
@@ -1921,7 +1939,7 @@ namespace l_language
                     //jmp :
                     if (!CSTRCMP_SKIP(ptr, ":"))
                     {
-                        push_error("not found \':\' keyword");
+                        push_error("not found \':\' keyword", is_incomplete_or(ptr));
                         return false;
                     }
                     
@@ -1935,13 +1953,13 @@ namespace l_language
                     //jmp :
                     if (!CSTRCMP_SKIP(ptr, ":"))
                     {
-                        push_error("not found \':\' keyword");
+                        push_error("not found \':\' keyword", is_incomplete_or(ptr));
                         return false;
                     }
                 }
                 else
                 {
-                    push_error("invalid class declaretion");
+                    push_error("invalid class declaretion", is_incomplete_or(ptr));
                     return false;
                 }
                 //..
@@ -1951,7 +1969,7 @@ namespace l_language
             //then
             if (!CSTRCMP_SKIP(ptr, "}"))
             {
-                push_error("not found \'}\' keyword");
+                push_error("not found \'}\' keyword", is_incomplete_or(ptr));
                 return false;
             }
             //skip spaces

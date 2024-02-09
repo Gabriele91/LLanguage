@@ -57,6 +57,9 @@ namespace l_language
         if(is_marked()) return;
         //mark
         l_ref::mark();
+        //mark class
+        if(m_clazz.is_ref_obj())
+            m_clazz.mark();
         //mark next
         if(next()) next()->mark();
     }
@@ -68,6 +71,9 @@ namespace l_language
         if(is_unmarked()) return;
         //unmark
         l_ref::unmark();
+        //mark class
+        if(m_clazz.is_ref_obj())
+            m_clazz.unmark();
         //unmark next
         if(next()) next()->unmark();
     }
@@ -154,12 +160,15 @@ namespace l_language
         if(l_ref::is_marked()) return;
         //mark
         l_ref::mark();
+        //mark class
+        if(m_clazz.is_ref_obj())
+            m_clazz.mark();
         //unmark
         m_local_variables.mark();
         //mark this
         if(m_this.is_ref_obj())
         {
-            m_this.unmark();
+            m_this.mark();
         }
         //mark next
         if(next()) next()->mark();
@@ -172,6 +181,9 @@ namespace l_language
         if(is_unmarked()) return;
         //unmark
         l_ref::unmark();
+        //unmark class
+        if(m_clazz.is_ref_obj())
+            m_clazz.unmark();
         //unmark
         m_local_variables.unmark();
         //unmark this

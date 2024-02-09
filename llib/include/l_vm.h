@@ -66,13 +66,14 @@ namespace l_language
         //flags
         enum compiler_flags
         {
-            NONE           = 0x000000,
-            ERRORS         = 0b000001,
-            SYNTAX_ERROR   = 0b000011,
-            COMPILE_ERROR  = 0b000101,
-            RUNTIME_ERROR  = 0b001001,
-            EXECUTE        = 0b010000,
-            DUMP           = 0b100000,
+            NONE             = 0x0000000,
+            ERRORS           = 0b0011111,
+            SYNTAX_ERROR     = 0b0000010,
+            INCOMPLETE_ERROR = 0b0000100,
+            COMPILE_ERROR    = 0b0001000,
+            RUNTIME_ERROR    = 0b0010000,
+            EXECUTE          = 0b0100000,
+            DUMP             = 0b1000000,
         };
         
         struct compiler_ouput
