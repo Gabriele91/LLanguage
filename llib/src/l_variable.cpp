@@ -65,6 +65,11 @@ namespace l_language
         return static_cast< l_object* >( m_value.m_pobj );
     }
     
+    l_closer* l_variable::closer()
+    {
+        return static_cast< l_closer* >( m_value.m_pobj );
+    }
+    
     const l_table* l_variable::table() const
     {
         return static_cast<  const l_table* >( m_value.m_pobj );
@@ -95,6 +100,11 @@ namespace l_language
         return static_cast< const l_object* >( m_value.m_pobj );
     }
     
+    const l_closer* l_variable::closer() const
+    {
+        return static_cast< const l_closer* >( m_value.m_pobj );
+    }
+
     bool l_variable::add(l_variable& var,l_variable& output)
     {
         

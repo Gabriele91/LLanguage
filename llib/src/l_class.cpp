@@ -54,28 +54,27 @@ namespace l_language
         l_ref::mark();
         //mark childs
         for(auto& map:m_maps)
+        {
             for(auto it:map)
             {
                 l_variable& var = it.second.m_variable;
-                
-                if(var.is_ref_obj())
-                    if(var.is_unmarked())
-                    {
-                        var.mark();
-                    }
-                
+                // Mark attrbute
+                if(var.is_ref_obj() && var.is_unmarked())
+                {
+                    var.mark();
+                }
                 //key is static
                 const l_variable& key = it.first;
                 //is a object?
-                if(key.is_ref_obj())
-                    if(key.is_unmarked())
-                    {
-                        //object
-                        l_ref* key_object = key.m_value.m_pobj;
-                        //mark
-                        key_object->mark();
-                    }
+                if(key.is_ref_obj() && key.is_unmarked())
+                {
+                    //object
+                    l_variable* key_object = (l_variable*)&key;
+                    //mark
+                    key_object->mark();
+                }
             }
+        }
     }
     
     //unmark event
@@ -93,27 +92,27 @@ namespace l_language
         l_ref::unmark();
         //mark childs
         for(auto& map:m_maps)
+        {
             for(auto it:map)
             {
                 l_variable& var = it.second.m_variable;
-                
-                if(var.is_ref_obj())
-                    if(var.is_marked())
-                    {
-                        var.unmark();
-                    }
+                // Unmark attrbute
+                if(var.is_ref_obj() && var.is_marked())
+                {
+                    var.unmark();
+                }
                 //key is static
                 const l_variable& key = it.first;
                 //is a object?
-                if(key.is_ref_obj())
-                    if(key.is_marked())
-                    {
-                        //object
-                        l_ref* key_object = key.m_value.m_pobj;
-                        //mark
-                        key_object->unmark();
-                    }
+                if(key.is_ref_obj() && key.is_marked())
+                {
+                    //object
+                    l_variable* key_object = (l_variable*)&key;
+                    //mark
+                    key_object->unmark();
+                }
             }
+        }
     }
     
     //exists def?

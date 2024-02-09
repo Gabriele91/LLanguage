@@ -109,7 +109,7 @@ void interactive_mode()
         // Reset main function
         l_vmruntime.function(main_function_id) = main_function;
         // Clean GC, todo: fix class closer!
-        // l_vmruntime.get_gc().delete_garbage();
+        l_vmruntime.get_gc().delete_garbage();
         std::cout << "> ";
     }
 }

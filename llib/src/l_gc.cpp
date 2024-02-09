@@ -12,6 +12,7 @@
 #include <l_vm.h>
 #include <l_variable.h>
 #include <l_array.h>
+#include <l_xrange.h>
 #include <l_class.h>
 #include <l_object.h>
 #include <l_call_context.h>
@@ -60,6 +61,8 @@ namespace  l_language
                  l_object* object = dynamic_cast< l_object* >(it->m_obj);
                  // Closer
                  l_closer*  closer = dynamic_cast< l_closer* >(it->m_obj);
+                 // Closer
+                 l_xrange*  xrange = dynamic_cast< l_xrange* >(it->m_obj);
                  //print vector
                       if(array)
                         printf("; array[%u]", (unsigned)array->size());
@@ -73,6 +76,8 @@ namespace  l_language
                         printf("; class");
                  else if(closer)
                         printf("; closer");
+                 else if(xrange)
+                        printf("; xrange");
                  //new line
                  printf("\n");
             )
@@ -142,7 +147,6 @@ namespace  l_language
 
     void  l_gc::mark_pool()
     {
-        
         for(auto& thread  : m_vm.m_threads)
         {
             //temporal register
@@ -164,6 +168,15 @@ namespace  l_language
                 {
                     var.mark();
                 }
+            }
+        }
+        // Consts
+        for(auto& function : m_vm.m_functions)
+        for(auto& constant : function->m_costants)
+        {
+            if(constant.is_ref_obj() && constant.is_unmarked())
+            {
+                constant.mark();
             }
         }
     }

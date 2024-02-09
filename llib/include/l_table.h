@@ -66,24 +66,21 @@ namespace l_language
             //mark
             l_ref::mark();
             //mark childs
-            for(auto it:m_map)
+            for(auto& it:m_map)
             {
                 l_variable& var = it.second;
-                
-                if(var.is_ref_obj())
-                if(var.is_unmarked())
+                // Mark attrbute
+                if(var.is_ref_obj() && var.is_unmarked())
                 {
                     var.mark();
-                }
-                
+                } 
                 //key is static
                 const l_variable& key = it.first;
                 //is a object?
-                if(key.is_ref_obj())
-                if(key.is_unmarked())
+                if(key.is_ref_obj() && key.is_unmarked())
                 {
                     //object
-                    l_ref* key_object = key.m_value.m_pobj;
+                    l_variable* key_object = (l_variable*)&key;
                     //mark
                     key_object->mark();
                 }
@@ -101,19 +98,17 @@ namespace l_language
             {
                 l_variable& var = it.second;
                 
-                if(var.is_ref_obj())
-                if(var.is_marked())
+                if(var.is_ref_obj() && var.is_marked())
                 {
                     var.unmark();
                 }
                 //key is static
                 const l_variable& key = it.first;
                 //is a object?
-                if(key.is_ref_obj())
-                if(key.is_marked())
+                if(key.is_ref_obj() && key.is_marked())
                 {
                     //object
-                    l_ref* key_object = key.m_value.m_pobj;
+                    l_variable* key_object = (l_variable*)&key;
                     //mark
                     key_object->unmark();
                 }

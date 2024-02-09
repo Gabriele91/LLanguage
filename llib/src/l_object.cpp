@@ -21,29 +21,27 @@ namespace l_language
         //mark class
         m_class.mark();
         //mark
-        m_raw_pointer.mark();
+        if(m_raw_pointer.is_ref_obj() && m_raw_pointer.is_unmarked())
+            m_raw_pointer.mark();
         //mark fields
-        for(auto it:m_attributes)
+        for(auto& it : m_attributes)
         {
             l_variable& var = it.second.m_variable;
-            
-            if(var.is_ref_obj())
-                if(var.is_unmarked())
-                {
-                    var.mark();
-                }
-            
+            // Mark attrbute
+            if(var.is_ref_obj() && var.is_unmarked())
+            {
+                var.mark();
+            } 
             //key is static
             const l_variable& key = it.first;
             //is a object?
-            if(key.is_ref_obj())
-                if(key.is_unmarked())
-                {
-                    //object
-                    l_ref* key_object = key.m_value.m_pobj;
-                    //mark
-                    key_object->mark();
-                }
+            if(key.is_ref_obj() && key.is_unmarked())
+            {
+                //object
+                l_variable* key_object = (l_variable*)&key;
+                //mark
+                key_object->mark();
+            }
         }
         
     }
@@ -57,28 +55,27 @@ namespace l_language
         //unmark class
         m_class.unmark();
         //unmark
-        m_raw_pointer.unmark();
+        if(m_raw_pointer.is_ref_obj() && m_raw_pointer.is_marked())
+            m_raw_pointer.unmark();
         //unmark fields
         for(auto it:m_attributes)
         {
             l_variable& var = it.second.m_variable;
             //...
-            if(var.is_ref_obj())
-                if(var.is_marked())
-                {
-                    var.unmark();
-                }
+            if(var.is_ref_obj() && var.is_marked())
+            {
+                var.unmark();
+            }
             //key is static
             const l_variable& key = it.first;
             //is a object?
-            if(key.is_ref_obj())
-                if(key.is_marked())
-                {
-                    //object
-                    l_ref* key_object = key.m_value.m_pobj;
-                    //mark
-                    key_object->unmark();
-                }
+            if(key.is_ref_obj() && key.is_marked())
+            {
+                //object
+                l_variable* key_object = (l_variable*)&key;
+                //mark
+                key_object->unmark();
+            }
         }
     }
     

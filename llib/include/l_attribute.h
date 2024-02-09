@@ -3,7 +3,7 @@
 //  LLanguage
 //
 //  Created by Gabriele on 05/07/17.
-//  Copyright © 2016 Gabriele Di Bari. All rights reserved.
+//  Copyright ï¿½ 2016 Gabriele Di Bari. All rights reserved.
 //
 #pragma once
 #include <map>

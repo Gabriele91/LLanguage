@@ -226,6 +226,7 @@ namespace l_language
                    m_type == ITERATOR    ||
                    m_type == CLASS       ||
                    m_type == OBJECT      ||
+                   m_type == CLOSER      ||
                    m_type == COBJECT;
         }
         
@@ -334,6 +335,8 @@ namespace l_language
         l_class* clazz();
         
         l_object* object();
+
+        l_closer* closer();
         
         const l_table* table() const;
         
@@ -346,6 +349,8 @@ namespace l_language
         const l_class* clazz() const;
         
         const l_object* object() const;
+
+        const l_closer* closer() const;
         
         bool is_false()
         {
@@ -386,6 +391,10 @@ namespace l_language
                 return m_value.m_pobj == nullptr;
             }
             if(m_type == OBJECT)
+            {
+                return m_value.m_pobj == nullptr;
+            }
+            if(m_type == CLOSER)
             {
                 return m_value.m_pobj == nullptr;
             }

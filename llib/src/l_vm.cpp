@@ -140,6 +140,9 @@ namespace l_language
             //start
             if(flags & EXECUTE)
             {
+                // Clean errors
+                m_default_thread.m_errors.clear();
+                // Run
                 if(!execute(&m_default_thread))
                 {
                     for(auto& error:m_default_thread.m_errors)
