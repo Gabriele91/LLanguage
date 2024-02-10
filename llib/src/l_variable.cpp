@@ -299,7 +299,7 @@ namespace l_language
     }
 
 
-    bool l_variable::sub(l_variable& var,l_variable& output)
+    bool l_variable::sub(l_variable& var,l_variable& output) const
     {
         if(m_type == LNULL)
         {
@@ -317,7 +317,7 @@ namespace l_language
         return false;
     }
     
-    bool l_variable::mul(l_variable& var,l_variable& output)
+    bool l_variable::mul(l_variable& var,l_variable& output) const
     {
         if(m_type == LNULL)
         {
@@ -337,7 +337,7 @@ namespace l_language
         return false;
     }
     
-    bool l_variable::div(l_variable& var,l_variable& output)
+    bool l_variable::div(l_variable& var,l_variable& output) const
     {
         if(m_type == LNULL)
         {
@@ -357,7 +357,7 @@ namespace l_language
         return false;
     }
     
-    bool l_variable::equal(l_variable& var,l_variable& output)
+    bool l_variable::equal(l_variable& var,l_variable& output) const
     {
         if(m_type == LNULL)
         {
@@ -375,7 +375,7 @@ namespace l_language
         return false;
     }
     
-    bool l_variable::not_equal(l_variable& var,l_variable& output)
+    bool l_variable::not_equal(l_variable& var,l_variable& output) const
     {
         
         if(m_type == LNULL)
@@ -394,42 +394,34 @@ namespace l_language
         return false;
     }
     
-    bool l_variable::unm(l_variable& output)
+    bool l_variable::unm(l_variable& output) const
     {
-        if (m_type == LNULL)
+        switch(m_type)
         {
-            output = l_variable(1);
-            return true;
+            case LNULL:
+                output = l_variable(1);
+                return true;
+            case LBOOL:
+                output = l_variable(!m_value.m_b);
+                return true;
+            case INT:
+                output = l_variable(-m_value.m_i);
+                return true;
+            case FLOAT:
+                output = l_variable(-m_value.m_f);
+                return true;
+            default:
+                return false;
         }
-        
-        if (m_type == LBOOL)
-        {
-            output = l_variable(m_value.m_b ? false : true);
-            return true;
-        }
-        
-        if (m_type == INT)
-        {
-            output = l_variable(-m_value.m_i);
-            return true;
-        }
-        
-        if (m_type == FLOAT)
-        {
-            output = l_variable(-m_value.m_f);
-            return true;
-        }
-        
-        return false;
     }
     
-    bool l_variable::not_value(l_variable& output)
+    bool l_variable::not_value(l_variable& output) const
     {
         output = l_variable(is_false());
         return true;
     }
     
-    bool l_variable::lt (l_variable& var, l_variable& output)
+    bool l_variable::lt (l_variable& var, l_variable& output) const
     {
         if(m_type == LNULL)
         {
@@ -451,8 +443,7 @@ namespace l_language
         return false;
     }
     
-    
-    bool l_variable::le (l_variable& var, l_variable& output)
+    bool l_variable::le (l_variable& var, l_variable& output) const
     {
         if(m_type == LNULL)
         {
@@ -474,7 +465,7 @@ namespace l_language
         return false;
     }
     
-    bool l_variable::rt (l_variable& var, l_variable& output)
+    bool l_variable::rt (l_variable& var, l_variable& output) const
     {
         if(m_type == LNULL)
         {
@@ -496,8 +487,7 @@ namespace l_language
         return false;
     }
     
-    
-    bool l_variable::re (l_variable& var, l_variable& output)
+    bool l_variable::re (l_variable& var, l_variable& output) const
     {
         if(m_type == LNULL)
         {
@@ -519,8 +509,7 @@ namespace l_language
         return false;
     }
     
-    
-    bool l_variable::and_value (l_variable& var, l_variable& output)
+    bool l_variable::and_value (l_variable& var, l_variable& output) const
     {
         if(m_type == LNULL)
         {
@@ -543,8 +532,7 @@ namespace l_language
         return false;
     }
     
-    
-    bool l_variable::or_value (l_variable& var, l_variable& output)
+    bool l_variable::or_value (l_variable& var, l_variable& output) const
     {
         if(m_type == LNULL)
         {
@@ -566,7 +554,7 @@ namespace l_language
         return false;
     }
     
-    bool l_variable::mod (l_variable& var, l_variable& output)
+    bool l_variable::mod (l_variable& var, l_variable& output) const
     {
         if((is_int()  && var.is_int())   ||
            (is_bool() && var.is_bool())  ||

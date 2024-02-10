@@ -71,7 +71,21 @@ namespace l_language
         {
             //none
         }
-        
+
+        l_variable(l_variable&& var)
+        {
+            // Move type
+            m_type = std::move(var.m_type);
+            // Move value
+            m_value = std::move(var.m_value);
+            // Move const delete
+            m_const = std::move(var.m_const);
+            // Reset values
+            var.m_type = LNULL;
+            var.m_value = value { 0 };
+            var.m_const = false;
+        }
+
         l_variable(bool value)
         {
             m_type      = LBOOL;
@@ -164,6 +178,22 @@ namespace l_language
             //const delete
             m_const = value.m_const;
             //strings
+            return *this;
+        }
+
+        l_variable& operator = (l_variable&& var)
+        {
+            //copy type
+            m_type = std::move(var.m_type);
+            //copy value
+            m_value = std::move(var.m_value); 
+            //const delete
+            m_const = std::move(var.m_const);
+            // reset values
+            var.m_type = LNULL;
+            var.m_value = value { 0 };
+            var.m_const = false;
+            //this
             return *this;
         }
         
@@ -352,89 +382,70 @@ namespace l_language
 
         const l_closer* closer() const;
         
-        bool is_false()
+        bool is_false() const
         {
-            if(m_type == LBOOL)
+            switch(m_type)
             {
-                return !m_value.m_b;
+                case LBOOL:
+                    return !m_value.m_b;
+                case LNULL:
+                    return true;
+                case INT:
+                    return m_value.m_i == 0;
+                case FUNCTION:
+                    return m_value.m_fid == 0;
+                case FLOAT:
+                    return m_value.m_f == 0.0;
+                case REF:
+                case STRING:
+                case TABLE:
+                case ARRAY:
+                case ITERATOR:
+                case CLASS:
+                case OBJECT:
+                case CLOSER:
+                case COBJECT:
+                case CFUNCTION:
+                    return m_value.m_pobj == nullptr;
+                default:
+                    return false;
             }
-            if(m_type == LNULL)
-            {
-                return true;
-            }
-            if (m_type == INT)
-            {
-                return m_value.m_i == 0;
-            }
-            if (m_type == FUNCTION)
-            {
-                return m_value.m_fid == 0;
-            }
-            if(m_type == FLOAT)
-            {
-                return m_value.m_f == 0.0;
-            }
-            if(m_type == CFUNCTION)
-            {
-                return m_value.m_pcfun == nullptr;
-            }
-            if(m_type == STRING)
-            {
-                return m_value.m_pobj == nullptr;
-            }
-            if(m_type == ARRAY)
-            {
-                return m_value.m_pobj == nullptr;
-            }
-            if(m_type == TABLE)
-            {
-                return m_value.m_pobj == nullptr;
-            }
-            if(m_type == OBJECT)
-            {
-                return m_value.m_pobj == nullptr;
-            }
-            if(m_type == CLOSER)
-            {
-                return m_value.m_pobj == nullptr;
-            }
-            return false;
         }
         
-        bool is_true()
+        bool is_true() const
         {
             return !is_false();
         }
         
         bool add(l_variable& var,l_variable& output);
         
-        bool sub(l_variable& var,l_variable& output);
+        bool sub(l_variable& var,l_variable& output) const;
         
-        bool mul(l_variable& var,l_variable& output);
+        bool mul(l_variable& var,l_variable& output) const;
         
-        bool div(l_variable& var,l_variable& output);
+        bool div(l_variable& var,l_variable& output) const;
         
-        bool equal(l_variable& var,l_variable& output);
+        bool equal(l_variable& var,l_variable& output) const;
         
-        bool not_equal(l_variable& var,l_variable& output);
+        bool not_equal(l_variable& var,l_variable& output) const;
         
-        bool unm(l_variable& output);
+        bool unm(l_variable& output) const;
         
-        bool not_value(l_variable& output);
+        bool not_value(l_variable& output) const;
         
-        bool lt (l_variable& var, l_variable& output);
+        bool lt (l_variable& var, l_variable& output) const;
         
-        bool le (l_variable& var, l_variable& output);
+        bool le (l_variable& var, l_variable& output) const;
         
-        bool rt (l_variable& var, l_variable& output);
+        bool rt (l_variable& var, l_variable& output) const;
         
-        bool re (l_variable& var, l_variable& output);
+        bool re (l_variable& var, l_variable& output) const;
         
-        bool and_value (l_variable& var, l_variable& output);
+        bool and_value (l_variable& var, l_variable& output) const;
         
-        bool or_value (l_variable& var, l_variable& output);
+        bool or_value (l_variable& var, l_variable& output) const;
         
-        bool mod (l_variable& var, l_variable& output);
+        bool mod (l_variable& var, l_variable& output) const;
         
         
         l_variable operator + (l_variable& var)
@@ -546,12 +557,16 @@ namespace l_language
         
         bool is_marked() const
         {
-            return m_value.m_pobj->is_marked();
+            if (is_ref_obj())
+                return m_value.m_pobj->is_marked();
+            return false;
         }
         
         bool is_unmarked() const
         {
-            return m_value.m_pobj->is_unmarked();
+            if (is_ref_obj())
+                return m_value.m_pobj->is_unmarked();
+            return false;
         }
         
         void mark()
