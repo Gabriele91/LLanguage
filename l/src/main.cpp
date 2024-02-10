@@ -75,7 +75,7 @@ void interactive_mode()
     while (std::getline(std::cin, source_line)) 
     {
         // Append 
-        source_buffer += source_line;
+        source_buffer += source_line + '\n';
         // Compile
         compiler_ouput output = l_vmruntime.compile(source_buffer, 0);
         // Test error
@@ -92,7 +92,7 @@ void interactive_mode()
         else 
         {
             // execute
-            output = l_vmruntime.compile(source_buffer, l_language::l_vm::DUMP | l_language::l_vm::EXECUTE);
+            output = l_vmruntime.compile(source_buffer, l_language::l_vm::EXECUTE);
             // Output errors 
             if(output.m_type & l_language::l_vm::RUNTIME_ERROR)
             {

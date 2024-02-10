@@ -33,6 +33,7 @@ namespace l_language
             // Interactive mode
             case l_syntactic_tree::EXP_NODE:             visit(fun,node->to<l_syntactic_tree::exp_node>());             break;
             case l_syntactic_tree::CONSTANT_NODE:        visit(fun,node->to<l_syntactic_tree::constant_node>());        break;
+            case l_syntactic_tree::FIELD_NODE:           visit(fun,node->to<l_syntactic_tree::field_node>());           break;
             // Unknown
             default: assert(0); break;
         }
