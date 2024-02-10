@@ -4,6 +4,13 @@ project(LLIB)
 # Windows
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
+# Release
+if (MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE "/Ox /OPT:REF")
+else()
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+endif()
+
 # Add a postfix for debug library
 set(CMAKE_DEBUG_POSTFIX d)
 

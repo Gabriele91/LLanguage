@@ -102,6 +102,7 @@ void interactive_mode()
             else if (l_vmruntime.thread(0).size())
             {
                 print_return(l_vmruntime.thread(0).top());
+                l_vmruntime.thread(0).pop();
             }
         }
         // Free source context
@@ -112,6 +113,33 @@ void interactive_mode()
         l_vmruntime.get_gc().delete_garbage();
         std::cout << "> ";
     }
+}
+
+int execute_script(const std::string& i_source, int f_compier_flags) 
+{
+    using l_vmachine       = l_language::l_vm;
+    //compiler object
+    l_vmachine it_compiler;
+    //add libs
+    it_compiler.add_lib(l_language::l_base_lib);
+    it_compiler.add_lib("io",  l_language::l_io_lib);
+    it_compiler.add_lib("os",  l_language::l_os_lib);
+    it_compiler.add_lib("math",l_language::l_math_lib);
+    //read code // "source.it"
+    std::ifstream source_file(i_source);
+    std::string source((std::istreambuf_iterator<char>(source_file)),
+                        (std::istreambuf_iterator<char>()));
+    //compile
+    l_language::l_vm::compiler_ouput compiler_ouput;
+    compiler_ouput = it_compiler.compile(source,f_compier_flags);
+    //ouput:
+    if(compiler_ouput.m_type & l_language::l_vm::ERRORS)
+    {
+        std::cout << "Runtime errors:" << std::endl;
+        std::cout << compiler_ouput.m_errors;
+        return -1;
+    }
+    return 0;
 }
 
 int main(int argc,const char* args[])
@@ -195,31 +223,11 @@ int main(int argc,const char* args[])
     //COMPILER
     if(i_source.size())
     {
-        //compiler object
-        l_vmachine it_compiler;
-        //add libs
-        it_compiler.add_lib(l_language::l_base_lib);
-        it_compiler.add_lib("io",  l_language::l_io_lib);
-        it_compiler.add_lib("os",  l_language::l_os_lib);
-        it_compiler.add_lib("math",l_language::l_math_lib);
-        //read code // "source.it"
-        std::ifstream source_file(i_source);
-        std::string source((std::istreambuf_iterator<char>(source_file)),
-                           (std::istreambuf_iterator<char>()));
-        //compile
-        l_language::l_vm::compiler_ouput compiler_ouput;
-        compiler_ouput = it_compiler.compile(source,f_compier_flags);
-        //ouput:
-        if(compiler_ouput.m_type & l_language::l_vm::ERRORS)
-        {
-            std::cout << "Runtime errors:" << std::endl;
-            std::cout << compiler_ouput.m_errors;
-        }
+        return execute_script(i_source, f_compier_flags);
     }
     else
     {
         interactive_mode();
+        return 0;
     }
-    
-    return 0;
 }

@@ -6,6 +6,13 @@ if (NOT DEFINED LLIB_LIBRARIES OR NOT DEFINED LLIB_INCLUDE_DIR)
     find_package(LLIB REQUIRED)
 endif()
 
+# Release
+if (MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE "/Ox /OPT:REF")
+else()
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+endif()
+
 # Add a postfix for debug library
 set(CMAKE_DEBUG_POSTFIX d)
 
