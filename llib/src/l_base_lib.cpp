@@ -161,6 +161,7 @@ int l_type_of(l_language::l_thread* th,int args)
         case l_language::l_variable::OBJECT:      str ="object";         break;
 		case l_language::l_variable::CLASS:       str ="class";          break;
 		case l_language::l_variable::COBJECT:     str ="cobject";        break;
+		case l_language::l_variable::CLOSER:      str ="closer";         break;
 		default: return -1; break;
     }
     //push type

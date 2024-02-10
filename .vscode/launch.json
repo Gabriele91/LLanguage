@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/install/bin/Ld.exe",
             "args": [
-                "${file}"
+                "-s", "${file}"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
@@ -35,7 +35,7 @@
             "program": "${workspaceFolder}/install/tests/testd.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}/install/tests/",
             "environment": [],
             "console": "externalTerminal"
         }

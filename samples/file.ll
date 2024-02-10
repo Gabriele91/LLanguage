@@ -19,7 +19,7 @@ io.println(str)
 file = io.file()
 file.open("ciao.txt","rb")
 for ( line = file.read_line() i = 1 ;
-      file.is_open() ;
+      length(line) ;
       line = file.read_line() i += 1 )
 {
     io.println( i, " -> ", line )
@@ -39,7 +39,7 @@ for ( key in file )
         io.print("("+key+")",file.get_char())
 }
 
-io.println("")
+io.println("@@@")
 
 file.close()
 

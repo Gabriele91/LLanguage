@@ -101,17 +101,22 @@ public:
     
     bool open(const std::string& file, const std::string& mode)
     {
+        if(is_open()) close();
         m_file = std::fopen(file.c_str(),mode.c_str());
         return m_file != nullptr;
     }
     
     bool write(const std::string& value)
     {
-        return std::fwrite(value.c_str(), value.length(), 1, m_file) == value.length();
+        if(is_open())
+            return std::fwrite(value.c_str(), value.length(), 1, m_file) == 1;
+        return false;
     }
     
     bool close()
     {
+        if(!is_open()) return true;
+        // Close! 
         bool success = std::fclose(m_file);
         m_file = nullptr;
         return success;
@@ -124,6 +129,8 @@ public:
     
     void print()
     {
+        if(!is_open()) return;
+        // Print Contents
         char cbuffer[128]= {'\0'};
         while(std::fread(&cbuffer, sizeof(char), 128, m_file))
         {
@@ -134,6 +141,8 @@ public:
     
     std::string read_char()
     {
+        if(!is_open()) return "";
+        // read a char
         char cbuffer[2]= {'\0'};
         //read
         std::fread(&cbuffer[0], sizeof(char), 1, m_file);
@@ -143,6 +152,8 @@ public:
     
     std::string get_char()
     {
+        if(!is_open()) return "";
+        // read a char
         char cbuffer[2]= {'\0'};
         //read
         if(std::fread(&cbuffer[0], sizeof(char), 1, m_file))
@@ -155,14 +166,13 @@ public:
     
     std::string read_all()
     {
+        if(!is_open()) return "";
         //alloc
         std::stringstream sstr;
         char cbuffer[128]= {'\0'};
         //read
         while(std::fread(&cbuffer[0], sizeof(char), 128, m_file))
             sstr << cbuffer;
-        //close
-        close();
         //return
         return sstr.str();
     }
@@ -175,11 +185,11 @@ public:
         //alloc
         std::vector< unsigned char > buffer(f_size);
         //read
-        if(std::fread(buffer.data(), f_size, 1, m_file))
+        if(std::fread(buffer.data(), f_size, 1, m_file) == 1)
         {
-            close();
+            return buffer;
         }
-        return buffer;
+        return {};
     }
     
     int write_bytes(const  std::vector< unsigned char >& bytes)
@@ -190,21 +200,26 @@ public:
     
     int tell()
     {
+        if(!is_open()) return -1;
         return (int)std::ftell(m_file);
     }
     
     void set(int pos)
     {
+        if(!is_open()) return;
         std::fseek(m_file, pos, SEEK_SET);
     }
     
     void cursor(int pos)
-    {
+    {       
+        if(!is_open()) return;
         std::fseek(m_file, pos, SEEK_CUR);
     }
     
     int size()
-    {
+    {        
+        if(!is_open()) return 0;
+        //get size
         int pos = tell();
         //go to end
         std::fseek(m_file, 0, SEEK_END);
@@ -218,18 +233,21 @@ public:
     
     void rewind()
     {
+        if(!is_open()) return;
         //return to 0
         std::fseek(m_file, 0, SEEK_SET);
     }
     
     bool eof()
     {
+        if(!is_open()) return true;
         //return to 0
         return (bool)std::feof(m_file);
     }
     
     std::string read_line()
     {
+        if(!is_open()) return {};
         //alloc
         std::stringstream sstr;
         char cbuffer = '\0';
@@ -239,8 +257,6 @@ public:
             if(cbuffer&&cbuffer!='\n') sstr << cbuffer;
             else break;
         }
-        //eof?
-        if(eof()) close();
         //return
         return sstr.str();
     }
@@ -389,13 +405,13 @@ namespace l_language
                                   
         static l_language::l_vm::l_extern_libary l_lib=
         {
-            { "print",   l_print                   },
-            { "println", l_println                 },
-            { "input",   l_input                   },
-            { "file",    l_file_class              },
-            { "file_rename",  l_def(rename)        },
-            { "file_remove",  l_def(remove)        },
-            { "file_copy",    l_def(l_file_copy)   }
+            { "print",   l_print              },
+            { "println", l_println            },
+            { "input",   l_input              },
+            { "file",    l_file_class         },
+            { "rename",  l_def(rename)        },
+            { "remove",  l_def(remove)        },
+            { "copy",    l_def(l_file_copy)   }
         };
         //return lib
         return l_lib;
