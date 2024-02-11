@@ -9,6 +9,7 @@ endif()
 # Release
 if (MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "/Ox /OPT:REF")
+    add_definitions("-D_CRT_SECURE_NO_WARNINGS")
 else()
     set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif()

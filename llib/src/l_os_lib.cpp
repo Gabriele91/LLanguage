@@ -6,6 +6,7 @@
 //  Copyright © 2016 Gabriele Di Bari. All rights reserved.
 //
 #include <ctime>
+#include <chrono>
 #include <l_os_lib.h>
 #include <l_string.h>
 #include <l_variable.h>
@@ -56,6 +57,15 @@ int l_time(l_language::l_thread* th, int args)
     return 1;
 }
 
+int l_mstime(l_language::l_thread* th, int args)
+{
+    int mstime = int(std::chrono::duration_cast< std::chrono::milliseconds >(
+        std::chrono::system_clock::now().time()
+    ).count());
+    th->push_return({ mstime });
+    return 1;
+}
+
 namespace l_language
 {
     const l_language::l_vm::l_extern_libary& l_os_lib(l_vm* vm)
@@ -65,7 +75,8 @@ namespace l_language
             { "system" , l_system              },
             { "get_env", l_get_env             },
             { "clock",   l_clock               },
-            { "time",    l_time                }
+            { "time",    l_time                },
+            { "mstime",  l_mstime              }
         };
         return l_lib;
     }
