@@ -12,6 +12,7 @@
 #include <map>
 #include <algorithm>
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <l_syntactic_tree.h>
 //utf 8

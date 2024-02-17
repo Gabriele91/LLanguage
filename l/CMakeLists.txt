@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.10)
 project(L)
 
 if (NOT DEFINED LLIB_LIBRARIES OR NOT DEFINED LLIB_INCLUDE_DIR)
@@ -46,5 +46,5 @@ target_link_libraries(${PROJECT_NAME} ${LLIB_LIBRARIES})
 # Install
 install(
     TARGETS ${PROJECT_NAME}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
 )

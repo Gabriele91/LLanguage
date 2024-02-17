@@ -60,7 +60,7 @@ int l_time(l_language::l_thread* th, int args)
 int l_mstime(l_language::l_thread* th, int args)
 {
     int mstime = int(std::chrono::duration_cast< std::chrono::milliseconds >(
-        std::chrono::system_clock::now().time()
+        std::chrono::system_clock().now().time_since_epoch()
     ).count());
     th->push_return({ mstime });
     return 1;

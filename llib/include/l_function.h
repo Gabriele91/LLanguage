@@ -8,6 +8,7 @@
 #pragma once
 #include <vector>
 #include <memory>
+#include <cstring>
 #include <l_opcode.h>
 #include <l_variable.h>
 #include <l_commands.h>
