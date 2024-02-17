@@ -66,6 +66,20 @@ int l_mstime(l_language::l_thread* th, int args)
     return 1;
 }
 
+int l_exit(l_language::l_thread* th, int args)
+{
+    //have an arg?
+    if (args <= 0) return -1;
+    //get variable
+    auto& command = th->value(0);
+    //isn't a int?
+    if (!command.is_int()) return -1;
+    // Exit
+    exit(command.to_int());
+    // Ok
+    return 0;
+}
+
 namespace l_language
 {
     const l_language::l_vm::l_extern_libary& l_os_lib(l_vm* vm)
@@ -76,7 +90,8 @@ namespace l_language
             { "get_env", l_get_env             },
             { "clock",   l_clock               },
             { "time",    l_time                },
-            { "mstime",  l_mstime              }
+            { "mstime",  l_mstime              },
+            { "exit",    l_exit                }
         };
         return l_lib;
     }
