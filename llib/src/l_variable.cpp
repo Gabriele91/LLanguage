@@ -114,11 +114,11 @@ namespace l_language
             switch (var.m_type)
             {
                 case LNULL:
-                output = (int)0;
+                output = (l_int)0;
                 break;
                 
                 case LBOOL:
-                output = (int)var.m_value.m_b;
+                output = (l_int)var.m_value.m_b;
                 break;
                 
                 case INT:
@@ -143,11 +143,11 @@ namespace l_language
             switch (var.m_type)
             {
                 case LNULL:
-                output = (int) (m_value.m_b);
+                output = (l_int) (m_value.m_b);
                 break;
                 
                 case LBOOL:
-                output = (int) (m_value.m_b + var.m_value.m_b);
+                output = (l_int) ((l_int)m_value.m_b + (l_int)var.m_value.m_b);
                 break;
                 
                 case INT:
@@ -205,11 +205,11 @@ namespace l_language
                 break;
                 
                 case LBOOL:
-                output = m_value.m_f + (float)var.m_value.m_b;
+                output = m_value.m_f + (l_float)var.m_value.m_b;
                 break;
                 
                 case INT:
-                output = m_value.m_f + (float)var.m_value.m_i;
+                output = m_value.m_f + (l_float)var.m_value.m_i;
                 break;
                 
                 case FLOAT:
@@ -262,36 +262,36 @@ namespace l_language
         }
     }
     
-#define math_op(OP)\
+#define math_op(OP,bool_cast)\
     switch (m_type)\
     {\
         case LBOOL:\
         switch (var.m_type)\
         {\
-            case LNULL: output =         m_value.m_b  OP false; break;\
-            case LBOOL: output =         m_value.m_b  OP var.m_value.m_b; break;\
-            case INT:   output = ((int)  m_value.m_b) OP var.m_value.m_i; break;\
-            case FLOAT: output = ((float)m_value.m_b) OP var.m_value.m_f; break;\
+            case LNULL: output = (bool_cast)m_value.m_b    OP (bool_cast)false;           break;\
+            case LBOOL: output = (bool_cast)m_value.m_b    OP (bool_cast)var.m_value.m_b; break;\
+            case INT:   output = ((l_int)m_value.m_b)   OP var.m_value.m_i; break;\
+            case FLOAT: output = ((l_float)m_value.m_b) OP var.m_value.m_f; break;\
             default: return false; break; \
         }\
         return true;\
         case INT:\
         switch (var.m_type)\
         {\
-            case LNULL: output = m_value.m_i          OP 0;                      break;\
-            case LBOOL: output = m_value.m_i          OP ((int)var.m_value.m_b); break;\
-            case INT: output   = m_value.m_i          OP var.m_value.m_i;        break;\
-            case FLOAT: output = ((float)m_value.m_i) OP var.m_value.m_f;        break;\
+            case LNULL: output = m_value.m_i            OP (l_int)0;                 break;\
+            case LBOOL: output = m_value.m_i            OP ((l_int)var.m_value.m_b); break;\
+            case INT: output   = m_value.m_i            OP var.m_value.m_i;          break;\
+            case FLOAT: output = ((l_float)m_value.m_i) OP var.m_value.m_f;          break;\
             default: return false;  break;\
         }\
         return true;\
         case FLOAT:\
         switch (var.m_type)\
         {\
-            case LNULL: output = m_value.m_f OP 0.0f; break;\
-            case LBOOL: output = m_value.m_f OP ((float)var.m_value.m_b); break;\
-            case INT:   output = m_value.m_f OP var.m_value.m_i; break;\
-            case FLOAT: output = m_value.m_f OP var.m_value.m_f;  break;\
+            case LNULL: output = m_value.m_f OP (l_float)0.0f;              break;\
+            case LBOOL: output = m_value.m_f OP ((l_float)var.m_value.m_b); break;\
+            case INT:   output = m_value.m_f OP var.m_value.m_i;            break;\
+            case FLOAT: output = m_value.m_f OP var.m_value.m_f;            break;\
             default:   return false;  break;\
         }\
         return true;\
@@ -305,15 +305,15 @@ namespace l_language
         {
             switch (var.m_type)
             {
-                case LNULL: output = (int)0; break;
-                case LBOOL: output = -((int)var.m_value.m_b); break;
+                case LNULL: output = (l_int)0; break;
+                case LBOOL: output = -((l_int)var.m_value.m_b); break;
                 case INT:   output = -var.m_value.m_i; break;
                 case FLOAT: output = -var.m_value.m_f; break;
                 default: return false;
             }
             return true;
         }
-        math_op( - )
+        math_op( -, l_int )
         return false;
     }
     
@@ -327,13 +327,13 @@ namespace l_language
                 case LBOOL:
                 case INT:
                 case FLOAT:
-                    output = (int)0;
+                    output = (l_int)0;
                     return true;
                 default:
                     return false;
             }
         }
-        math_op( * )
+        math_op( *, l_int )
         return false;
     }
     
@@ -347,13 +347,13 @@ namespace l_language
                 case LBOOL:
                 case INT:
                 case FLOAT:
-                    output = (int)0;
+                    output = (l_int)0;
                     return true;
                 default:
                     return false;
             }
         }
-        math_op( / )
+        math_op( /, l_int )
         return false;
     }
     
@@ -369,7 +369,7 @@ namespace l_language
             output = l_variable(string()->str() == var.string()->str());
             return true;
         }
-        else math_op( == )
+        else math_op( ==, bool )
             
         output = false;
         return false;
@@ -388,7 +388,7 @@ namespace l_language
             output = l_variable(string()->str() != var.string()->str());
             return true;
         }
-        else math_op( != )
+        else math_op( !=, bool )
         
         output = false;
         return false;
@@ -399,7 +399,7 @@ namespace l_language
         switch(m_type)
         {
             case LNULL:
-                output = l_variable(1);
+                output = l_variable(l_int(1));
                 return true;
             case LBOOL:
                 output = l_variable(!m_value.m_b);
@@ -428,16 +428,16 @@ namespace l_language
             switch (var.m_type)
             {
                 case LNULL: output = false; break;
-                case LBOOL: output = false < var.m_value.m_b; break;
-                case INT:   output = 0     < var.m_value.m_i; break;
-                case FLOAT: output = 0.0f  < var.m_value.m_f; break;
+                case LBOOL: output = false          < var.m_value.m_b; break;
+                case INT:   output = (l_int)0       < var.m_value.m_i; break;
+                case FLOAT: output = (l_float)0.0f  < var.m_value.m_f; break;
                 default:
                     output = false;
                     return false;
             }
             return true;
         }
-        else math_op( < )
+        else math_op( <, bool )
             
         output = false;
         return false;
@@ -451,15 +451,15 @@ namespace l_language
             {
                 case LNULL: output = true; break;
                 case LBOOL: output = true; break;
-                case INT:   output = 0     <= var.m_value.m_i; break;
-                case FLOAT: output = 0.0f  <= var.m_value.m_f; break;
+                case INT:   output = (l_int)0       <= var.m_value.m_i; break;
+                case FLOAT: output = (l_float)0.0f  <= var.m_value.m_f; break;
                 default:
                     output = false;
                     return false;
             }
             return true;
         }
-        else math_op( <= )
+        else math_op( <=, bool )
             
         output = false;
         return false;
@@ -473,15 +473,15 @@ namespace l_language
             {
                 case LNULL: output = false; break;
                 case LBOOL: output = false; break;
-                case INT:   output = 0     > var.m_value.m_i; break;
-                case FLOAT: output = 0.0f  > var.m_value.m_f; break;
+                case INT:   output = (l_int)0       > var.m_value.m_i; break;
+                case FLOAT: output = (l_float)0.0f  > var.m_value.m_f; break;
                 default:
                     output = false;
                     return false;
             }
             return true;
         }
-        else math_op( > )
+        else math_op( >, bool )
             
         output = false;
         return false;
@@ -495,15 +495,15 @@ namespace l_language
             {
                 case LNULL: output = true; break;
                 case LBOOL: output = true; break;
-                case INT:   output = 0     >= var.m_value.m_i; break;
-                case FLOAT: output = 0.0f  >= var.m_value.m_f; break;
+                case INT:   output = (l_int)0       >= var.m_value.m_i; break;
+                case FLOAT: output = (l_float)0.0f  >= var.m_value.m_f; break;
                 default:
                     output = false;
                     return false;
             }
             return true;
         }
-        else math_op( >= )
+        else math_op( >=, bool )
             
         output = false;
         return false;
@@ -526,7 +526,7 @@ namespace l_language
                     return false;
             }
         }
-        else math_op( && )
+        else math_op( &&, bool )
             
         output = false;
         return false;
@@ -540,15 +540,15 @@ namespace l_language
             {
                 case LNULL: output = false; break;
                 case LBOOL: output = var.m_value.m_b; break;
-                case INT:   output = var.m_value.m_i != 0; break;
-                case FLOAT: output = var.m_value.m_f != 0.0; break;
+                case INT:   output = var.m_value.m_i != (l_int)0; break;
+                case FLOAT: output = var.m_value.m_f != (l_float)0.0; break;
                 default:
                     output = false;
                     return false;
             }
             return true;
         }
-        else math_op( || )
+        else math_op( ||, bool )
         
         output = false;
         return false;

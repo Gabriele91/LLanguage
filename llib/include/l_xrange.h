@@ -19,9 +19,9 @@ namespace l_language
     class l_xrange_it : public l_iterator
     {
         //attributes
-        int m_current_index { 0 };
-        int m_end_index     { 0 };
-        int m_step_index    { 0 };
+        l_int m_current_index { 0 };
+        l_int m_end_index     { 0 };
+        l_int m_step_index    { 0 };
         //friend class
         friend class l_xrange;
         friend class l_gc;
@@ -63,7 +63,7 @@ namespace l_language
             return  vm.get_gc().new_obj< l_xrange_it >(init,end,step);
         }
         
-        l_xrange_it(int init,int end,int step)
+        l_xrange_it(l_int init,l_int end,l_int step)
         {
             m_current_index = init;
             m_end_index     = end;
@@ -141,7 +141,7 @@ namespace l_language
             m_step_index   = step;
         }
         
-        static l_variable gc_new(l_gc* gc,l_variable init,l_variable end,l_variable step = 1)
+        static l_variable gc_new(l_gc* gc,l_variable init,l_variable end,l_variable step = l_int(1))
         {
             return  gc->new_obj< l_xrange >(init,end,step);
         }
@@ -151,7 +151,7 @@ namespace l_language
             return  gc->new_obj< l_xrange >(init,end,step);
         }
         
-        static l_variable gc_new(l_gc& gc,l_variable init,l_variable end,l_variable step = 1)
+        static l_variable gc_new(l_gc& gc,l_variable init,l_variable end,l_variable step = l_int(1))
         {
             return  gc.new_obj< l_xrange >(init,end,step);
         }
@@ -161,7 +161,7 @@ namespace l_language
             return  gc.new_obj< l_xrange >(init,end,step);
         }
         
-        static l_variable gc_new(l_vm* vm,l_variable init,l_variable end,l_variable step = 1)
+        static l_variable gc_new(l_vm* vm,l_variable init,l_variable end,l_variable step = l_int(1))
         {
             return  gc_new(vm->get_gc(),init,end,step);
         }
@@ -171,7 +171,7 @@ namespace l_language
             return  gc_new(vm->get_gc(),init,end,step);
         }
         
-        static l_variable gc_new(l_vm& vm,l_variable init,l_variable end,l_variable step = 1)
+        static l_variable gc_new(l_vm& vm,l_variable init,l_variable end,l_variable step = l_int(1))
         {
             return  gc_new(vm.get_gc(),init,end,step);
         }

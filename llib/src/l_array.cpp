@@ -55,7 +55,7 @@ namespace l_language
             return -1;
         }
         //push size
-        thread->push_return({(int)thiz.array()->size()});
+        thread->push_return({(l_int)thiz.array()->size()});
         //return
         return 1;
     }

@@ -252,7 +252,7 @@ namespace l_language
         {
             l_array::l_pool_object_list_it begin = m_vector->m_pool.begin();
             auto difference = std::distance(begin,m_iterator);
-            return l_variable((int)difference);
+            return l_variable((l_int)difference);
         }
         
         virtual bool valid() const

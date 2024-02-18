@@ -18,14 +18,14 @@ int l_to_int(l_language::l_thread* th,int args)
     //get arg
     l_language::l_variable& var = th->value(0);
     //cast
-    int i = 0;
+     l_language::l_int i = 0;
     //cast
     switch (var.m_type)
     {
         case l_language::l_variable::LNULL: i = 0; break;
         case l_language::l_variable::LBOOL: i = var.m_value.m_b ? 1 : 0; break;
         case l_language::l_variable::INT: i = var.m_value.m_i; break;
-        case l_language::l_variable::FLOAT: i = (int)var.m_value.m_f; break;
+        case l_language::l_variable::FLOAT: i = (l_language::l_int)var.m_value.m_f; break;
         case l_language::l_variable::STRING: i = std::atoi(var.string()->c_str()); break;
         default: return -1; break;
     }
@@ -46,9 +46,9 @@ int l_to_float(l_language::l_thread* th,int args)
     {
         case l_language::l_variable::LNULL: f = 0.0f; break;
         case l_language::l_variable::LBOOL: f = var.m_value.m_b ? 1.0f : 0.0f; break;
-        case l_language::l_variable::INT: f = (float)var.m_value.m_i; break;
+        case l_language::l_variable::INT: f = (l_language::l_float)var.m_value.m_i; break;
         case l_language::l_variable::FLOAT: f = var.m_value.m_f; break;
-        case l_language::l_variable::STRING: f = (float)std::atof(var.string()->c_str()); break;
+        case l_language::l_variable::STRING: f = (l_language::l_float)std::atof(var.string()->c_str()); break;
         default: return -1; break;
     }
     //push string
@@ -79,9 +79,9 @@ int l_range(l_language::l_thread* th,int args)
     //alloc
     l_language::l_variable array = l_language::l_array::gc_new(th->get_gc());
     //add values
-    for(int value  = start;
-            value != stop;
-            value += step)
+    for(l_language::l_int value  = start;
+                          value != stop;
+                          value += step)
     {
         array.to<l_language::l_array>()->push({ value });
     }
@@ -230,9 +230,9 @@ int l_length(l_language::l_thread* th, int args)
     //typs
     switch (arg.m_type)
     {
-        case l_language::l_variable::STRING: th->push_return({(int)arg.string()->str().length()});  break;
-        case l_language::l_variable::ARRAY:  th->push_return({(int)arg.array()->size()});           break;
-        case l_language::l_variable::TABLE:  th->push_return({(int)arg.table()->size()});           break;
+        case l_language::l_variable::STRING: th->push_return({(l_language::l_int)arg.string()->str().length()});  break;
+        case l_language::l_variable::ARRAY:  th->push_return({(l_language::l_int)arg.array()->size()});           break;
+        case l_language::l_variable::TABLE:  th->push_return({(l_language::l_int)arg.table()->size()});           break;
         default: return -1; break;
     }
     return 1;

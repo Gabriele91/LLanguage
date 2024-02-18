@@ -18,8 +18,8 @@ void print_return(const l_language::l_variable& var)
     {
       //case l_language::l_variable::LNULL: printf("null\n"); break;
         case l_language::l_variable::LBOOL: printf("%s\n",var.m_value.m_b?"true":"false"); break;
-        case l_language::l_variable::INT: printf("%d\n",var.m_value.m_i); break;
-        case l_language::l_variable::FLOAT: printf("%g\n",var.m_value.m_f); break;
+        case l_language::l_variable::INT: printf(l_int_printf_tag "\n",var.m_value.m_i); break;
+        case l_language::l_variable::FLOAT: printf(l_float_printf_tag "\n",var.m_value.m_f); break;
         case l_language::l_variable::STRING:
         {
             printf("%s\n",var.string()->c_str());

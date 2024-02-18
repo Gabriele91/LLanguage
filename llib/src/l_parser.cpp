@@ -276,7 +276,7 @@ namespace l_language
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //parser of a unsigned int number
-    bool l_parser::parse_uint_number(const char*& c, unsigned int& i)
+    bool l_parser::parse_uint_number(const char*& c, l_int& ui)
     {
         std::string number;
         
@@ -284,14 +284,14 @@ namespace l_language
         
         if (number.size())
         {
-            std::istringstream(number) >> i;
+            std::istringstream(number) >> ui;
             return true;
         }
         
         return false;
     }
     //parser of a int number
-    bool l_parser::parse_int_number(const char*& c, int& i)
+    bool l_parser::parse_int_number(const char*& c, l_int& i)
     {
         std::string number;
         //minus
@@ -313,7 +313,7 @@ namespace l_language
         return false;
     }
     //parser float
-    bool l_parser::parse_ufloat_number(const char*& c, float& i)
+    bool l_parser::parse_ufloat_number(const char*& c, l_float& f)
     {
         std::string number;
         //before point
@@ -328,13 +328,13 @@ namespace l_language
         //return float
         if (number.size())
         {
-            std::istringstream(number) >> i;
+            std::istringstream(number) >> f;
             return true;
         }
         //not valid
         return false;
     }
-    bool l_parser::parse_float_number(const char*& c, float& i)
+    bool l_parser::parse_float_number(const char*& c, l_float& f)
     {
         std::string number;
         //minus
@@ -353,7 +353,7 @@ namespace l_language
         //return float
         if (number.size())
         {
-            std::istringstream(number) >> i;
+            std::istringstream(number) >> f;
             return true;
         }
         //not valid

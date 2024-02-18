@@ -27,6 +27,17 @@ namespace l_language
     class l_object;
     typedef int (*l_cfunction) (l_thread*,int args);
     typedef unsigned int l_function_id;
+    #ifdef L_SINGLE_PRECISION
+        typedef int l_int; 
+        typedef float l_float; 
+        #define l_int_printf_tag "%d"
+        #define l_float_printf_tag "%g"
+    #else
+        typedef long long l_int; 
+        typedef double l_float; 
+        #define l_int_printf_tag "%lld"
+        #define l_float_printf_tag "%g"
+    #endif
     //variable
     class l_variable
     {
@@ -55,8 +66,8 @@ namespace l_language
         union value
         {
             bool          m_b;
-            int   	      m_i;
-            float  	 	  m_f;
+            l_int   	  m_i;
+            l_float  	  m_f;
             l_ref*        m_pobj;
             l_cfunction   m_pcfun;
             l_function_id m_fid;
@@ -92,13 +103,13 @@ namespace l_language
             m_value.m_b = value;
         }
         
-        l_variable(int i)
+        l_variable(l_int i)
         {
             m_type      = INT;
             m_value.m_i = i;
         }
         
-        l_variable(float f)
+        l_variable(l_float f)
         {
             m_type      = FLOAT;
             m_value.m_f = f;
@@ -290,22 +301,22 @@ namespace l_language
             return m_type == CFUNCTION;
         }
         
-        int to_int() const
+        l_int to_int() const
         {
                   if(is_int())   return m_value.m_i;
-            else if(is_float())  return (int)m_value.m_f;
-            else if(is_bool())   return (int)m_value.m_b;
+            else if(is_float())  return (l_int)m_value.m_f;
+            else if(is_bool())   return (l_int)m_value.m_b;
             else if(is_null())   return 0;
             //bad cast
 			return m_value.m_i;
         }
         
-        float to_float() const
+        l_float to_float() const
         {
-                 if(is_float()) return        m_value.m_f;
-            else if(is_int())   return (float)m_value.m_i;
-            else if(is_bool())  return (float)m_value.m_b;
-            else if(is_null())  return 0.0f;
+                 if(is_float()) return          m_value.m_f;
+            else if(is_int())   return (l_float)m_value.m_i;
+            else if(is_bool())  return (l_float)m_value.m_b;
+            else if(is_null())  return (l_float)0.0f;
             //bad cast
             return m_value.m_f;
         }

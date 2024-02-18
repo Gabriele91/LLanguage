@@ -23,8 +23,8 @@ int l_print(l_language::l_thread* th,int args)
         {
             case l_language::l_variable::LNULL: printf("null"); break;
             case l_language::l_variable::LBOOL: printf("%s",var.m_value.m_b?"true":"false"); break;
-            case l_language::l_variable::INT: printf("%d",var.m_value.m_i); break;
-            case l_language::l_variable::FLOAT: printf("%g",var.m_value.m_f); break;
+            case l_language::l_variable::INT: printf(l_int_printf_tag,var.m_value.m_i); break;
+            case l_language::l_variable::FLOAT: printf(l_float_printf_tag,var.m_value.m_f); break;
             case l_language::l_variable::STRING:
             {
                 printf("%s",var.string()->c_str());
@@ -312,7 +312,7 @@ public:
         //set pos
         m_file->set(m_cursor);
         //tell
-        return m_file->tell();
+        return (l_language::l_int)m_file->tell();
     }
     
     void next()

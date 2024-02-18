@@ -76,9 +76,9 @@ inline bool test_array(l_language::l_variable& var,std::vector<l_language::l_var
     return true;
 }
 
-inline int gauss(int rand)
+inline l_language::l_int gauss(l_language::l_int rand)
 {
-    int success_values = rand*(rand+1) / 2;
+    l_language::l_int success_values = rand*(rand+1) / 2;
     return success_values;
 }
 
@@ -150,24 +150,24 @@ int main()
     TEST_TYPE_OF("is int",   // test name
                  int_test,   // function
                  INT,        // return type
-                 0           // args
+                 l_language::l_int(0) // args
                  );
     
     TEST_TYPE_OF("is float",   // test name
                  float_test,   // function
                  FLOAT,        // return type
-                 0             // args
+                 l_language::l_int(0) // args
                  );
     TEST_TYPE_OF("is string",  // test name
                  string_test,  // function
                  STRING,       // return type
-                 0             // args
+                 l_language::l_int(0) // args
                  );
     
     std::vector<l_language::l_variable> array_test_values =
     {
-        1.2f,
-        3,
+        l_language::l_float(1.2f),
+        l_language::l_int(3),
         l_language::l_string::const_new(it_compiler.get_gc(), "hello"),
         l_language::l_string::const_new(it_compiler.get_gc(), "l"),
         l_language::l_string::const_new(it_compiler.get_gc(), "language")
@@ -176,11 +176,11 @@ int main()
     TEST_ARRAY("generic test array",  // test name
                array_test,            // function
                array_test_values,     // return
-               0                      // args
+               l_language::l_int(0)   // args
                );
     
     //1-100
-    int range_values = rand() % 100 + 1;
+    l_language::l_int range_values = rand() % 100 + 1;
     
     TEST("for range(len) rand",    // test name
          for_range_1_rand,         // function
@@ -190,13 +190,13 @@ int main()
     
     TEST("for like c rand",        // test name
          for_c_like,               // function
-         90,                       // return
-         0                         // args
+         l_language::l_int(90),    // return
+         l_language::l_int(0)      // args
          );
 
     
     //0-(range_values-1)
-    int start_values = rand() % range_values - 1 ;
+    l_language::l_int start_values = rand() % range_values - 1 ;
     
     TEST("for range(start,len) rand",                    // test name
          for_range_2_rand,                               // function
@@ -206,18 +206,18 @@ int main()
     
     std::vector<l_language::l_variable> array_range_values =
     {
-        1,
-        3
+        l_language::l_int(1),
+        l_language::l_int(3),
     };
     
     TEST_ARRAY("range(start,len,step)",  // test name
          range_3,                        // function
          array_range_values,             // return
-         1,5,2                           // args
+         l_language::l_int(1), l_language::l_int(5), l_language::l_int(2) // args
          );
     
     //lambda calc test
-    int rand_l_c_1 = rand() % 100 - 1 ;
+    l_language::l_int rand_l_c_1 = rand() % 100 - 1 ;
     
     TEST("lambda calc 1",   // test name
           lambda_calc_1,    // function
@@ -225,10 +225,10 @@ int main()
           rand_l_c_1        // args
          );
     
-    int rand_l_2_n   = rand() % 100 - 1 ;
-    int rand_l_2_c   = rand() % 100 - 1 ;
-    int rand_l_2_d   = rand() % 100 - 1 ;
-    int rand_l_2_ret = rand_l_2_n*(rand_l_2_c+rand_l_2_d);
+    l_language::l_int rand_l_2_n   = rand() % 100 - 1 ;
+    l_language::l_int rand_l_2_c   = rand() % 100 - 1 ;
+    l_language::l_int rand_l_2_d   = rand() % 100 - 1 ;
+    l_language::l_int rand_l_2_ret = rand_l_2_n*(rand_l_2_c+rand_l_2_d);
     
     TEST("lambda calc 2",                   // test name
          lambda_calc_2,                     // function

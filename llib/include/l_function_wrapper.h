@@ -35,7 +35,7 @@ namespace l_language
                 thread->push_error( l_exception_to_int(thread,"can't cast value to int") );
                 success = false;
             }
-            return thread->value(n).to_int();
+            return (int)thread->value(n).to_int();
         }
         
         template < >
@@ -57,7 +57,7 @@ namespace l_language
                 thread->push_error( l_exception_to_float(thread,"can't cast value to float") );
                 success = false;
             }
-            return thread->value(n).to_float();
+            return (float)thread->value(n).to_float();
         }
         
         template < >
@@ -115,23 +115,41 @@ namespace l_language
         {
             thread->push_return( l_variable(value) );
         }
+
+        template < >
+        inline void l_return(l_language::l_thread* thread,const int& value)
+        {
+            thread->push_return( l_variable((l_int)value) );
+        }
+
+        template < >
+        inline void l_return(l_language::l_thread* thread,const long long& value)
+        {
+            thread->push_return( l_variable((l_int)value) );
+        }
+        
+        template < >
+        inline void l_return(l_language::l_thread* thread,const float& value)
+        {
+            thread->push_return( l_variable((l_float)value) );
+        }
         
         template < >
         inline void l_return(l_language::l_thread* thread,const double& value)
         {
-            thread->push_return( l_variable((float)value) );
+            thread->push_return( l_variable((l_float)value) );
         }
         
         template < >
         inline void l_return(l_language::l_thread* thread,const long& value)
         {
-            thread->push_return( l_variable((int)value) );
+            thread->push_return( l_variable((l_int)value) );
         }
         
         template < >
         inline void l_return(l_language::l_thread* thread,const size_t& value)
         {
-            thread->push_return( l_variable((int)value) );
+            thread->push_return( l_variable((l_int)value) );
         }
         
         template < >

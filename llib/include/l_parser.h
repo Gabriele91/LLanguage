@@ -14,6 +14,7 @@
 #include <string>
 #include <cstring>
 #include <sstream>
+#include <l_variable.h>
 #include <l_syntactic_tree.h>
 //utf 8
 #define UTF_8_CODE
@@ -237,12 +238,12 @@ namespace l_language
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		//parser
 		//parser of a unsigned int number
-        static bool parse_uint_number(const char*& c, unsigned int& i);
+        static bool parse_uint_number(const char*& c, l_int& i);
 		//parser of a int number
-        static bool parse_int_number(const char*& c, int& i);
+        static bool parse_int_number(const char*& c, l_int& i);
 		//parser float
-        static bool parse_ufloat_number(const char*& c, float& i);
-        static bool parse_float_number(const char*& c, float& i);
+        static bool parse_ufloat_number(const char*& c, l_float& i);
+        static bool parse_float_number(const char*& c, l_float& i);
 		//parser of a string
         bool parse_cstring(const char* in, const char** cout, std::string& out,bool count_lines = true);
 		//parsing a name (variable/keyword)
@@ -271,24 +272,24 @@ namespace l_language
             //costant int
             else if (is_int_number(ptr))
             {
-                int value = 0;
+                l_int value = 0;
                 if (!parse_int_number(ptr, value))
                 {
                     push_error("not valid int costant", is_incomplete_or(ptr));
                     return false;
                 }
-                node = l_syntactic_tree::constant((int)value, m_line);
+                node = l_syntactic_tree::constant((l_int)value, m_line);
             }
             //costant float
             else if (is_float_number(ptr))
             {
-                float value = 0;
+                l_float value = 0;
                 if (!parse_float_number(ptr, value))
                 {
                     push_error("not valid float costant", is_incomplete_or(ptr));
                     return false;
                 }
-                node = l_syntactic_tree::constant(value, m_line);
+                node = l_syntactic_tree::constant((l_float)value, m_line);
             }
 			//costant string
 			else if (is_start_string(*ptr))

@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <array>
+#include <l_variable.h>
 
 namespace l_language
 {
@@ -600,9 +601,9 @@ namespace l_language
 			{
 				union
 				{
-					float m_float{ 0 };
-					int   m_int;
-                    bool  m_bool;
+					l_float m_float{ 0 };
+					l_int   m_int;
+                    bool    m_bool;
 				};
 				std::string m_string;
 			};
@@ -984,7 +985,7 @@ namespace l_language
 		}
 
         //constant
-        static constant_node* constant(int value, size_t line = 0, size_t ichar = 0)
+        static constant_node* constant(l_int value, size_t line = 0, size_t ichar = 0)
         {
             auto* node = new constant_node;
             node->m_value.m_int = value;
@@ -993,7 +994,7 @@ namespace l_language
             node->m_char = ichar;
             return node;
         }
-		static constant_node* constant(float value, size_t line = 0, size_t ichar = 0)
+		static constant_node* constant(l_float value, size_t line = 0, size_t ichar = 0)
 		{
 			auto* node = new constant_node;
 			node->m_value.m_float = value;
@@ -1026,7 +1027,7 @@ namespace l_language
         static constant_node* constant_null(size_t line = 0, size_t ichar = 0)
         {
             auto* node = new constant_node;
-            node->m_value.m_int = 0;
+            node->m_value.m_int = (l_int)0;
             node->m_const_type = constant_node::constant_type::CNULL;
             node->m_line = line;
             node->m_char = ichar;

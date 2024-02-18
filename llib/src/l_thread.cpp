@@ -198,7 +198,7 @@ namespace l_language
                 case L_PUSH_NULL:  push( l_variable() );          break;
                 case L_PUSH_TRUE:  push( l_variable(true) );      break;
                 case L_PUSH_FALSE: push( l_variable(false) );     break;
-                case L_PUSH_INT:   push( l_variable(cmp.m_arg) ); break;
+                case L_PUSH_INT:   push( l_variable(l_language::l_int(cmp.m_arg)) ); break;
                 case L_PUSHK:      push( vconst(cmp.m_arg) );     break;
                 case L_CLOSER:
                 {
